@@ -48,7 +48,7 @@ export const analyzeDetection = createServerFn({ method: "POST" })
         treatment_chemical: result.treatment_chemical,
         prevention: result.prevention,
         summary: result.summary,
-        raw: result as unknown as Record<string, unknown>,
+        raw: JSON.parse(JSON.stringify(result)),
       })
       .select("id")
       .single();
