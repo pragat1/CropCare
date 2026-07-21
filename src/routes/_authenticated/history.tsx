@@ -38,7 +38,7 @@ function HistoryPage() {
           </Card>
         )}
         {q.data?.map((d) => (
-          <Link key={d.id} to="/app/detection/$id" params={{ id: d.id }}>
+          <Link key={d.id} to="/detection/$id" params={{ id: d.id }}>
             <Card className="p-4 flex items-center gap-4 hover:shadow-[var(--shadow-soft)] transition">
               <div className={`grid place-items-center w-11 h-11 rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}>
                 {d.is_healthy ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}

@@ -48,7 +48,7 @@ function DetectionPage() {
       qc.invalidateQueries({ queryKey: ["history"] });
       qc.invalidateQueries({ queryKey: ["recent-detections"] });
       toast.success("Detection deleted");
-      navigate({ to: "/app/history" });
+      navigate({ to: "/history" });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Delete failed"),
   });
@@ -62,7 +62,7 @@ function DetectionPage() {
 
   return (
     <AppShell>
-      <Link to="/app/history" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
+      <Link to="/history" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
         <ArrowLeft className="h-4 w-4" /> Back to history
       </Link>
 

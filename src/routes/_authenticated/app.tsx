@@ -61,7 +61,7 @@ function DetectPage() {
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ["recent-detections"] });
       qc.invalidateQueries({ queryKey: ["history"] });
-      navigate({ to: "/app/detection/$id", params: { id } });
+      navigate({ to: "/detection/$id", params: { id } });
     },
     onError: (e) => {
       toast.error(e instanceof Error ? e.message : "Analysis failed");
@@ -145,7 +145,7 @@ function DetectPage() {
               </Card>
             )}
             {recent.data?.map((d) => (
-              <Link key={d.id} to="/app/detection/$id" params={{ id: d.id }}>
+              <Link key={d.id} to="/detection/$id" params={{ id: d.id }}>
                 <Card className="p-4 flex items-center gap-3 hover:shadow-[var(--shadow-soft)] transition-shadow">
                   <div className={`grid place-items-center w-10 h-10 rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}>
                     {d.is_healthy ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
@@ -158,7 +158,7 @@ function DetectPage() {
                 </Card>
               </Link>
             ))}
-            <Link to="/app/history"><Button variant="ghost" className="w-full">View all history →</Button></Link>
+            <Link to="/history"><Button variant="ghost" className="w-full">View all history →</Button></Link>
           </div>
         </div>
       </div>

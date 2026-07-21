@@ -21,7 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const tabs = [
     { to: "/app", label: "Detect", icon: ScanLine },
-    { to: "/app/history", label: "History", icon: History },
+    { to: "/history", label: "History", icon: History },
   ] as const;
 
   return (
