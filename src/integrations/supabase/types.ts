@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      detections: {
+        Row: {
+          causes: Json | null
+          confidence: number | null
+          created_at: string
+          crop: string
+          disease: string | null
+          id: string
+          image_path: string
+          is_healthy: boolean
+          prevention: Json | null
+          raw: Json | null
+          severity: string | null
+          summary: string | null
+          symptoms: Json | null
+          treatment_chemical: Json | null
+          treatment_organic: Json | null
+          user_id: string
+        }
+        Insert: {
+          causes?: Json | null
+          confidence?: number | null
+          created_at?: string
+          crop: string
+          disease?: string | null
+          id?: string
+          image_path: string
+          is_healthy?: boolean
+          prevention?: Json | null
+          raw?: Json | null
+          severity?: string | null
+          summary?: string | null
+          symptoms?: Json | null
+          treatment_chemical?: Json | null
+          treatment_organic?: Json | null
+          user_id: string
+        }
+        Update: {
+          causes?: Json | null
+          confidence?: number | null
+          created_at?: string
+          crop?: string
+          disease?: string | null
+          id?: string
+          image_path?: string
+          is_healthy?: boolean
+          prevention?: Json | null
+          raw?: Json | null
+          severity?: string | null
+          summary?: string | null
+          symptoms?: Json | null
+          treatment_chemical?: Json | null
+          treatment_organic?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
