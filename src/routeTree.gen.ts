@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
+import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/tips'
 import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
@@ -37,6 +38,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedTrackerRoute = AuthenticatedTrackerRouteImport.update({
   id: '/tracker',
   path: '/tracker',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTipsRoute = AuthenticatedTipsRouteImport.update({
+  id: '/tips',
+  path: '/tips',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSoilRoute = AuthenticatedSoilRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/_authenticated/tips': typeof AuthenticatedTipsRoute
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/diseases'
     | '/history'
     | '/soil'
+    | '/tips'
     | '/tracker'
     | '/detection/$id'
     | '/soil/$id'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/diseases'
     | '/history'
     | '/soil'
+    | '/tips'
     | '/tracker'
     | '/detection/$id'
     | '/soil/$id'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/_authenticated/diseases'
     | '/_authenticated/history'
     | '/_authenticated/soil'
+    | '/_authenticated/tips'
     | '/_authenticated/tracker'
     | '/_authenticated/detection/$id'
     | '/_authenticated/soil/$id'
@@ -177,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/tracker'
       fullPath: '/tracker'
       preLoaderRoute: typeof AuthenticatedTrackerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tips': {
+      id: '/_authenticated/tips'
+      path: '/tips'
+      fullPath: '/tips'
+      preLoaderRoute: typeof AuthenticatedTipsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/soil': {
@@ -240,6 +259,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
+  AuthenticatedTipsRoute: typeof AuthenticatedTipsRoute
   AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
 }
@@ -249,6 +269,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
+  AuthenticatedTipsRoute: AuthenticatedTipsRoute,
   AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
 }
