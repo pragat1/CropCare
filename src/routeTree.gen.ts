@@ -12,8 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
+import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/tips'
+import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
+import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
+import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
 
 const AuthRoute = AuthRouteImport.update({
@@ -30,15 +38,55 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTrackerRoute = AuthenticatedTrackerRouteImport.update({
+  id: '/tracker',
+  path: '/tracker',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTipsRoute = AuthenticatedTipsRouteImport.update({
+  id: '/tips',
+  path: '/tips',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSoilRoute = AuthenticatedSoilRouteImport.update({
+  id: '/soil',
+  path: '/soil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSeasonsRoute = AuthenticatedSeasonsRouteImport.update({
+  id: '/seasons',
+  path: '/seasons',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedQuizRoute = AuthenticatedQuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDiseasesRoute = AuthenticatedDiseasesRouteImport.update({
+  id: '/diseases',
+  path: '/diseases',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSoilIdRoute = AuthenticatedSoilIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedSoilRoute,
 } as any)
 const AuthenticatedDetectionIdRoute =
   AuthenticatedDetectionIdRouteImport.update({
@@ -50,39 +98,97 @@ const AuthenticatedDetectionIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/about': typeof AuthenticatedAboutRoute
   '/app': typeof AuthenticatedAppRoute
+  '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/quiz': typeof AuthenticatedQuizRoute
+  '/seasons': typeof AuthenticatedSeasonsRoute
+  '/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/tips': typeof AuthenticatedTipsRoute
+  '/tracker': typeof AuthenticatedTrackerRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/soil/$id': typeof AuthenticatedSoilIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/about': typeof AuthenticatedAboutRoute
   '/app': typeof AuthenticatedAppRoute
+  '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/quiz': typeof AuthenticatedQuizRoute
+  '/seasons': typeof AuthenticatedSeasonsRoute
+  '/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/tips': typeof AuthenticatedTipsRoute
+  '/tracker': typeof AuthenticatedTrackerRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/soil/$id': typeof AuthenticatedSoilIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/quiz': typeof AuthenticatedQuizRoute
+  '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
+  '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/_authenticated/tips': typeof AuthenticatedTipsRoute
+  '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/app' | '/history' | '/detection/$id'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/about'
+    | '/app'
+    | '/diseases'
+    | '/history'
+    | '/quiz'
+    | '/seasons'
+    | '/soil'
+    | '/tips'
+    | '/tracker'
+    | '/detection/$id'
+    | '/soil/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app' | '/history' | '/detection/$id'
+  to:
+    | '/'
+    | '/auth'
+    | '/about'
+    | '/app'
+    | '/diseases'
+    | '/history'
+    | '/quiz'
+    | '/seasons'
+    | '/soil'
+    | '/tips'
+    | '/tracker'
+    | '/detection/$id'
+    | '/soil/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/about'
     | '/_authenticated/app'
+    | '/_authenticated/diseases'
     | '/_authenticated/history'
+    | '/_authenticated/quiz'
+    | '/_authenticated/seasons'
+    | '/_authenticated/soil'
+    | '/_authenticated/tips'
+    | '/_authenticated/tracker'
     | '/_authenticated/detection/$id'
+    | '/_authenticated/soil/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,11 +220,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tracker': {
+      id: '/_authenticated/tracker'
+      path: '/tracker'
+      fullPath: '/tracker'
+      preLoaderRoute: typeof AuthenticatedTrackerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tips': {
+      id: '/_authenticated/tips'
+      path: '/tips'
+      fullPath: '/tips'
+      preLoaderRoute: typeof AuthenticatedTipsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/soil': {
+      id: '/_authenticated/soil'
+      path: '/soil'
+      fullPath: '/soil'
+      preLoaderRoute: typeof AuthenticatedSoilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/seasons': {
+      id: '/_authenticated/seasons'
+      path: '/seasons'
+      fullPath: '/seasons'
+      preLoaderRoute: typeof AuthenticatedSeasonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/quiz': {
+      id: '/_authenticated/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof AuthenticatedQuizRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/history': {
       id: '/_authenticated/history'
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/diseases': {
+      id: '/_authenticated/diseases'
+      path: '/diseases'
+      fullPath: '/diseases'
+      preLoaderRoute: typeof AuthenticatedDiseasesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/app': {
@@ -127,6 +275,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/app'
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/about': {
+      id: '/_authenticated/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AuthenticatedAboutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/soil/$id': {
+      id: '/_authenticated/soil/$id'
+      path: '/$id'
+      fullPath: '/soil/$id'
+      preLoaderRoute: typeof AuthenticatedSoilIdRouteImport
+      parentRoute: typeof AuthenticatedSoilRoute
     }
     '/_authenticated/detection/$id': {
       id: '/_authenticated/detection/$id'
@@ -138,15 +300,40 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSoilRouteChildren {
+  AuthenticatedSoilIdRoute: typeof AuthenticatedSoilIdRoute
+}
+
+const AuthenticatedSoilRouteChildren: AuthenticatedSoilRouteChildren = {
+  AuthenticatedSoilIdRoute: AuthenticatedSoilIdRoute,
+}
+
+const AuthenticatedSoilRouteWithChildren =
+  AuthenticatedSoilRoute._addFileChildren(AuthenticatedSoilRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
+  AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
+  AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
+  AuthenticatedTipsRoute: typeof AuthenticatedTipsRoute
+  AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedQuizRoute: AuthenticatedQuizRoute,
+  AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
+  AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
+  AuthenticatedTipsRoute: AuthenticatedTipsRoute,
+  AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
 }
 
@@ -161,13 +348,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

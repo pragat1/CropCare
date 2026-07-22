@@ -71,6 +71,120 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          created_at: string
+          id: string
+          score: number
+          total: number
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          score: number
+          total: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          id?: string
+          score?: number
+          total?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      soil_analyses: {
+        Row: {
+          created_at: string
+          fertility: string | null
+          id: string
+          image_path: string
+          maintenance: string | null
+          ph_range: string | null
+          raw: Json | null
+          recommended_crops: Json | null
+          soil_type: string | null
+          summary: string | null
+          tips: Json | null
+          user_id: string
+          water_retention: string | null
+        }
+        Insert: {
+          created_at?: string
+          fertility?: string | null
+          id?: string
+          image_path: string
+          maintenance?: string | null
+          ph_range?: string | null
+          raw?: Json | null
+          recommended_crops?: Json | null
+          soil_type?: string | null
+          summary?: string | null
+          tips?: Json | null
+          user_id: string
+          water_retention?: string | null
+        }
+        Update: {
+          created_at?: string
+          fertility?: string | null
+          id?: string
+          image_path?: string
+          maintenance?: string | null
+          ph_range?: string | null
+          raw?: Json | null
+          recommended_crops?: Json | null
+          soil_type?: string | null
+          summary?: string | null
+          tips?: Json | null
+          user_id?: string
+          water_retention?: string | null
+        }
+        Relationships: []
+      }
+      treatment_progress: {
+        Row: {
+          after_image_path: string
+          analysis: Json | null
+          before_image_path: string
+          created_at: string
+          crop: string | null
+          id: string
+          improvement_percent: number | null
+          notes: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          after_image_path: string
+          analysis?: Json | null
+          before_image_path: string
+          created_at?: string
+          crop?: string | null
+          id?: string
+          improvement_percent?: number | null
+          notes?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          after_image_path?: string
+          analysis?: Json | null
+          before_image_path?: string
+          created_at?: string
+          crop?: string | null
+          id?: string
+          improvement_percent?: number | null
+          notes?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
