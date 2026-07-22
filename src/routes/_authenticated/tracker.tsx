@@ -95,7 +95,7 @@ function TrackerPage() {
             <label className="text-sm font-medium">Crop</label>
             <Select value={crop} onValueChange={setCrop}>
               <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
-              <SelectContent>{CROP_LIST.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+              <SelectContent>{CROP_LIST.map(c => <SelectItem key={c.key} value={c.name}>{c.emoji} {c.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div>
@@ -124,7 +124,7 @@ function TrackerPage() {
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{h.crop}</span>
                     <Badge variant="secondary">{h.status}</Badge>
-                    <span className="text-xs text-muted-foreground">{h.improvement_percent > 0 ? "+" : ""}{h.improvement_percent}%</span>
+                    <span className="text-xs text-muted-foreground">{(h.improvement_percent ?? 0) > 0 ? "+" : ""}{h.improvement_percent ?? 0}%</span>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">{a.summary}</div>
                   <div className="text-xs text-muted-foreground mt-1">{new Date(h.created_at).toLocaleString()}</div>
