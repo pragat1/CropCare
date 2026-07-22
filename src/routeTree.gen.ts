@@ -12,8 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
+import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
 
 const AuthRoute = AuthRouteImport.update({
@@ -30,6 +33,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTrackerRoute = AuthenticatedTrackerRouteImport.update({
+  id: '/tracker',
+  path: '/tracker',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSoilRoute = AuthenticatedSoilRouteImport.update({
+  id: '/soil',
+  path: '/soil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -39,6 +52,11 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSoilIdRoute = AuthenticatedSoilIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedSoilRoute,
 } as any)
 const AuthenticatedDetectionIdRoute =
   AuthenticatedDetectionIdRouteImport.update({
@@ -52,14 +70,20 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/app': typeof AuthenticatedAppRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/tracker': typeof AuthenticatedTrackerRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/soil/$id': typeof AuthenticatedSoilIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app': typeof AuthenticatedAppRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/tracker': typeof AuthenticatedTrackerRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/soil/$id': typeof AuthenticatedSoilIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,13 +92,32 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
+  '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/app' | '/history' | '/detection/$id'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/app'
+    | '/history'
+    | '/soil'
+    | '/tracker'
+    | '/detection/$id'
+    | '/soil/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app' | '/history' | '/detection/$id'
+  to:
+    | '/'
+    | '/auth'
+    | '/app'
+    | '/history'
+    | '/soil'
+    | '/tracker'
+    | '/detection/$id'
+    | '/soil/$id'
   id:
     | '__root__'
     | '/'
@@ -82,7 +125,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/app'
     | '/_authenticated/history'
+    | '/_authenticated/soil'
+    | '/_authenticated/tracker'
     | '/_authenticated/detection/$id'
+    | '/_authenticated/soil/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,6 +160,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tracker': {
+      id: '/_authenticated/tracker'
+      path: '/tracker'
+      fullPath: '/tracker'
+      preLoaderRoute: typeof AuthenticatedTrackerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/soil': {
+      id: '/_authenticated/soil'
+      path: '/soil'
+      fullPath: '/soil'
+      preLoaderRoute: typeof AuthenticatedSoilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/history': {
       id: '/_authenticated/history'
       path: '/history'
@@ -128,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/soil/$id': {
+      id: '/_authenticated/soil/$id'
+      path: '/$id'
+      fullPath: '/soil/$id'
+      preLoaderRoute: typeof AuthenticatedSoilIdRouteImport
+      parentRoute: typeof AuthenticatedSoilRoute
+    }
     '/_authenticated/detection/$id': {
       id: '/_authenticated/detection/$id'
       path: '/detection/$id'
@@ -138,15 +205,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedSoilRouteChildren {
+  AuthenticatedSoilIdRoute: typeof AuthenticatedSoilIdRoute
+}
+
+const AuthenticatedSoilRouteChildren: AuthenticatedSoilRouteChildren = {
+  AuthenticatedSoilIdRoute: AuthenticatedSoilIdRoute,
+}
+
+const AuthenticatedSoilRouteWithChildren =
+  AuthenticatedSoilRoute._addFileChildren(AuthenticatedSoilRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
+  AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
+  AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
 }
 
@@ -161,13 +243,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
