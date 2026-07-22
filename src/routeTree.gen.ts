@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
 import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/tips'
 import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
+import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
@@ -50,6 +51,11 @@ const AuthenticatedSoilRoute = AuthenticatedSoilRouteImport.update({
   path: '/soil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSeasonsRoute = AuthenticatedSeasonsRouteImport.update({
+  id: '/seasons',
+  path: '/seasons',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRoute
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/seasons': typeof AuthenticatedSeasonsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
+  '/seasons': typeof AuthenticatedSeasonsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
   '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
   '/_authenticated/tips': typeof AuthenticatedTipsRoute
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/diseases'
     | '/history'
+    | '/seasons'
     | '/soil'
     | '/tips'
     | '/tracker'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/diseases'
     | '/history'
+    | '/seasons'
     | '/soil'
     | '/tips'
     | '/tracker'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/diseases'
     | '/_authenticated/history'
+    | '/_authenticated/seasons'
     | '/_authenticated/soil'
     | '/_authenticated/tips'
     | '/_authenticated/tracker'
@@ -205,6 +217,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSoilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/seasons': {
+      id: '/_authenticated/seasons'
+      path: '/seasons'
+      fullPath: '/seasons'
+      preLoaderRoute: typeof AuthenticatedSeasonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/history': {
       id: '/_authenticated/history'
       path: '/history'
@@ -258,6 +277,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
   AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
   AuthenticatedTipsRoute: typeof AuthenticatedTipsRoute
   AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
@@ -268,6 +288,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
   AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
   AuthenticatedTipsRoute: AuthenticatedTipsRoute,
   AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
