@@ -96,7 +96,7 @@ export async function auditLog(entry: {
       status: entry.status ?? "success",
       latency_ms: entry.latencyMs ?? null,
       error: entry.error ?? null,
-      metadata: entry.metadata ?? {},
+      metadata: JSON.parse(JSON.stringify(entry.metadata ?? {})),
     });
   } catch (err) {
     console.error("[audit] failed to write audit log", err);
