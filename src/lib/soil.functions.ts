@@ -1,9 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  assertOwnedPath,
+  downloadImageAsDataUrl,
+  enforceRateLimit,
+  withAudit,
+} from "./server-utils.server";
 
 const InputSchema = z.object({
-  imagePath: z.string().trim().min(1).max(500),
+  imagePath: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500)
+    .regex(/^[a-zA-Z0-9/_.-]+$/, "Invalid path characters"),
 });
 
 export const analyzeSoil = createServerFn({ method: "POST" })
@@ -11,20 +22,17 @@ export const analyzeSoil = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    if (!data.imagePath.startsWith(`${userId}/`)) throw new Error("Invalid image path");
+    return withAudit(
+      { userId, action: "soil.analyze", resource: data.imagePath },
+      async () => {
+        assertOwnedPath(data.imagePath, userId);
+        await enforceRateLimit(userId, "soil.analyze", 8);
 
-    const { data: blob, error: dlErr } = await supabase.storage
-      .from("soil-images")
-      .download(data.imagePath);
-    if (dlErr || !blob) throw new Error(dlErr?.message ?? "Failed to read soil image");
-    const b64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
-    const mime = blob.type || "image/jpeg";
-    const dataUrl = `data:${mime};base64,${b64}`;
+        const { dataUrl } = await downloadImageAsDataUrl(supabase, "soil-images", data.imagePath);
+        const { analyzeSoilImage } = await import("./ai-soil.server");
+        const result = await analyzeSoilImage(dataUrl);
 
-    const { analyzeSoilImage } = await import("./ai-soil.server");
-    const result = await analyzeSoilImage(dataUrl);
-
-    const { data: row, error: insErr } = await supabase
+        const { data: row, error: insErr } = await supabase
       .from("soil_analyses")
       .insert({
         user_id: userId,
@@ -41,6 +49,8 @@ export const analyzeSoil = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (insErr || !row) throw new Error(insErr?.message ?? "Failed to save soil analysis");
-    return { id: row.id as string };
+        if (insErr || !row) throw new Error(insErr?.message ?? "Failed to save soil analysis");
+        return { id: row.id as string };
+      },
+    );
   });
