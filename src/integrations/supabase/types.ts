@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          error: string | null
+          id: string
+          latency_ms: number | null
+          metadata: Json | null
+          resource: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          latency_ms?: number | null
+          metadata?: Json | null
+          resource?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          latency_ms?: number | null
+          metadata?: Json | null
+          resource?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       detections: {
         Row: {
           alternatives: Json | null
@@ -122,6 +158,27 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action: string
+          bucket: string
+          count: number
+          user_id: string
+        }
+        Insert: {
+          action: string
+          bucket: string
+          count?: number
+          user_id: string
+        }
+        Update: {
+          action?: string
+          bucket?: string
+          count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       soil_analyses: {
         Row: {
           created_at: string
@@ -214,7 +271,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      rate_limit_hit: {
+        Args: {
+          _action: string
+          _limit: number
+          _user: string
+          _window_seconds?: number
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
