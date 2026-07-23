@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Upload, ScanLine, Loader2, CheckCircle2, AlertTriangle, Leaf } from "lucide-react";
+import { Upload, ScanLine, Loader2, CheckCircle2, AlertTriangle, Leaf, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -130,6 +130,25 @@ function DetectPage() {
             >
               {mutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing…</> : <><ScanLine className="h-4 w-4" /> Analyze leaf</>}
             </Button>
+            {mutation.isError && (
+              <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
+                <div className="flex items-start gap-2 text-destructive">
+                  <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">Analysis failed</div>
+                    <div className="text-muted-foreground mt-1">
+                      {mutation.error instanceof Error ? mutation.error.message : "Something went wrong. Please try again."}
+                    </div>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={() => mutation.mutate()} disabled={!file || mutation.isPending}>
+                  <RotateCcw className="h-3.5 w-3.5" /> Retry analysis
+                </Button>
+              </div>
+            )}
+            {mutation.isPending && (
+              <p className="mt-3 text-xs text-muted-foreground text-center">This usually takes 5-15 seconds. Please keep this tab open.</p>
+            )}
           </Card>
         </div>
 
