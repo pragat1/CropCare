@@ -1,5 +1,6 @@
 // Server-only Lovable AI helper for crop disease analysis.
 import type { Database } from "@/integrations/supabase/types";
+import { aiChatCompletion, safeJsonParse } from "./ai-gateway.server";
 
 export type Severity = "low" | "medium" | "high";
 export type PlantPart = "leaf" | "stem" | "fruit" | "root" | "flower" | "whole plant" | "unknown";
@@ -126,38 +127,19 @@ function safeParse(text: string): unknown {
 }
 
 export async function analyzeLeafImage(imageDataUrl: string, crop: string): Promise<DetectionResult> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
-
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: `Crop: ${crop}. Analyze this image and return the JSON described in the system prompt.` },
-            { type: "image_url", image_url: { url: imageDataUrl } },
-          ],
-        },
-      ],
-      response_format: { type: "json_object" },
-    }),
+  const text = await aiChatCompletion({
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: `Crop: ${crop}. Analyze this image and return the JSON described in the system prompt.` },
+          { type: "image_url", image_url: { url: imageDataUrl } },
+        ],
+      },
+    ],
   });
-
-  if (!res.ok) {
-    const body = await res.text();
-    if (res.status === 429) throw new Error("Rate limit exceeded — please try again in a moment.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Please add credits to continue.");
-    throw new Error(`AI request failed [${res.status}]: ${body.slice(0, 300)}`);
-  }
-
-  const payload = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  const text = payload.choices?.[0]?.message?.content ?? "";
-  const parsed = safeParse(text) as Record<string, unknown>;
+  const parsed = safeJsonParse<Record<string, unknown>>(text);
 
   const top = normalizeCandidate(parsed.top);
   const altsRaw = Array.isArray(parsed.alternatives) ? parsed.alternatives : [];
