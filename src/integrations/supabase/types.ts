@@ -16,57 +16,81 @@ export type Database = {
     Tables: {
       detections: {
         Row: {
+          alternatives: Json | null
           causes: Json | null
           confidence: number | null
           created_at: string
           crop: string
+          differentials: Json | null
           disease: string | null
           id: string
           image_path: string
+          immediate_actions: Json | null
           is_healthy: boolean
+          plant_part: string | null
           prevention: Json | null
           raw: Json | null
+          reasoning: string | null
+          recovery_time: string | null
           severity: string | null
           summary: string | null
           symptoms: Json | null
           treatment_chemical: Json | null
+          treatment_chemical_detailed: Json | null
           treatment_organic: Json | null
+          treatment_organic_detailed: Json | null
           user_id: string
         }
         Insert: {
+          alternatives?: Json | null
           causes?: Json | null
           confidence?: number | null
           created_at?: string
           crop: string
+          differentials?: Json | null
           disease?: string | null
           id?: string
           image_path: string
+          immediate_actions?: Json | null
           is_healthy?: boolean
+          plant_part?: string | null
           prevention?: Json | null
           raw?: Json | null
+          reasoning?: string | null
+          recovery_time?: string | null
           severity?: string | null
           summary?: string | null
           symptoms?: Json | null
           treatment_chemical?: Json | null
+          treatment_chemical_detailed?: Json | null
           treatment_organic?: Json | null
+          treatment_organic_detailed?: Json | null
           user_id: string
         }
         Update: {
+          alternatives?: Json | null
           causes?: Json | null
           confidence?: number | null
           created_at?: string
           crop?: string
+          differentials?: Json | null
           disease?: string | null
           id?: string
           image_path?: string
+          immediate_actions?: Json | null
           is_healthy?: boolean
+          plant_part?: string | null
           prevention?: Json | null
           raw?: Json | null
+          reasoning?: string | null
+          recovery_time?: string | null
           severity?: string | null
           summary?: string | null
           symptoms?: Json | null
           treatment_chemical?: Json | null
+          treatment_chemical_detailed?: Json | null
           treatment_organic?: Json | null
+          treatment_organic_detailed?: Json | null
           user_id?: string
         }
         Relationships: []
