@@ -2,12 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, AlertTriangle, Sprout, FlaskConical, ShieldCheck, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertTriangle, Sprout, FlaskConical, ShieldCheck, Trash2, Zap, Clock, GitCompare, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
+import type { DiseaseCandidate, Differential, TreatmentPlan } from "@/lib/ai.server";
 
 export const Route = createFileRoute("/_authenticated/detection/$id")({
   component: DetectionPage,
@@ -58,7 +60,15 @@ function DetectionPage() {
 
   const d = q.data;
   const arr = (v: unknown): string[] => Array.isArray(v) ? (v as string[]) : [];
+  const asAlts = (v: unknown): DiseaseCandidate[] => Array.isArray(v) ? (v as DiseaseCandidate[]) : [];
+  const asDiffs = (v: unknown): Differential[] => Array.isArray(v) ? (v as Differential[]) : [];
+  const asPlans = (v: unknown): TreatmentPlan[] => Array.isArray(v) ? (v as TreatmentPlan[]) : [];
   const healthy = !!d.is_healthy;
+  const alternatives = asAlts(d.alternatives);
+  const differentials = asDiffs(d.differentials);
+  const organic = asPlans(d.treatment_organic_detailed);
+  const chemical = asPlans(d.treatment_chemical_detailed);
+  const immediate = arr(d.immediate_actions);
 
   return (
     <AppShell>
@@ -92,24 +102,111 @@ function DetectionPage() {
                 <div className="flex flex-wrap gap-2 mt-2">
                   <Badge variant="secondary">Confidence: {d.confidence ?? 0}%</Badge>
                   {d.severity && !healthy && <Badge variant="outline" className="capitalize">Severity: {d.severity}</Badge>}
+                  {d.plant_part && <Badge variant="outline" className="capitalize gap-1"><Leaf className="h-3 w-3" /> {d.plant_part}</Badge>}
+                  {d.recovery_time && !healthy && <Badge variant="outline" className="gap-1"><Clock className="h-3 w-3" /> {d.recovery_time}</Badge>}
                 </div>
                 {d.summary && <p className="text-muted-foreground mt-3">{d.summary}</p>}
+                {d.reasoning && !healthy && (
+                  <p className="text-sm mt-3"><span className="font-medium">Why this diagnosis: </span><span className="text-muted-foreground">{d.reasoning}</span></p>
+                )}
               </div>
             </div>
           </Card>
 
           {!healthy && (
             <>
+              {(alternatives.length > 0 || d.disease) && (
+                <Card className="p-6">
+                  <h2 className="font-serif text-lg font-semibold mb-4">Top possible diseases</h2>
+                  <div className="space-y-4">
+                    <CandidateRow rank={1} disease={d.disease ?? "Unknown"} confidence={d.confidence ?? 0} reasoning={d.reasoning ?? ""} primary />
+                    {alternatives.map((c, i) => (
+                      <CandidateRow key={i} rank={i + 2} disease={c.disease} confidence={c.confidence} reasoning={c.reasoning} />
+                    ))}
+                  </div>
+                </Card>
+              )}
+              {immediate.length > 0 && (
+                <Section title="Do this now" items={immediate} icon={<Zap className="h-4 w-4" />} tone="warning" />
+              )}
               <Section title="Observed symptoms" items={arr(d.symptoms)} />
               <Section title="Likely causes" items={arr(d.causes)} />
-              <Section title="Organic treatment" items={arr(d.treatment_organic)} icon={<Sprout className="h-4 w-4" />} tone="success" />
-              <Section title="Chemical treatment" items={arr(d.treatment_chemical)} icon={<FlaskConical className="h-4 w-4" />} tone="warning" />
+              <TreatmentSection title="Organic treatment" plans={organic} fallback={arr(d.treatment_organic)} icon={<Sprout className="h-4 w-4" />} tone="success" />
+              <TreatmentSection title="Chemical treatment" plans={chemical} fallback={arr(d.treatment_chemical)} icon={<FlaskConical className="h-4 w-4" />} tone="warning" />
               <Section title="Prevention" items={arr(d.prevention)} icon={<ShieldCheck className="h-4 w-4" />} />
+              {differentials.length > 0 && (
+                <Card className="p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="grid place-items-center w-7 h-7 rounded-md bg-muted"><GitCompare className="h-4 w-4" /></span>
+                    <h2 className="font-serif text-lg font-semibold">Similar diseases</h2>
+                  </div>
+                  <ul className="space-y-3">
+                    {differentials.map((diff, i) => (
+                      <li key={i} className="text-sm">
+                        <div className="font-medium">{diff.disease}</div>
+                        <div className="text-muted-foreground">{diff.differentiator}</div>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              )}
             </>
           )}
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function CandidateRow({ rank, disease, confidence, reasoning, primary }: { rank: number; disease: string; confidence: number; reasoning: string; primary?: boolean }) {
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className={`grid place-items-center w-6 h-6 rounded-full text-xs font-semibold ${primary ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"}`}>{rank}</span>
+          <span className="font-medium truncate">{disease}</span>
+        </div>
+        <Badge variant={primary ? "default" : "secondary"}>{confidence}%</Badge>
+      </div>
+      <Progress value={confidence} className="h-1.5 mt-2" />
+      {reasoning && <p className="text-xs text-muted-foreground mt-2">{reasoning}</p>}
+    </div>
+  );
+}
+
+function TreatmentSection({ title, plans, fallback, icon, tone }: { title: string; plans: TreatmentPlan[]; fallback: string[]; icon?: React.ReactNode; tone?: "success" | "warning" }) {
+  const toneCls =
+    tone === "success" ? "bg-success/10 text-success" :
+    tone === "warning" ? "bg-amber-500/10 text-amber-700 dark:text-amber-400" :
+    "bg-muted text-foreground";
+  if (!plans.length && !fallback.length) return null;
+  return (
+    <Card className="p-6">
+      <div className="flex items-center gap-2 mb-4">
+        {icon && <span className={`grid place-items-center w-7 h-7 rounded-md ${toneCls}`}>{icon}</span>}
+        <h2 className="font-serif text-lg font-semibold">{title}</h2>
+      </div>
+      {plans.length > 0 ? (
+        <div className="space-y-4">
+          {plans.map((p, i) => (
+            <div key={i} className="rounded-lg border border-border p-4">
+              <div className="font-medium">{p.name}{p.active_ingredient ? <span className="text-muted-foreground font-normal"> · {p.active_ingredient}</span> : null}</div>
+              <dl className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-1 text-sm">
+                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Dosage</dt><dd>{p.dosage || "—"}</dd></div>
+                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Frequency</dt><dd>{p.frequency || "—"}</dd></div>
+                <div><dt className="text-xs uppercase tracking-wide text-muted-foreground">Precautions</dt><dd>{p.precautions || "—"}</dd></div>
+              </dl>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {fallback.map((it, i) => (
+            <li key={i} className="flex gap-2 text-sm"><span className="text-primary mt-1">•</span><span>{it}</span></li>
+          ))}
+        </ul>
+      )}
+    </Card>
   );
 }
 
