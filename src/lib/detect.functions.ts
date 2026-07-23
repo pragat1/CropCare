@@ -1,10 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  assertOwnedPath,
+  downloadImageAsDataUrl,
+  enforceRateLimit,
+  withAudit,
+} from "./server-utils.server";
 
 const InputSchema = z.object({
   crop: z.string().trim().min(1).max(80),
-  imagePath: z.string().trim().min(1).max(500),
+  imagePath: z
+    .string()
+    .trim()
+    .min(1)
+    .max(500)
+    .regex(/^[a-zA-Z0-9/_.-]+$/, "Invalid path characters"),
 });
 
 export const analyzeDetection = createServerFn({ method: "POST" })
@@ -12,27 +23,17 @@ export const analyzeDetection = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    return withAudit(
+      { userId, action: "detection.analyze", resource: data.imagePath, metadata: { crop: data.crop } },
+      async () => {
+        assertOwnedPath(data.imagePath, userId);
+        await enforceRateLimit(userId, "detection.analyze", 8);
 
-    // Verify the uploaded object belongs to the caller's folder.
-    if (!data.imagePath.startsWith(`${userId}/`)) {
-      throw new Error("Invalid image path");
-    }
+        const { dataUrl } = await downloadImageAsDataUrl(supabase, "leaf-images", data.imagePath);
+        const { analyzeLeafImage } = await import("./ai.server");
+        const result = await analyzeLeafImage(dataUrl, data.crop);
 
-    // Download the image server-side (RLS enforced as this user).
-    const { data: blob, error: dlErr } = await supabase.storage
-      .from("leaf-images")
-      .download(data.imagePath);
-    if (dlErr || !blob) throw new Error(dlErr?.message ?? "Failed to read uploaded image");
-
-    const arrayBuf = await blob.arrayBuffer();
-    const b64 = Buffer.from(arrayBuf).toString("base64");
-    const mime = blob.type || "image/jpeg";
-    const dataUrl = `data:${mime};base64,${b64}`;
-
-    const { analyzeLeafImage } = await import("./ai.server");
-    const result = await analyzeLeafImage(dataUrl, data.crop);
-
-    const { data: row, error: insErr } = await supabase
+        const { data: row, error: insErr } = await supabase
       .from("detections")
       .insert({
         user_id: userId,
@@ -61,6 +62,8 @@ export const analyzeDetection = createServerFn({ method: "POST" })
       .select("id")
       .single();
 
-    if (insErr || !row) throw new Error(insErr?.message ?? "Failed to save detection");
-    return { id: row.id as string };
+        if (insErr || !row) throw new Error(insErr?.message ?? "Failed to save detection");
+        return { id: row.id as string };
+      },
+    );
   });

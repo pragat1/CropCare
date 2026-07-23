@@ -1,4 +1,5 @@
 // Server-only Lovable AI helper for before/after treatment comparison.
+import { aiChatCompletion, safeJsonParse } from "./ai-gateway.server";
 export type TreatmentComparison = {
   status: "Improved" | "No Change" | "Worse";
   improvement_percent: number; // -100..100
@@ -22,38 +23,20 @@ const SYSTEM_PROMPT = `You are a plant pathologist reviewing treatment progress.
 No markdown, no commentary — JSON only.`;
 
 export async function compareTreatmentImages(beforeUrl: string, afterUrl: string, crop: string): Promise<TreatmentComparison> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("Missing LOVABLE_API_KEY");
-
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: [
-            { type: "text", text: `Crop: ${crop}. First image is BEFORE treatment, second image is AFTER. Return the JSON.` },
-            { type: "image_url", image_url: { url: beforeUrl } },
-            { type: "image_url", image_url: { url: afterUrl } },
-          ],
-        },
-      ],
-      response_format: { type: "json_object" },
-    }),
+  const text = await aiChatCompletion({
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: `Crop: ${crop}. First image is BEFORE treatment, second image is AFTER. Return the JSON.` },
+          { type: "image_url", image_url: { url: beforeUrl } },
+          { type: "image_url", image_url: { url: afterUrl } },
+        ],
+      },
+    ],
   });
-  if (!res.ok) {
-    if (res.status === 429) throw new Error("Rate limit exceeded — please try again in a moment.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Please add credits to continue.");
-    throw new Error(`AI request failed [${res.status}]`);
-  }
-  const payload = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  const text = (payload.choices?.[0]?.message?.content ?? "").replace(/^```json\s*|\s*```$/g, "").trim();
-  let parsed: TreatmentComparison;
-  try { parsed = JSON.parse(text) as TreatmentComparison; }
-  catch { throw new Error("AI returned an unreadable response. Please retry."); }
+  const parsed = safeJsonParse<TreatmentComparison>(text);
 
   const pct = Math.max(-100, Math.min(100, Math.round(Number(parsed.improvement_percent) || 0)));
   const status: TreatmentComparison["status"] = ["Improved", "No Change", "Worse"].includes(parsed.status)

@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeDetection } from "@/lib/detect.functions";
 import { AppShell } from "@/components/app-shell";
+import { compressImage, validateImageFile } from "@/lib/image-client";
 
 const CROPS = [
   "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
@@ -49,15 +50,23 @@ function DetectPage() {
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) throw new Error("Not signed in");
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const compressed = await compressImage(file);
+      const ext = (compressed.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${uid}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("leaf-images")
-        .upload(path, file, { contentType: file.type || "image/jpeg", upsert: false });
+        .upload(path, compressed, { contentType: compressed.type || "image/jpeg", upsert: false });
       if (upErr) throw upErr;
       const res = await analyze({ data: { crop, imagePath: path } });
       return res.id;
     },
+    retry: (count, err) => {
+      // Retry transient network / upstream errors up to twice.
+      const msg = err instanceof Error ? err.message : "";
+      if (/timed out|upstream|network|502|503|504/i.test(msg) && count < 2) return true;
+      return false;
+    },
+    retryDelay: (attempt) => 500 * 2 ** attempt,
     onSuccess: (id) => {
       qc.invalidateQueries({ queryKey: ["recent-detections"] });
       qc.invalidateQueries({ queryKey: ["history"] });
@@ -70,12 +79,9 @@ function DetectPage() {
 
   function onPick(f: File | null) {
     if (!f) return;
-    if (!f.type.startsWith("image/")) {
-      toast.error("Please pick an image file");
-      return;
-    }
-    if (f.size > 8 * 1024 * 1024) {
-      toast.error("Image is larger than 8MB");
+    const err = validateImageFile(f);
+    if (err) {
+      toast.error(err);
       return;
     }
     setFile(f);
