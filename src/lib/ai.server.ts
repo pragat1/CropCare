@@ -115,17 +115,6 @@ function normalizeDiff(v: unknown): Differential {
   return { disease: str(o.disease, 120) || "Unknown", differentiator: str(o.differentiator, 300) };
 }
 
-function safeParse(text: string): unknown {
-  const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
-  try { return JSON.parse(cleaned); } catch { /* fallthrough */ }
-  // Try to extract first JSON object substring.
-  const match = cleaned.match(/\{[\s\S]*\}/);
-  if (match) {
-    try { return JSON.parse(match[0]); } catch { /* ignore */ }
-  }
-  throw new Error("AI returned an unreadable response. Please retry.");
-}
-
 export async function analyzeLeafImage(imageDataUrl: string, crop: string): Promise<DetectionResult> {
   const text = await aiChatCompletion({
     messages: [
