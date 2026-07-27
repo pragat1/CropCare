@@ -72,8 +72,9 @@ function DiseasesPage() {
                 </div>
               </div>
             </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       )}
     </AppShell>
   );
