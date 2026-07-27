@@ -14,6 +14,7 @@ import { compareTreatment } from "@/lib/treatment.functions";
 import { AppShell } from "@/components/app-shell";
 import { UploadZone } from "@/components/upload-zone";
 import { CROP_LIST } from "@/lib/data/crops";
+import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/tracker")({
   component: TrackerPage,
@@ -76,10 +77,14 @@ function TrackerPage() {
 
   return (
     <AppShell>
-      <h1 className="font-serif text-3xl font-semibold">Treatment tracker</h1>
-      <p className="text-muted-foreground mt-1">Compare before and after images to measure recovery.</p>
+      <PageHeader
+        icon={LineChart}
+        eyebrow="Progress"
+        title="Treatment tracker"
+        description="Compare before and after images to measure recovery."
+      />
 
-      <Card className="mt-6 p-6 space-y-4">
+      <Card className="mt-8 p-6 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="text-sm font-medium">Before treatment</label>
