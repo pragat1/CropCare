@@ -127,7 +127,7 @@ function SoilPage() {
               </Link>
             ))}
           </div>
-        </div>
+        </FadeIn>
       </div>
     </AppShell>
   );
