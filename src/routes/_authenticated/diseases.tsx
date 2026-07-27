@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AppShell } from "@/components/app-shell";
 import { DISEASES } from "@/lib/data/diseases";
-import { Search } from "lucide-react";
+import { Search, BookOpen } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
+import { Stagger, StaggerItem } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/diseases")({ component: DiseasesPage });
 
@@ -21,10 +23,14 @@ function DiseasesPage() {
 
   return (
     <AppShell>
-      <h1 className="font-serif text-3xl font-semibold">Disease database</h1>
-      <p className="text-muted-foreground mt-1">Browse {DISEASES.length} common crop diseases with organic and chemical treatments.</p>
+      <PageHeader
+        icon={BookOpen}
+        eyebrow="Reference"
+        title="Disease database"
+        description={`Browse ${DISEASES.length} common crop diseases with organic and chemical treatments.`}
+      />
 
-      <div className="mt-6 flex flex-col sm:flex-row gap-3">
+      <div className="mt-8 flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input value={q} onChange={e => setQ(e.target.value)} placeholder="Search diseases…" className="pl-9" aria-label="Search diseases" />
@@ -41,9 +47,10 @@ function DiseasesPage() {
       {filtered.length === 0 ? (
         <Card className="p-8 mt-6 text-center text-muted-foreground border-dashed">No diseases match your search.</Card>
       ) : (
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <Stagger className="mt-6 grid gap-5 md:grid-cols-2">
           {filtered.map(d => (
-            <Card key={d.id} className="p-5">
+            <StaggerItem key={d.id}>
+            <Card className="h-full p-6">
               <div className="flex items-start gap-3">
                 <span className="text-2xl" aria-hidden>{d.emoji}</span>
                 <div className="flex-1 min-w-0">
