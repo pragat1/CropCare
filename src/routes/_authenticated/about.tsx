@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import { AppShell } from "@/components/app-shell";
 import { Leaf, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, ScanLine } from "lucide-react";
+import { Stagger, StaggerItem, FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/about")({ component: AboutPage });
 
@@ -18,21 +19,28 @@ const FEATURES = [
 function AboutPage() {
   return (
     <AppShell>
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-3">
-          <span className="grid place-items-center w-10 h-10 rounded-lg bg-primary text-primary-foreground"><Leaf className="h-5 w-5" /></span>
-          <h1 className="font-serif text-3xl font-semibold">About LeafScan</h1>
-        </div>
-        <p className="text-muted-foreground mt-3">A modern crop-care companion combining AI diagnostics with practical agronomy guidance. Your scans and progress are private and stored securely under your account.</p>
+      <div className="mx-auto max-w-3xl">
+        <FadeIn>
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-brand text-primary-foreground ring-glow"><Leaf className="h-5 w-5" /></span>
+            <h1 className="font-serif text-3xl font-semibold tracking-tight">About <span className="text-gradient">LeafScan</span></h1>
+          </div>
+          <p className="text-muted-foreground mt-4">A modern crop-care companion combining AI diagnostics with practical agronomy guidance. Your scans and progress are private and stored securely under your account.</p>
+        </FadeIn>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Stagger className="mt-8 grid gap-5 sm:grid-cols-2">
           {FEATURES.map(f => (
-            <Card key={f.title} className="p-5">
-              <div className="flex items-center gap-2"><f.icon className="h-5 w-5 text-primary" /><h2 className="font-semibold">{f.title}</h2></div>
-              <p className="text-sm text-muted-foreground mt-2">{f.body}</p>
-            </Card>
+            <StaggerItem key={f.title}>
+              <Card className="h-full p-6">
+                <div className="flex items-center gap-2.5">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary"><f.icon className="h-4.5 w-4.5" /></span>
+                  <h2 className="font-semibold">{f.title}</h2>
+                </div>
+                <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{f.body}</p>
+              </Card>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </AppShell>
   );
