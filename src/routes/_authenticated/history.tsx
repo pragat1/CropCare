@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
+import { PageHeader } from "@/components/page-header";
+import { Stagger, StaggerItem } from "@/components/motion";
+import { History as HistoryIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/history")({
   component: HistoryPage,
@@ -25,10 +28,14 @@ function HistoryPage() {
 
   return (
     <AppShell>
-      <h1 className="font-serif text-3xl font-semibold">History</h1>
-      <p className="text-muted-foreground mt-1">All your past leaf scans and diagnoses.</p>
+      <PageHeader
+        icon={HistoryIcon}
+        eyebrow="Archive"
+        title="History"
+        description="All your past leaf scans and diagnoses."
+      />
 
-      <div className="mt-6 space-y-3">
+      <Stagger className="mt-8 space-y-3">
         {q.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
         {q.data && q.data.length === 0 && (
           <Card className="p-10 text-center text-muted-foreground border-dashed">
@@ -38,8 +45,9 @@ function HistoryPage() {
           </Card>
         )}
         {q.data?.map((d) => (
-          <Link key={d.id} to="/detection/$id" params={{ id: d.id }}>
-            <Card className="p-4 flex items-center gap-4 hover:shadow-[var(--shadow-soft)] transition">
+          <StaggerItem key={d.id}>
+          <Link to="/detection/$id" params={{ id: d.id }}>
+            <Card className="flex items-center gap-4 p-4">
               <div className={`grid place-items-center w-11 h-11 rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}>
                 {d.is_healthy ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
               </div>
@@ -54,8 +62,9 @@ function HistoryPage() {
               </div>
             </Card>
           </Link>
+          </StaggerItem>
         ))}
-      </div>
+      </Stagger>
     </AppShell>
   );
 }

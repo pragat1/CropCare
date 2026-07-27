@@ -1,7 +1,8 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { Leaf, ShieldCheck, Sparkles, Camera } from "lucide-react";
+import { Leaf, ShieldCheck, Sparkles, Camera, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { FadeIn, Stagger, StaggerItem, GlassCard } from "@/components/motion";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -14,55 +15,74 @@ export const Route = createFileRoute("/")({
 
 function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/60 backdrop-blur-sm bg-background/70 sticky top-0 z-40">
-        <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-serif text-xl font-semibold">
-            <span className="grid place-items-center w-9 h-9 rounded-lg bg-primary text-primary-foreground">
+    <div className="min-h-screen bg-background bg-mesh text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/60 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
+          <div className="flex min-w-0 items-center gap-2.5 font-serif text-xl font-semibold tracking-tight">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-brand text-primary-foreground ring-glow">
               <Leaf className="h-4 w-4" />
             </span>
-            LeafScan
+            <span className="truncate">LeafScan</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Link to="/auth"><Button variant="ghost">Sign in</Button></Link>
-            <Link to="/auth"><Button>Get started</Button></Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link to="/auth"><Button variant="ghost" className="rounded-full">Sign in</Button></Link>
+            <Link to="/auth"><Button className="rounded-full">Get started</Button></Link>
           </div>
         </div>
       </header>
 
-      <section className="mx-auto max-w-6xl px-6 pt-20 pb-24">
+      <section className="mx-auto max-w-6xl px-4 pb-24 pt-20 md:px-6 md:pt-28">
         <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground mb-6">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> AI-powered agriculture
-          </div>
-          <h1 className="font-serif text-5xl md:text-6xl font-semibold leading-[1.05] tracking-tight">
-            Diagnose crop disease from a single leaf photo.
-          </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-2xl">
-            Upload a photo, pick your crop, and get an instant diagnosis with symptoms, likely causes, and a treatment plan — organic and chemical options included.
-          </p>
-          <div className="mt-8 flex gap-3">
-            <Link to="/auth"><Button size="lg" className="gap-2"><Camera className="h-4 w-4" /> Scan a leaf</Button></Link>
-            <Link to="/auth"><Button size="lg" variant="outline">Create free account</Button></Link>
-          </div>
+          <FadeIn>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur-md">
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> AI-powered agriculture
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.08}>
+            <h1 className="font-serif text-5xl font-semibold leading-[1.03] tracking-tight md:text-6xl">
+              Diagnose crop disease from{" "}
+              <span className="text-gradient">a single leaf photo.</span>
+            </h1>
+          </FadeIn>
+          <FadeIn delay={0.16}>
+            <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
+              Upload a photo, pick your crop, and get an instant diagnosis with symptoms, likely causes, and a treatment plan — organic and chemical options included.
+            </p>
+          </FadeIn>
+          <FadeIn delay={0.24} className="mt-8 flex flex-wrap gap-3">
+            <Link to="/auth">
+              <Button size="lg" className="gap-2 rounded-full px-6 ring-glow">
+                <Camera className="h-4 w-4" /> Scan a leaf
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button size="lg" variant="outline" className="gap-2 rounded-full border-border/60 bg-card/40 px-6 backdrop-blur-md">
+                Create free account <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </FadeIn>
         </div>
 
-        <div className="mt-20 grid md:grid-cols-3 gap-4">
+        <Stagger className="mt-20 grid gap-5 md:grid-cols-3">
           {[
             { icon: Camera, title: "Snap & upload", body: "Take a clear photo of the affected leaf. That's it — no forms, no waiting." },
             { icon: Sparkles, title: "AI diagnosis", body: "Gemini-powered vision identifies disease, severity, and confidence." },
             { icon: ShieldCheck, title: "Treatment plan", body: "Actionable organic and chemical treatments plus prevention tips." },
           ].map(({ icon: Icon, title, body }) => (
-            <div key={title} className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
-              <Icon className="h-5 w-5 text-primary" />
-              <h3 className="mt-4 font-serif text-xl font-semibold">{title}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{body}</p>
-            </div>
+            <StaggerItem key={title}>
+              <GlassCard className="h-full">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <h2 className="mt-5 font-serif text-xl font-semibold">{title}</h2>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
+              </GlassCard>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </section>
 
-      <footer className="border-t border-border/60 py-8 text-center text-sm text-muted-foreground">
+      <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
         LeafScan · Sign in to save your detection history.
       </footer>
     </div>

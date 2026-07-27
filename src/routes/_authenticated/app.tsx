@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { analyzeDetection } from "@/lib/detect.functions";
 import { AppShell } from "@/components/app-shell";
 import { compressImage, validateImageFile } from "@/lib/image-client";
+import { PageHeader } from "@/components/page-header";
+import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
 
 const CROPS = [
   "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
@@ -90,12 +92,17 @@ function DetectPage() {
 
   return (
     <AppShell>
-      <div className="grid gap-8 md:grid-cols-[1fr_1fr] items-start">
+      <div className="grid items-start gap-8 md:grid-cols-[1fr_1fr]">
         <div>
-          <h1 className="font-serif text-3xl font-semibold">New scan</h1>
-          <p className="text-muted-foreground mt-1">Upload a clear photo of the affected leaf and pick your crop.</p>
+          <PageHeader
+            icon={ScanLine}
+            eyebrow="Detect"
+            title="New scan"
+            description="Upload a clear photo of the affected leaf and pick your crop."
+          />
 
-          <Card className="mt-6 p-6 border-border shadow-[var(--shadow-soft)]">
+          <FadeIn delay={0.1} className="mt-6">
+          <Card className="p-6">
             <label className="block text-sm font-medium mb-2">Crop</label>
             <Select value={crop} onValueChange={setCrop}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -156,12 +163,13 @@ function DetectPage() {
               <p className="mt-3 text-xs text-muted-foreground text-center">This usually takes 5-15 seconds. Please keep this tab open.</p>
             )}
           </Card>
+          </FadeIn>
         </div>
 
-        <div>
+        <FadeIn delay={0.18}>
           <h2 className="font-serif text-xl font-semibold">Recent scans</h2>
           <p className="text-muted-foreground text-sm mt-1">Your last three detections.</p>
-          <div className="mt-4 space-y-3">
+          <Stagger className="mt-4 space-y-3">
             {recent.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
             {recent.data && recent.data.length === 0 && (
               <Card className="p-6 text-center text-muted-foreground border-dashed">
@@ -170,8 +178,9 @@ function DetectPage() {
               </Card>
             )}
             {recent.data?.map((d) => (
-              <Link key={d.id} to="/detection/$id" params={{ id: d.id }}>
-                <Card className="p-4 flex items-center gap-3 hover:shadow-[var(--shadow-soft)] transition-shadow">
+              <StaggerItem key={d.id}>
+              <Link to="/detection/$id" params={{ id: d.id }}>
+                <Card className="flex items-center gap-3 p-4">
                   <div className={`grid place-items-center w-10 h-10 rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}>
                     {d.is_healthy ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                   </div>
@@ -182,10 +191,11 @@ function DetectPage() {
                   <Badge variant="secondary">{d.confidence ?? 0}%</Badge>
                 </Card>
               </Link>
+              </StaggerItem>
             ))}
-            <Link to="/history"><Button variant="ghost" className="w-full">View all history →</Button></Link>
-          </div>
-        </div>
+            <Link to="/history"><Button variant="ghost" className="w-full rounded-xl">View all history →</Button></Link>
+          </Stagger>
+        </FadeIn>
       </div>
     </AppShell>
   );

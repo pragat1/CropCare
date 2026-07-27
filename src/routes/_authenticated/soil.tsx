@@ -12,6 +12,8 @@ import { analyzeSoil } from "@/lib/soil.functions";
 import { AppShell } from "@/components/app-shell";
 import { UploadZone } from "@/components/upload-zone";
 import { SOIL_GUIDE } from "@/lib/data/soil-guide";
+import { PageHeader } from "@/components/page-header";
+import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/soil")({
   component: SoilPage,
@@ -59,12 +61,16 @@ function SoilPage() {
 
   return (
     <AppShell>
-      <div className="grid gap-8 md:grid-cols-[1fr_1fr] items-start">
+      <div className="grid items-start gap-8 md:grid-cols-[1fr_1fr]">
         <div>
-          <h1 className="font-serif text-3xl font-semibold">Soil analysis</h1>
-          <p className="text-muted-foreground mt-1">Upload a photo of your soil — get type, fertility, and recommended crops.</p>
+          <PageHeader
+            icon={Sprout}
+            eyebrow="Soil"
+            title="Soil analysis"
+            description="Upload a photo of your soil — get type, fertility, and recommended crops."
+          />
 
-          <Card className="mt-6 p-6">
+          <Card className="mt-8 p-6">
             <UploadZone
               label="Upload soil photo"
               hint="A close-up in natural light works best"
@@ -94,7 +100,7 @@ function SoilPage() {
           </div>
         </div>
 
-        <div>
+        <FadeIn delay={0.15}>
           <h2 className="font-serif text-xl font-semibold">Recent soil scans</h2>
           <div className="mt-4 space-y-3">
             {recent.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
@@ -121,7 +127,7 @@ function SoilPage() {
               </Link>
             ))}
           </div>
-        </div>
+        </FadeIn>
       </div>
     </AppShell>
   );
