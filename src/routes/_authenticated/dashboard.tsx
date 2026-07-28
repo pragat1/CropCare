@@ -93,13 +93,13 @@ function StatCard({
 
 const chartTooltip = {
   contentStyle: {
-    background: "hsl(var(--card))",
-    border: "1px solid hsl(var(--border))",
+    background: "var(--card)",
+    border: "1px solid var(--border)",
     borderRadius: "12px",
     fontSize: "12px",
-    color: "hsl(var(--foreground))",
+    color: "var(--foreground)",
   },
-  cursor: { fill: "hsl(var(--muted))", opacity: 0.35 },
+  cursor: { fill: "var(--muted)", opacity: 0.35 },
 } as const;
 
 function DashboardPage() {
@@ -218,7 +218,7 @@ function DashboardPage() {
                 <div
                   className="relative mt-5 grid h-40 w-40 place-items-center rounded-full"
                   style={{
-                    background: `conic-gradient(hsl(var(--primary)) ${(stats.score ?? 0) * 3.6}deg, hsl(var(--muted)) 0deg)`,
+                    background: `conic-gradient(var(--primary) ${(stats.score ?? 0) * 3.6}deg, var(--muted) 0deg)`,
                   }}
                   role="img"
                   aria-label={`Crop health score ${stats.score ?? 0} out of 100`}
@@ -250,20 +250,20 @@ function DashboardPage() {
                     <AreaChart data={stats.weekly} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
                       <defs>
                         <linearGradient id="gHealthy" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.5} />
-                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.5} />
+                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                         </linearGradient>
                         <linearGradient id="gDiseased" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.45} />
-                          <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
+                          <stop offset="5%" stopColor="var(--destructive)" stopOpacity={0.45} />
+                          <stop offset="95%" stopColor="var(--destructive)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
                       <Tooltip {...chartTooltip} />
-                      <Area type="monotone" dataKey="healthy" stroke="hsl(var(--primary))" fill="url(#gHealthy)" strokeWidth={2} />
-                      <Area type="monotone" dataKey="diseased" stroke="hsl(var(--destructive))" fill="url(#gDiseased)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="healthy" stroke="var(--primary)" fill="url(#gHealthy)" strokeWidth={2} />
+                      <Area type="monotone" dataKey="diseased" stroke="var(--destructive)" fill="url(#gDiseased)" strokeWidth={2} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -282,11 +282,11 @@ function DashboardPage() {
                 <div className="mt-4 h-[220px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={stats.monthly} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
-                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} stroke="hsl(var(--muted-foreground))" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
+                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} stroke="var(--muted-foreground)" />
                       <Tooltip {...chartTooltip} />
-                      <Bar dataKey="scans" radius={[8, 8, 0, 0]} fill="hsl(var(--primary))" />
+                      <Bar dataKey="scans" radius={[8, 8, 0, 0]} fill="var(--primary)" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
