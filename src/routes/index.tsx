@@ -8,7 +8,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/app" });
+    if (data.session) throw redirect({ to: "/dashboard" });
   },
   component: Landing,
 });

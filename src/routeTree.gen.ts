@@ -19,6 +19,7 @@ import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
@@ -73,6 +74,11 @@ const AuthenticatedDiseasesRoute = AuthenticatedDiseasesRouteImport.update({
   path: '/diseases',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/about': typeof AuthenticatedAboutRoute
   '/app': typeof AuthenticatedAppRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/about': typeof AuthenticatedAboutRoute
   '/app': typeof AuthenticatedAppRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/about'
     | '/app'
+    | '/dashboard'
     | '/diseases'
     | '/history'
     | '/quiz'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/about'
     | '/app'
+    | '/dashboard'
     | '/diseases'
     | '/history'
     | '/quiz'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/about'
     | '/_authenticated/app'
+    | '/_authenticated/dashboard'
     | '/_authenticated/diseases'
     | '/_authenticated/history'
     | '/_authenticated/quiz'
@@ -269,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiseasesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
@@ -314,6 +333,7 @@ const AuthenticatedSoilRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
@@ -327,6 +347,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
