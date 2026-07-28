@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu } from "lucide-react";
+import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   const tabs = [
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/app", label: "Detect", icon: ScanLine },
     { to: "/soil", label: "Soil", icon: Sprout },
     { to: "/tracker", label: "Tracker", icon: LineChart },
@@ -45,7 +46,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background bg-mesh">
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 md:px-6">
-          <Link to="/app" className="flex shrink-0 items-center gap-2.5 font-serif text-lg font-semibold tracking-tight">
+          <Link to="/dashboard" className="flex shrink-0 items-center gap-2.5 font-serif text-lg font-semibold tracking-tight">
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground ring-glow">
               <Leaf className="h-4.5 w-4.5" />
             </span>
