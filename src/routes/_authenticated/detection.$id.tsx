@@ -148,14 +148,14 @@ function DetectionPage() {
             </div>
           </Card>
 
+          {d.weather && (
+            <WeatherAtScan
+              weather={d.weather as unknown as WeatherSnapshot}
+              risk={(d.weather_risk as unknown as { level: RiskLevel; score: number; top: Array<{ name: string; score: number }> }) ?? null}
+            />
+          )}
           {!healthy && (
             <>
-              {d.weather && (
-                <WeatherAtScan
-                  weather={d.weather as unknown as WeatherSnapshot}
-                  risk={(d.weather_risk as unknown as { level: RiskLevel; score: number; top: Array<{ name: string; score: number }> }) ?? null}
-                />
-              )}
               {(alternatives.length > 0 || d.disease) && (
                 <Card className="p-6">
                   <h2 className="font-serif text-lg font-semibold mb-4">Top possible diseases</h2>
