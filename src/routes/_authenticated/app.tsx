@@ -14,6 +14,7 @@ import { AppShell } from "@/components/app-shell";
 import { compressImage, validateImageFile } from "@/lib/image-client";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
+import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
 
 const CROPS = [
   "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
@@ -32,6 +33,7 @@ function DetectPage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const weather = useWeatherIntel(crop);
 
   const recent = useQuery({
     queryKey: ["recent-detections"],
@@ -60,6 +62,21 @@ function DetectPage() {
         .upload(path, compressed, { contentType: compressed.type || "image/jpeg", upsert: false });
       if (upErr) throw upErr;
       const res = await analyze({ data: { crop, imagePath: path } });
+      const intel = weather.intel;
+      const res = await analyze({
+        data: {
+          crop,
+          imagePath: path,
+          weather: intel?.weather,
+          weatherRisk: intel
+            ? {
+                level: intel.overall.level,
+                score: intel.overall.score,
+                top: intel.risks.slice(0, 3).map((r) => ({ name: r.name, level: r.level, score: r.score })),
+              }
+            : undefined,
+        },
+      });
       return res.id;
     },
     retry: (count, err) => {
