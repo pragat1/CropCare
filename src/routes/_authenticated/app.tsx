@@ -61,7 +61,6 @@ function DetectPage() {
         .from("leaf-images")
         .upload(path, compressed, { contentType: compressed.type || "image/jpeg", upsert: false });
       if (upErr) throw upErr;
-      const res = await analyze({ data: { crop, imagePath: path } });
       const intel = weather.intel;
       const res = await analyze({
         data: {
