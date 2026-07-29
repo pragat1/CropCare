@@ -76,6 +76,8 @@ export type Database = {
           treatment_organic: Json | null
           treatment_organic_detailed: Json | null
           user_id: string
+          weather: Json | null
+          weather_risk: Json | null
         }
         Insert: {
           alternatives?: Json | null
@@ -102,6 +104,8 @@ export type Database = {
           treatment_organic?: Json | null
           treatment_organic_detailed?: Json | null
           user_id: string
+          weather?: Json | null
+          weather_risk?: Json | null
         }
         Update: {
           alternatives?: Json | null
@@ -128,6 +132,8 @@ export type Database = {
           treatment_organic?: Json | null
           treatment_organic_detailed?: Json | null
           user_id?: string
+          weather?: Json | null
+          weather_risk?: Json | null
         }
         Relationships: []
       }
