@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWeatherRouteImport } from './routes/_authenticated/weather'
 import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
 import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/tips'
 import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
@@ -38,6 +39,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWeatherRoute = AuthenticatedWeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedTrackerRoute = AuthenticatedTrackerRouteImport.update({
   id: '/tracker',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
+  '/weather': typeof AuthenticatedWeatherRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
 }
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
+  '/weather': typeof AuthenticatedWeatherRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
 }
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
   '/_authenticated/tips': typeof AuthenticatedTipsRoute
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
+  '/_authenticated/weather': typeof AuthenticatedWeatherRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
 }
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/soil'
     | '/tips'
     | '/tracker'
+    | '/weather'
     | '/detection/$id'
     | '/soil/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/soil'
     | '/tips'
     | '/tracker'
+    | '/weather'
     | '/detection/$id'
     | '/soil/$id'
   id:
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/_authenticated/soil'
     | '/_authenticated/tips'
     | '/_authenticated/tracker'
+    | '/_authenticated/weather'
     | '/_authenticated/detection/$id'
     | '/_authenticated/soil/$id'
   fileRoutesById: FileRoutesById
@@ -231,6 +243,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/weather': {
+      id: '/_authenticated/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof AuthenticatedWeatherRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/tracker': {
       id: '/_authenticated/tracker'
@@ -341,6 +360,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
   AuthenticatedTipsRoute: typeof AuthenticatedTipsRoute
   AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
+  AuthenticatedWeatherRoute: typeof AuthenticatedWeatherRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
 }
 
@@ -355,6 +375,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
   AuthenticatedTipsRoute: AuthenticatedTipsRoute,
   AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
+  AuthenticatedWeatherRoute: AuthenticatedWeatherRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
 }
 

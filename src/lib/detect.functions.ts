@@ -16,6 +16,27 @@ const InputSchema = z.object({
     .min(1)
     .max(500)
     .regex(/^[a-zA-Z0-9/_.-]+$/, "Invalid path characters"),
+  weather: z
+    .object({
+      temperature: z.number(),
+      humidity: z.number(),
+      rainfall: z.number(),
+      wind: z.number(),
+      uvIndex: z.number(),
+      condition: z.string().max(80),
+      latitude: z.number().min(-90).max(90),
+      longitude: z.number().min(-180).max(180),
+      place: z.string().max(120).nullable().optional(),
+      observedAt: z.string().max(40),
+    })
+    .optional(),
+  weatherRisk: z
+    .object({
+      level: z.enum(["low", "moderate", "high"]),
+      score: z.number().min(0).max(100),
+      top: z.array(z.object({ name: z.string().max(80), level: z.string().max(20), score: z.number() })).max(5),
+    })
+    .optional(),
 });
 
 export const analyzeDetection = createServerFn({ method: "POST" })
@@ -41,6 +62,8 @@ export const analyzeDetection = createServerFn({ method: "POST" })
         image_path: data.imagePath,
         is_healthy: result.is_healthy,
         disease: result.is_healthy ? null : result.top.disease,
+        weather: data.weather ? JSON.parse(JSON.stringify(data.weather)) : null,
+        weather_risk: data.weatherRisk ? JSON.parse(JSON.stringify(data.weatherRisk)) : null,
         confidence: result.top.confidence,
         severity: result.severity,
         symptoms: result.symptoms,

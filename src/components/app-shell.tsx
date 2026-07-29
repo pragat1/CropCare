@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard } from "lucide-react";
+import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard, CloudSun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,6 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/app", label: "Detect", icon: ScanLine },
     { to: "/soil", label: "Soil", icon: Sprout },
+    { to: "/weather", label: "Weather", icon: CloudSun },
     { to: "/tracker", label: "Tracker", icon: LineChart },
     { to: "/diseases", label: "Diseases", icon: BookOpen },
     { to: "/tips", label: "Tips", icon: Lightbulb },

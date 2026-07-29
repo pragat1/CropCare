@@ -14,6 +14,7 @@ import { AppShell } from "@/components/app-shell";
 import { compressImage, validateImageFile } from "@/lib/image-client";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
+import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
 
 const CROPS = [
   "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
@@ -32,6 +33,7 @@ function DetectPage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const weather = useWeatherIntel(crop);
 
   const recent = useQuery({
     queryKey: ["recent-detections"],
@@ -59,7 +61,21 @@ function DetectPage() {
         .from("leaf-images")
         .upload(path, compressed, { contentType: compressed.type || "image/jpeg", upsert: false });
       if (upErr) throw upErr;
-      const res = await analyze({ data: { crop, imagePath: path } });
+      const intel = weather.intel;
+      const res = await analyze({
+        data: {
+          crop,
+          imagePath: path,
+          weather: intel?.weather,
+          weatherRisk: intel
+            ? {
+                level: intel.overall.level,
+                score: intel.overall.score,
+                top: intel.risks.slice(0, 3).map((r) => ({ name: r.name, level: r.level, score: r.score })),
+              }
+            : undefined,
+        },
+      });
       return res.id;
     },
     retry: (count, err) => {
@@ -167,7 +183,22 @@ function DetectPage() {
         </div>
 
         <FadeIn delay={0.18}>
-          <h2 className="font-serif text-xl font-semibold">Recent scans</h2>
+          <h2 className="font-serif text-xl font-semibold">Weather intelligence</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Live conditions and risk for your selected crop — saved with each scan.</p>
+          <div className="mt-4">
+            <WeatherPanel
+              crop={crop}
+              intel={weather.intel}
+              isLoading={weather.isLoading}
+              error={weather.error}
+              asked={weather.asked}
+              onRequest={weather.requestLocation}
+              onRetry={weather.retry}
+              compact
+            />
+          </div>
+
+          <h2 className="mt-8 font-serif text-xl font-semibold">Recent scans</h2>
           <p className="text-muted-foreground text-sm mt-1">Your last three detections.</p>
           <Stagger className="mt-4 space-y-3">
             {recent.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
