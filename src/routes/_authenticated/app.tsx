@@ -183,7 +183,22 @@ function DetectPage() {
         </div>
 
         <FadeIn delay={0.18}>
-          <h2 className="font-serif text-xl font-semibold">Recent scans</h2>
+          <h2 className="font-serif text-xl font-semibold">Weather intelligence</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Live conditions and risk for your selected crop — saved with each scan.</p>
+          <div className="mt-4">
+            <WeatherPanel
+              crop={crop}
+              intel={weather.intel}
+              isLoading={weather.isLoading}
+              error={weather.error}
+              asked={weather.asked}
+              onRequest={weather.requestLocation}
+              onRetry={weather.retry}
+              compact
+            />
+          </div>
+
+          <h2 className="mt-8 font-serif text-xl font-semibold">Recent scans</h2>
           <p className="text-muted-foreground text-sm mt-1">Your last three detections.</p>
           <Stagger className="mt-4 space-y-3">
             {recent.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
