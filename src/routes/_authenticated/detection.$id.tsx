@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, AlertTriangle, Sprout, FlaskConical, ShieldCheck, Trash2, Zap, Clock, GitCompare, Leaf } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertTriangle, Sprout, FlaskConical, ShieldCheck, Trash2, Zap, Clock, GitCompare, Leaf, CloudSun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,41 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import type { DiseaseCandidate, Differential, TreatmentPlan } from "@/lib/ai.server";
+import { RISK_STYLES, type RiskLevel, type WeatherSnapshot } from "@/lib/weather-types";
+
+function WeatherAtScan({ weather, risk }: { weather: WeatherSnapshot; risk: { level: RiskLevel; score: number; top: Array<{ name: string; score: number }> } | null }) {
+  return (
+    <Card className="p-6">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="grid h-7 w-7 place-items-center rounded-md bg-muted"><CloudSun className="h-4 w-4" /></span>
+        <h2 className="font-serif text-lg font-semibold">Weather at scan time</h2>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        {weather.place ?? `${weather.latitude.toFixed(2)}, ${weather.longitude.toFixed(2)}`} · {weather.condition}
+      </p>
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-5">
+        {[
+          ["Temp", `${weather.temperature}°C`],
+          ["Humidity", `${weather.humidity}%`],
+          ["Rain 24h", `${weather.rainfall} mm`],
+          ["Wind", `${weather.wind} km/h`],
+          ["UV", `${weather.uvIndex}`],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-xl border border-border/50 bg-card/40 p-3">
+            <div className="text-xs text-muted-foreground">{label}</div>
+            <div className="mt-0.5 font-semibold tabular-nums">{value}</div>
+          </div>
+        ))}
+      </div>
+      {risk && (
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className={`capitalize ${RISK_STYLES[risk.level]}`}>Weather risk: {risk.level} · {risk.score}%</Badge>
+          {risk.top?.map((t) => <Badge key={t.name} variant="secondary">{t.name} {t.score}%</Badge>)}
+        </div>
+      )}
+    </Card>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/detection/$id")({
   component: DetectionPage,
@@ -115,6 +150,12 @@ function DetectionPage() {
 
           {!healthy && (
             <>
+              {d.weather && (
+                <WeatherAtScan
+                  weather={d.weather as unknown as WeatherSnapshot}
+                  risk={(d.weather_risk as unknown as { level: RiskLevel; score: number; top: Array<{ name: string; score: number }> }) ?? null}
+                />
+              )}
               {(alternatives.length > 0 || d.disease) && (
                 <Card className="p-6">
                   <h2 className="font-serif text-lg font-semibold mb-4">Top possible diseases</h2>
