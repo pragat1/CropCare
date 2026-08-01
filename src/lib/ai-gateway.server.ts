@@ -49,6 +49,8 @@ export type CompletionOptions = {
   attempts?: number;
   /** enforce JSON response */
   json?: boolean;
+  /** extra top-level fields merged into the request body */
+  extraBody?: Record<string, unknown>;
 };
 
 async function sleep(ms: number) {
@@ -69,6 +71,7 @@ export async function aiChatCompletion(opts: CompletionOptions): Promise<string>
     model: opts.model ?? DEFAULT_MODEL,
     messages: opts.messages,
     ...(opts.json !== false ? { response_format: { type: "json_object" } } : {}),
+    ...(opts.extraBody ?? {}),
   });
 
   let lastError: AiGatewayError | undefined;
