@@ -1,6 +1,6 @@
 // Server-only helpers for the multilingual voice assistant.
 import { DISEASES } from "./data/diseases";
-import { aiChatCompletion, safeJsonParse } from "./ai-gateway.server";
+import { aiChatCompletion, safeJsonParse, type ChatContent } from "./ai-gateway.server";
 
 export type AssistantLang = "en" | "hi" | "pa";
 
@@ -14,6 +14,14 @@ export type AssistantAnswer = {
   answer: string;
   diseaseIds: string[];
   followUps: string[];
+  risk?: AssistantRisk | null;
+};
+
+export type AssistantRisk = {
+  level: "low" | "medium" | "high";
+  crop: string;
+  plantPart: string;
+  causes: string[];
 };
 
 /** Compact, token-friendly view of the disease database for grounding. */
@@ -34,6 +42,7 @@ export async function askAssistantAi(
   question: string,
   lang: AssistantLang,
   history: Array<{ role: "user" | "assistant"; content: string }>,
+  imageDataUrl?: string,
 ): Promise<AssistantAnswer> {
   const system = `You are CropCare's farming voice assistant. You ONLY answer using the disease database below plus general safe agronomy advice.
 
@@ -43,11 +52,20 @@ RULES
 - Be spoken-friendly: short sentences, no markdown, no bullets, no emojis, under 130 words.
 - Mention likely disease name, why it matches, one organic and one chemical option with dosage if listed, and one prevention tip.
 - Always add a short safety note when recommending chemicals.
+${imageDataUrl ? `- A photo of the plant is attached. Look at it carefully: describe what you actually see (spot colour, shape, location, wilting), then give the disease risk level and the likely causes. If the photo is not a plant, say so.` : ""}
 
 DISEASE DATABASE
 ${diseaseContext()}
 
-Return JSON only: {"answer": string, "diseaseIds": string[], "followUps": string[3 short suggested questions in ${LANG_LABEL[lang]}]}`;
+Return JSON only: {"answer": string, "diseaseIds": string[], "followUps": string[3 short suggested questions in ${LANG_LABEL[lang]}], "risk": {"level":"low"|"medium"|"high","crop": string,"plantPart": string,"causes": string[] } | null}
+Set "risk" whenever a plant problem is discussed (always when a photo is attached); "causes" must list the biological/environmental causes in ${LANG_LABEL[lang]}.`;
+
+  const userContent: ChatContent = imageDataUrl
+    ? [
+        { type: "text", text: question },
+        { type: "image_url", image_url: { url: imageDataUrl } },
+      ]
+    : question;
 
   const raw = await aiChatCompletion({
     model: "openai/gpt-5.6-sol",
@@ -55,16 +73,27 @@ Return JSON only: {"answer": string, "diseaseIds": string[], "followUps": string
     messages: [
       { role: "system", content: system },
       ...history.slice(-6),
-      { role: "user", content: question },
+      { role: "user", content: userContent },
     ],
   });
 
   const parsed = safeJsonParse<Partial<AssistantAnswer>>(raw);
   const known = new Set(DISEASES.map((d) => d.id));
+  const rawRisk = parsed.risk as Partial<AssistantRisk> | null | undefined;
+  const risk: AssistantRisk | null =
+    rawRisk && typeof rawRisk === "object" && ["low", "medium", "high"].includes(String(rawRisk.level))
+      ? {
+          level: rawRisk.level as AssistantRisk["level"],
+          crop: typeof rawRisk.crop === "string" ? rawRisk.crop : "",
+          plantPart: typeof rawRisk.plantPart === "string" ? rawRisk.plantPart : "",
+          causes: Array.isArray(rawRisk.causes) ? rawRisk.causes.filter((c) => typeof c === "string").slice(0, 6) : [],
+        }
+      : null;
   return {
     answer: typeof parsed.answer === "string" && parsed.answer.trim() ? parsed.answer.trim() : raw.slice(0, 800),
     diseaseIds: Array.isArray(parsed.diseaseIds) ? parsed.diseaseIds.filter((i) => typeof i === "string" && known.has(i)).slice(0, 3) : [],
     followUps: Array.isArray(parsed.followUps) ? parsed.followUps.filter((f) => typeof f === "string").slice(0, 3) : [],
+    risk,
   };
 }
 
