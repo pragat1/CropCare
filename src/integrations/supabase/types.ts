@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      assistant_messages: {
+        Row: {
+          content: string
+          created_at: string
+          disease_ids: Json
+          id: string
+          image_path: string | null
+          lang: string
+          risk: Json | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          disease_ids?: Json
+          id?: string
+          image_path?: string | null
+          lang?: string
+          risk?: Json | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          disease_ids?: Json
+          id?: string
+          image_path?: string | null
+          lang?: string
+          risk?: Json | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
