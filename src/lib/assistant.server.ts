@@ -1,6 +1,6 @@
 // Server-only helpers for the multilingual voice assistant.
 import { DISEASES } from "./data/diseases";
-import { aiChatCompletion, safeJsonParse } from "./ai-gateway.server";
+import { aiChatCompletion, safeJsonParse, type ChatContent } from "./ai-gateway.server";
 
 export type AssistantLang = "en" | "hi" | "pa";
 
