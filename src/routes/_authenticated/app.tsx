@@ -15,6 +15,11 @@ import { compressImage, validateImageFile } from "@/lib/image-client";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
 import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
+import { queueScan } from "@/lib/offline/sync";
+import { saveScans } from "@/lib/offline/scan-cache";
+import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
+import { CloudOff, Clock } from "lucide-react";
+import { useEffect } from "react";
 
 const CROPS = [
   "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
@@ -34,6 +39,8 @@ function DetectPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const weather = useWeatherIntel(crop);
+  const { online, syncing, pending, syncNow } = useSyncStatus();
+  const queued = usePendingQueue();
 
   const recent = useQuery({
     queryKey: ["recent-detections"],
@@ -51,6 +58,22 @@ function DetectPage() {
   const mutation = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Please choose a leaf image");
+      const intelForQueue = weather.intel;
+      if (!navigator.onLine) {
+        await queueScan({
+          crop,
+          file,
+          weather: intelForQueue?.weather,
+          weatherRisk: intelForQueue
+            ? {
+                level: intelForQueue.overall.level,
+                score: intelForQueue.overall.score,
+                top: intelForQueue.risks.slice(0, 3).map((r) => ({ name: r.name, level: r.level, score: r.score })),
+              }
+            : undefined,
+        });
+        return null;
+      }
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) throw new Error("Not signed in");
@@ -86,6 +109,13 @@ function DetectPage() {
     },
     retryDelay: (attempt) => 500 * 2 ** attempt,
     onSuccess: (id) => {
+      if (!id) {
+        setFile(null);
+        setPreview(null);
+        if (inputRef.current) inputRef.current.value = "";
+        toast.success("Saved offline — it will upload automatically when you're back online");
+        return;
+      }
       qc.invalidateQueries({ queryKey: ["recent-detections"] });
       qc.invalidateQueries({ queryKey: ["history"] });
       navigate({ to: "/detection/$id", params: { id } });
