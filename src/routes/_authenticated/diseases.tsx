@@ -9,17 +9,19 @@ import { DISEASES } from "@/lib/data/diseases";
 import { Search, BookOpen } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
+import { useOfflineData } from "@/hooks/use-offline";
 
 export const Route = createFileRoute("/_authenticated/diseases")({ component: DiseasesPage });
 
 function DiseasesPage() {
   const [q, setQ] = useState("");
   const [crop, setCrop] = useState<string>("all");
-  const crops = useMemo(() => Array.from(new Set(DISEASES.map(d => d.crop))).sort(), []);
-  const filtered = useMemo(() => DISEASES.filter(d =>
+  const { data: diseases } = useOfflineData("diseases", DISEASES);
+  const crops = useMemo(() => Array.from(new Set(diseases.map(d => d.crop))).sort(), [diseases]);
+  const filtered = useMemo(() => diseases.filter(d =>
     (crop === "all" || d.crop === crop) &&
     (q.trim() === "" || d.name.toLowerCase().includes(q.toLowerCase()) || d.summary.toLowerCase().includes(q.toLowerCase()))
-  ), [q, crop]);
+  ), [q, crop, diseases]);
 
   return (
     <AppShell>
@@ -27,7 +29,7 @@ function DiseasesPage() {
         icon={BookOpen}
         eyebrow="Reference"
         title="Disease database"
-        description={`Browse ${DISEASES.length} common crop diseases with organic and chemical treatments.`}
+        description={`Browse ${diseases.length} common crop diseases with organic and chemical treatments. Available offline.`}
       />
 
       <div className="mt-8 flex flex-col sm:flex-row gap-3">
