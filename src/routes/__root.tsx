@@ -13,6 +13,10 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
+import { toast } from "sonner";
+import { registerOfflineWorker } from "@/lib/offline/sw-register";
+import { startSyncEngine } from "@/lib/offline/sync";
+import { seedOfflineContent } from "@/lib/offline/content-cache";
 
 function NotFoundComponent() {
   return (
@@ -86,6 +90,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: "Instant AI diagnosis for crop diseases with organic and chemical treatment guidance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "theme-color", content: "#143a26" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "LeafScan" },
     ],
     links: [
       {
@@ -99,6 +106,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/pwa-192.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -133,6 +142,18 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  // Offline support: cache reference data, register the SW, and drain the upload queue.
+  useEffect(() => {
+    registerOfflineWorker();
+    void seedOfflineContent();
+    const stop = startSyncEngine((n) => {
+      toast.success(`${n} offline scan${n > 1 ? "s" : ""} synced`);
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-detections"] });
+    });
+    return stop;
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>

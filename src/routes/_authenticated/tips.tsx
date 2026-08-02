@@ -5,21 +5,24 @@ import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { TIPS, CROP_TIPS } from "@/lib/data/tips";
+import { useOfflineData } from "@/hooks/use-offline";
 
 export const Route = createFileRoute("/_authenticated/tips")({ component: TipsPage });
 
 function TipsPage() {
+  const { data: tips } = useOfflineData("tips", TIPS);
+  const { data: cropTips } = useOfflineData("cropTips", CROP_TIPS);
   return (
     <AppShell>
       <PageHeader
         icon={Lightbulb}
         eyebrow="Knowledge"
         title="Farming tips"
-        description="Best practices across watering, soil, sunlight, pests, fertilizer and harvest."
+        description="Best practices across watering, soil, sunlight, pests, fertilizer and harvest. Available offline."
       />
 
       <Stagger className="mt-8 grid gap-5 md:grid-cols-2">
-        {TIPS.map(g => (
+        {tips.map(g => (
           <StaggerItem key={g.cat}>
           <Card className="h-full p-6">
             <div className="flex items-center gap-2"><span className="text-xl" aria-hidden>{g.icon}</span><h2 className="font-semibold">{g.title}</h2></div>
@@ -33,7 +36,7 @@ function TipsPage() {
 
       <h2 className="font-serif text-2xl font-semibold mt-12">Crop-specific guides</h2>
       <div className="mt-4 grid gap-5 md:grid-cols-2">
-        {Object.values(CROP_TIPS).map(c => (
+        {Object.values(cropTips).map(c => (
           <Card key={c.name} className="p-6">
             <div className="flex items-center gap-2"><span className="text-xl" aria-hidden>{c.emoji}</span><h3 className="font-semibold">{c.name}</h3></div>
             <details className="mt-3 text-sm"><summary className="cursor-pointer font-medium">Watering</summary><ul className="mt-2 text-muted-foreground space-y-1">{c.watering.map((t,i)=><li key={i}>• {t}</li>)}</ul></details>

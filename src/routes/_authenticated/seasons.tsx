@@ -5,21 +5,25 @@ import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { SEASONS, SEASON_LIST } from "@/lib/data/seasons";
+import { useOfflineData } from "@/hooks/use-offline";
 
 export const Route = createFileRoute("/_authenticated/seasons")({ component: SeasonsPage });
 
 function SeasonsPage() {
+  const { data: seasons } = useOfflineData("seasons", SEASONS);
+  const { data: seasonList } = useOfflineData("seasonList", SEASON_LIST);
   return (
     <AppShell>
       <PageHeader
         icon={CalendarDays}
         eyebrow="Planning"
         title="Seasonal calendar"
-        description="What to plant and watch out for through the year."
+        description="What to plant and watch out for through the year. Available offline."
       />
       <Stagger className="mt-8 grid gap-5 md:grid-cols-2">
-        {SEASON_LIST.map(s => {
-          const data = SEASONS[s.key];
+        {seasonList.map(s => {
+          const data = seasons[s.key];
+          if (!data) return null;
           return (
             <StaggerItem key={s.key}>
             <Card className="h-full p-6">

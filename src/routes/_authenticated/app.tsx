@@ -15,6 +15,11 @@ import { compressImage, validateImageFile } from "@/lib/image-client";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
 import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
+import { queueScan } from "@/lib/offline/sync";
+import { saveScans } from "@/lib/offline/scan-cache";
+import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
+import { CloudOff, Clock } from "lucide-react";
+import { useEffect } from "react";
 
 const CROPS = [
   "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
@@ -34,6 +39,8 @@ function DetectPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const weather = useWeatherIntel(crop);
+  const { online, syncing, pending, syncNow } = useSyncStatus();
+  const queued = usePendingQueue();
 
   const recent = useQuery({
     queryKey: ["recent-detections"],
@@ -48,9 +55,43 @@ function DetectPage() {
     },
   });
 
+  // Keep a local copy of the latest scans so they can be read offline.
+  useEffect(() => {
+    if (recent.data?.length) {
+      void saveScans(
+        recent.data.map((d) => ({
+          id: d.id,
+          crop: d.crop,
+          disease: d.disease,
+          is_healthy: d.is_healthy,
+          confidence: d.confidence,
+          severity: null,
+          summary: null,
+          created_at: d.created_at,
+        })),
+      );
+    }
+  }, [recent.data]);
+
   const mutation = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Please choose a leaf image");
+      const intelForQueue = weather.intel;
+      if (!navigator.onLine) {
+        await queueScan({
+          crop,
+          file,
+          weather: intelForQueue?.weather,
+          weatherRisk: intelForQueue
+            ? {
+                level: intelForQueue.overall.level,
+                score: intelForQueue.overall.score,
+                top: intelForQueue.risks.slice(0, 3).map((r) => ({ name: r.name, level: r.level, score: r.score })),
+              }
+            : undefined,
+        });
+        return null;
+      }
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) throw new Error("Not signed in");
@@ -86,6 +127,13 @@ function DetectPage() {
     },
     retryDelay: (attempt) => 500 * 2 ** attempt,
     onSuccess: (id) => {
+      if (!id) {
+        setFile(null);
+        setPreview(null);
+        if (inputRef.current) inputRef.current.value = "";
+        toast.success("Saved offline — it will upload automatically when you're back online");
+        return;
+      }
       qc.invalidateQueries({ queryKey: ["recent-detections"] });
       qc.invalidateQueries({ queryKey: ["history"] });
       navigate({ to: "/detection/$id", params: { id } });
@@ -157,8 +205,18 @@ function DetectPage() {
               disabled={!file || mutation.isPending}
               onClick={() => mutation.mutate()}
             >
-              {mutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing…</> : <><ScanLine className="h-4 w-4" /> Analyze leaf</>}
+              {mutation.isPending
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> {online ? "Analyzing…" : "Saving offline…"}</>
+                : online
+                  ? <><ScanLine className="h-4 w-4" /> Analyze leaf</>
+                  : <><CloudOff className="h-4 w-4" /> Save scan for later</>}
             </Button>
+            {!online && (
+              <p className="mt-3 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-xs text-muted-foreground">
+                <CloudOff className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
+                You're offline. Scans are stored on this device and analyzed automatically as soon as the connection returns.
+              </p>
+            )}
             {mutation.isError && (
               <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
                 <div className="flex items-start gap-2 text-destructive">
@@ -197,6 +255,30 @@ function DetectPage() {
               compact
             />
           </div>
+
+          {queued.length > 0 && (
+            <Card className="mt-8 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 font-medium">
+                  <Clock className="h-4 w-4 text-warning" aria-hidden />
+                  Waiting to sync ({pending})
+                </div>
+                <Button size="sm" variant="outline" className="rounded-full" disabled={!online || syncing} onClick={() => void syncNow()}>
+                  {syncing ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Syncing…</> : "Sync now"}
+                </Button>
+              </div>
+              <ul className="mt-3 space-y-2 text-sm">
+                {queued.map((item) => (
+                  <li key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
+                    <span className="truncate">{item.crop} · {new Date(item.createdAt).toLocaleString()}</span>
+                    <Badge variant={item.lastError ? "destructive" : "secondary"}>
+                      {item.lastError ? "Retry pending" : "Queued"}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
 
           <h2 className="mt-8 font-serif text-xl font-semibold">Recent scans</h2>
           <p className="text-muted-foreground text-sm mt-1">Your last three detections.</p>
