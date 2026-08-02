@@ -10,6 +10,7 @@ import { useState } from "react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
+import { SyncStatus } from "@/components/sync-status";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -80,6 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
+          <SyncStatus className="ml-auto lg:ml-1" />
           <Button
             variant="ghost"
             size="sm"
