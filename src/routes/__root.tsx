@@ -13,6 +13,10 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "sonner";
+import { toast } from "sonner";
+import { registerOfflineWorker } from "@/lib/offline/sw-register";
+import { startSyncEngine } from "@/lib/offline/sync";
+import { seedOfflineContent } from "@/lib/offline/content-cache";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +137,18 @@ function RootComponent() {
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
+  // Offline support: cache reference data, register the SW, and drain the upload queue.
+  useEffect(() => {
+    registerOfflineWorker();
+    void seedOfflineContent();
+    const stop = startSyncEngine((n) => {
+      toast.success(`${n} offline scan${n > 1 ? "s" : ""} synced`);
+      queryClient.invalidateQueries({ queryKey: ["history"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-detections"] });
+    });
+    return stop;
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
