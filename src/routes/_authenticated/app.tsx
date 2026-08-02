@@ -55,6 +55,24 @@ function DetectPage() {
     },
   });
 
+  // Keep a local copy of the latest scans so they can be read offline.
+  useEffect(() => {
+    if (recent.data?.length) {
+      void saveScans(
+        recent.data.map((d) => ({
+          id: d.id,
+          crop: d.crop,
+          disease: d.disease,
+          is_healthy: d.is_healthy,
+          confidence: d.confidence,
+          severity: null,
+          summary: null,
+          created_at: d.created_at,
+        })),
+      );
+    }
+  }, [recent.data]);
+
   const mutation = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Please choose a leaf image");
