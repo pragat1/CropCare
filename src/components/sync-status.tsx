@@ -18,7 +18,7 @@ export function SyncStatus({ className }: { className?: string }) {
         : "Synced";
 
   const tone = !online
-    ? "border-warning/40 bg-warning/10 text-warning-foreground"
+    ? "border-warning/40 bg-warning/10 text-warning"
     : pending > 0 || syncing
       ? "border-primary/40 bg-primary/10 text-primary"
       : "border-border/50 bg-card/40 text-muted-foreground";
