@@ -20,6 +20,7 @@ export default defineConfig({
         registerType: "autoUpdate",
         injectRegister: null,
         filename: "sw.js",
+        outDir: "dist/client",
         devOptions: { enabled: false },
         manifest: {
           name: "LeafScan — AI Crop Disease Detection",
@@ -57,7 +58,8 @@ export default defineConfig({
             },
             {
               // Hashed, same-origin build assets.
-              urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/_build/"),
+              urlPattern: ({ url, sameOrigin }) =>
+                sameOrigin && (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/_build/")),
               handler: "CacheFirst",
               options: {
                 cacheName: "build-assets",
