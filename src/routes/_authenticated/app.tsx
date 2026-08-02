@@ -187,8 +187,18 @@ function DetectPage() {
               disabled={!file || mutation.isPending}
               onClick={() => mutation.mutate()}
             >
-              {mutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing…</> : <><ScanLine className="h-4 w-4" /> Analyze leaf</>}
+              {mutation.isPending
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> {online ? "Analyzing…" : "Saving offline…"}</>
+                : online
+                  ? <><ScanLine className="h-4 w-4" /> Analyze leaf</>
+                  : <><CloudOff className="h-4 w-4" /> Save scan for later</>}
             </Button>
+            {!online && (
+              <p className="mt-3 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-xs text-muted-foreground">
+                <CloudOff className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
+                You're offline. Scans are stored on this device and analyzed automatically as soon as the connection returns.
+              </p>
+            )}
             {mutation.isError && (
               <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
                 <div className="flex items-start gap-2 text-destructive">
