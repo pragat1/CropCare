@@ -238,6 +238,30 @@ function DetectPage() {
             />
           </div>
 
+          {queued.length > 0 && (
+            <Card className="mt-8 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 font-medium">
+                  <Clock className="h-4 w-4 text-warning" aria-hidden />
+                  Waiting to sync ({pending})
+                </div>
+                <Button size="sm" variant="outline" className="rounded-full" disabled={!online || syncing} onClick={() => void syncNow()}>
+                  {syncing ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Syncing…</> : "Sync now"}
+                </Button>
+              </div>
+              <ul className="mt-3 space-y-2 text-sm">
+                {queued.map((item) => (
+                  <li key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
+                    <span className="truncate">{item.crop} · {new Date(item.createdAt).toLocaleString()}</span>
+                    <Badge variant={item.lastError ? "destructive" : "secondary"}>
+                      {item.lastError ? "Retry pending" : "Queued"}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
           <h2 className="mt-8 font-serif text-xl font-semibold">Recent scans</h2>
           <p className="text-muted-foreground text-sm mt-1">Your last three detections.</p>
           <Stagger className="mt-4 space-y-3">
