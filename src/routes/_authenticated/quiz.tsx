@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { AppShell } from "@/components/app-shell";
 import { QUIZZES } from "@/lib/data/quizzes";
 import { supabase } from "@/integrations/supabase/client";
+import { useOfflineData, useSyncStatus } from "@/hooks/use-offline";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,15 +18,21 @@ function QuizPage() {
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const { data: quizzes } = useOfflineData("quizzes", QUIZZES);
+  const { online } = useSyncStatus();
 
-  const q = QUIZZES[i];
-  const total = QUIZZES.length;
+  const q = quizzes[i];
+  const total = quizzes.length;
 
   async function next() {
     const correct = picked === q.ans;
     const newScore = score + (correct ? 1 : 0);
     if (i + 1 >= total) {
       setScore(newScore); setDone(true);
+      if (!online) {
+        toast.info("Offline — score not saved to your account");
+        return;
+      }
       const { data: u } = await supabase.auth.getUser();
       if (u.user) {
         const { error } = await supabase.from("quiz_attempts").insert({
