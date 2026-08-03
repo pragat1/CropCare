@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard, CloudSun, MessageCircle } from "lucide-react";
+import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard, CloudSun, MessageCircle, BarChart3 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const tabs = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/analytics", label: "Analytics", icon: BarChart3 },
     { to: "/app", label: "Detect", icon: ScanLine },
     { to: "/assistant", label: "Assistant", icon: MessageCircle },
     { to: "/soil", label: "Soil", icon: Sprout },
