@@ -24,6 +24,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { useContentItems } from "@/lib/admin/library";
 import {
   CATEGORY_DEFS, isCategory, slugify, type ContentItem, type FieldDef,
@@ -116,7 +117,7 @@ function AdminCategoryPage() {
         slug: (d.slug.trim() || slugify(title)),
         sort_order: Number.isFinite(d.sort_order) ? d.sort_order : 0,
         published: d.published,
-        data: d.data,
+        data: d.data as unknown as Json,
       };
       if (d.id) {
         const { error: e } = await supabase.from("content_items").update(payload).eq("id", d.id);
@@ -170,7 +171,7 @@ function AdminCategoryPage() {
         category: def.key,
         slug: s.slug,
         title: s.title,
-        data: s.data,
+        data: s.data as unknown as Json,
         sort_order: s.sort_order,
         published: true,
         created_by: auth.user?.id ?? null,

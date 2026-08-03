@@ -29,6 +29,7 @@ import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
+import { Route as AuthenticatedAdminCategoryRouteImport } from './routes/_authenticated/admin.$category'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -130,6 +131,12 @@ const AuthenticatedDetectionIdRoute =
     path: '/detection/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminCategoryRoute =
+  AuthenticatedAdminCategoryRouteImport.update({
+    id: '/$category',
+    path: '/$category',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
+  '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -168,6 +176,7 @@ export interface FileRoutesByTo {
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
+  '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -191,6 +200,7 @@ export interface FileRoutesById {
   '/_authenticated/tips': typeof AuthenticatedTipsRoute
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
   '/_authenticated/weather': typeof AuthenticatedWeatherRoute
+  '/_authenticated/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/tips'
     | '/tracker'
     | '/weather'
+    | '/admin/$category'
     | '/detection/$id'
     | '/soil/$id'
     | '/admin/'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/tips'
     | '/tracker'
     | '/weather'
+    | '/admin/$category'
     | '/detection/$id'
     | '/soil/$id'
     | '/admin'
@@ -256,6 +268,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tips'
     | '/_authenticated/tracker'
     | '/_authenticated/weather'
+    | '/_authenticated/admin/$category'
     | '/_authenticated/detection/$id'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
@@ -409,14 +422,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDetectionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/$category': {
+      id: '/_authenticated/admin/$category'
+      path: '/$category'
+      fullPath: '/admin/$category'
+      preLoaderRoute: typeof AuthenticatedAdminCategoryRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCategoryRoute: typeof AuthenticatedAdminCategoryRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCategoryRoute: AuthenticatedAdminCategoryRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
