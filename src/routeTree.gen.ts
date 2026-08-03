@@ -26,6 +26,7 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
 
@@ -113,6 +114,11 @@ const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedSoilIdRoute = AuthenticatedSoilIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -129,7 +135,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/about': typeof AuthenticatedAboutRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/app': typeof AuthenticatedAppRoute
   '/assistant': typeof AuthenticatedAssistantRoute
@@ -144,12 +150,12 @@ export interface FileRoutesByFullPath {
   '/weather': typeof AuthenticatedWeatherRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/about': typeof AuthenticatedAboutRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/app': typeof AuthenticatedAppRoute
   '/assistant': typeof AuthenticatedAssistantRoute
@@ -164,6 +170,7 @@ export interface FileRoutesByTo {
   '/weather': typeof AuthenticatedWeatherRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -171,7 +178,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/about': typeof AuthenticatedAboutRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
@@ -186,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/weather': typeof AuthenticatedWeatherRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -208,12 +216,12 @@ export interface FileRouteTypes {
     | '/weather'
     | '/detection/$id'
     | '/soil/$id'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/about'
-    | '/admin'
     | '/analytics'
     | '/app'
     | '/assistant'
@@ -228,6 +236,7 @@ export interface FileRouteTypes {
     | '/weather'
     | '/detection/$id'
     | '/soil/$id'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weather'
     | '/_authenticated/detection/$id'
     | '/_authenticated/soil/$id'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -378,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAboutRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/soil/$id': {
       id: '/_authenticated/soil/$id'
       path: '/$id'
@@ -395,6 +412,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedSoilRouteChildren {
   AuthenticatedSoilIdRoute: typeof AuthenticatedSoilIdRoute
 }
@@ -408,7 +436,7 @@ const AuthenticatedSoilRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
@@ -426,7 +454,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
