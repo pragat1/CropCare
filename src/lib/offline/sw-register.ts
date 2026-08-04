@@ -21,7 +21,11 @@ async function unregisterAppWorkers() {
   const regs = await navigator.serviceWorker.getRegistrations();
   await Promise.allSettled(
     regs
-      .filter((r) => (r.active?.scriptURL ?? r.installing?.scriptURL ?? r.waiting?.scriptURL ?? "").endsWith(SW_URL))
+      .filter((r) =>
+        (r.active?.scriptURL ?? r.installing?.scriptURL ?? r.waiting?.scriptURL ?? "").endsWith(
+          SW_URL,
+        ),
+      )
       .map((r) => r.unregister()),
   );
 }
@@ -31,7 +35,8 @@ export function registerOfflineWorker(): void {
 
   const inIframe = window.self !== window.top;
   const swOff = new URLSearchParams(window.location.search).get("sw") === "off";
-  const blocked = !import.meta.env.PROD || inIframe || isPreviewHost(window.location.hostname) || swOff;
+  const blocked =
+    !import.meta.env.PROD || inIframe || isPreviewHost(window.location.hostname) || swOff;
 
   if (blocked) {
     void unregisterAppWorkers();

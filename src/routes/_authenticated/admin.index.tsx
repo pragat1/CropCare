@@ -15,9 +15,17 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
     meta: [
       { title: "Admin · LeafScan Content Library" },
-      { name: "description", content: "Administrator dashboard to manage diseases, treatments, quizzes, growth tips, seasonal guides, crops and the soil database." },
+      {
+        name: "description",
+        content:
+          "Administrator dashboard to manage diseases, treatments, quizzes, growth tips, seasonal guides, crops and the soil database.",
+      },
       { property: "og:title", content: "Admin · LeafScan Content Library" },
-      { property: "og:description", content: "Manage the LeafScan content library: diseases, treatments, quizzes, tips, seasons, crops and soil." },
+      {
+        property: "og:description",
+        content:
+          "Manage the LeafScan content library: diseases, treatments, quizzes, tips, seasons, crops and soil.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -59,12 +67,20 @@ function AdminHome() {
               <Link to="/admin/$category" params={{ category: key }} className="block h-full">
                 <Card className="flex h-full flex-col p-6 transition-colors hover:border-primary/40">
                   <div className="flex items-start justify-between gap-3">
-                    <span className="text-3xl" aria-hidden>{def.emoji}</span>
-                    <Badge variant="secondary">{c ? `${c.published}/${c.total} live` : "empty"}</Badge>
+                    <span className="text-3xl" aria-hidden>
+                      {def.emoji}
+                    </span>
+                    <Badge variant="secondary">
+                      {c ? `${c.published}/${c.total} live` : "empty"}
+                    </Badge>
                   </div>
                   <h2 className="mt-4 font-serif text-lg font-semibold">{def.plural}</h2>
                   <p className="mt-1 flex-1 text-sm text-muted-foreground">{def.description}</p>
-                  <Button variant="ghost" size="sm" className="mt-3 gap-1 self-start rounded-full text-primary">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3 gap-1 self-start rounded-full text-primary"
+                  >
                     Manage <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
                 </Card>

@@ -20,7 +20,7 @@ import { seedOfflineContent } from "@/lib/offline/content-cache";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
@@ -48,7 +48,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load
@@ -84,10 +84,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "LeafScan — AI Crop Disease Detection" },
-      { name: "description", content: "Upload a leaf photo and get instant AI-powered crop disease diagnosis, treatment plans, and prevention advice." },
+      {
+        name: "description",
+        content:
+          "Upload a leaf photo and get instant AI-powered crop disease diagnosis, treatment plans, and prevention advice.",
+      },
       { name: "author", content: "LeafScan" },
       { property: "og:title", content: "LeafScan — AI Crop Disease Detection" },
-      { property: "og:description", content: "Instant AI diagnosis for crop diseases with organic and chemical treatment guidance." },
+      {
+        property: "og:description",
+        content:
+          "Instant AI diagnosis for crop diseases with organic and chemical treatment guidance.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#143a26" },

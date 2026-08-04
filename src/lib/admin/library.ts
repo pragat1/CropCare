@@ -57,7 +57,9 @@ export function mapDiseases(items: ContentItem[]): Disease[] {
       crop: str(d.crop, "general"),
       emoji: str(d.emoji, "🌿"),
       name: it.title,
-      severity: (severity === "low" || severity === "high" ? severity : "medium") as Disease["severity"],
+      severity: (severity === "low" || severity === "high"
+        ? severity
+        : "medium") as Disease["severity"],
       summary: str(d.summary),
       symptoms: list(d.symptoms),
       causes: list(d.causes),

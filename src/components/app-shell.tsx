@@ -1,5 +1,23 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard, CloudSun, MessageCircle, BarChart3, ShieldCheck } from "lucide-react";
+import {
+  Leaf,
+  LogOut,
+  ScanLine,
+  History,
+  Sprout,
+  LineChart,
+  BookOpen,
+  Lightbulb,
+  CalendarDays,
+  Brain,
+  Info,
+  Menu,
+  LayoutDashboard,
+  CloudSun,
+  MessageCircle,
+  BarChart3,
+  ShieldCheck,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { ReactNode } from "react";
 import { useState } from "react";
-import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SyncStatus } from "@/components/sync-status";
 import { useIsAdmin } from "@/hooks/use-admin";
 
@@ -53,10 +69,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background bg-mesh">
+    <div className="min-h-dvh bg-background bg-mesh">
       <header className="sticky top-0 z-40 border-b border-border/50 bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 md:px-6">
-          <Link to="/dashboard" className="flex shrink-0 items-center gap-2.5 font-serif text-lg font-semibold tracking-tight">
+          <Link
+            to="/dashboard"
+            className="flex shrink-0 items-center gap-2.5 font-serif text-lg font-semibold tracking-tight"
+          >
             <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground ring-glow">
               <Leaf className="h-4.5 w-4.5" />
             </span>
@@ -69,7 +88,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link key={to} to={to} className="relative">
                   <span
                     className={`relative z-10 flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
-                      active ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                      active
+                        ? "text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -100,21 +121,38 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Button>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open menu" className="min-h-11 min-w-11 rounded-xl lg:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Open menu"
+                className="min-h-11 min-w-11 rounded-xl lg:hidden"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 glass-strong">
-              <SheetHeader><SheetTitle>Menu</SheetTitle></SheetHeader>
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
               <div className="mt-4 flex flex-col gap-1">
                 {tabs.map(({ to, label, icon: Icon }) => (
                   <Link key={to} to={to} onClick={() => setOpen(false)}>
-                    <Button variant={isActive(to) ? "secondary" : "ghost"} className="w-full justify-start gap-2 rounded-xl">
+                    <Button
+                      variant={isActive(to) ? "secondary" : "ghost"}
+                      className="w-full justify-start gap-2 rounded-xl"
+                    >
                       <Icon className="h-4 w-4" /> {label}
                     </Button>
                   </Link>
                 ))}
-                <Button variant="ghost" onClick={() => { setOpen(false); signOut(); }} className="mt-2 w-full justify-start gap-2 rounded-xl">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setOpen(false);
+                    signOut();
+                  }}
+                  className="mt-2 w-full justify-start gap-2 rounded-xl"
+                >
                   <LogOut className="h-4 w-4" /> Sign out
                 </Button>
               </div>

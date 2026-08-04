@@ -13,14 +13,28 @@ type Props = {
   ariaLabel?: string;
 };
 
-export function UploadZone({ label = "Upload image", hint = "JPG or PNG, up to 8MB", file, onFile, disabled, maxMB = 8, ariaLabel }: Props) {
+export function UploadZone({
+  label = "Upload image",
+  hint = "JPG or PNG, up to 8MB",
+  file,
+  onFile,
+  disabled,
+  maxMB = 8,
+  ariaLabel,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
   function pick(f: File | null) {
     if (!f) return;
-    if (!f.type.startsWith("image/")) { toast.error("Please choose an image file"); return; }
-    if (f.size > maxMB * 1024 * 1024) { toast.error(`Image larger than ${maxMB}MB`); return; }
+    if (!f.type.startsWith("image/")) {
+      toast.error("Please choose an image file");
+      return;
+    }
+    if (f.size > maxMB * 1024 * 1024) {
+      toast.error(`Image larger than ${maxMB}MB`);
+      return;
+    }
     setPreview(URL.createObjectURL(f));
     onFile(f);
   }
@@ -39,9 +53,17 @@ export function UploadZone({ label = "Upload image", hint = "JPG or PNG, up to 8
         aria-disabled={disabled}
         className="rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-colors bg-muted/40 aspect-video grid place-items-center cursor-pointer overflow-hidden relative"
         onClick={() => !disabled && inputRef.current?.click()}
-        onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && !disabled) { e.preventDefault(); inputRef.current?.click(); } }}
+        onKeyDown={(e) => {
+          if ((e.key === "Enter" || e.key === " ") && !disabled) {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
         onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); if (!disabled) pick(e.dataTransfer.files?.[0] ?? null); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          if (!disabled) pick(e.dataTransfer.files?.[0] ?? null);
+        }}
       >
         {preview ? (
           <>
@@ -52,7 +74,10 @@ export function UploadZone({ label = "Upload image", hint = "JPG or PNG, up to 8
               variant="secondary"
               aria-label="Remove image"
               className="absolute top-2 right-2 min-h-9 min-w-9"
-              onClick={(e) => { e.stopPropagation(); clear(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                clear();
+              }}
             >
               <X className="h-4 w-4" />
             </Button>
@@ -74,7 +99,9 @@ export function UploadZone({ label = "Upload image", hint = "JPG or PNG, up to 8
         />
       </div>
       {file && (
-        <p className="text-xs text-muted-foreground mt-2 truncate">{file.name} · {(file.size / 1024).toFixed(0)} KB</p>
+        <p className="text-xs text-muted-foreground mt-2 truncate">
+          {file.name} · {(file.size / 1024).toFixed(0)} KB
+        </p>
       )}
     </div>
   );

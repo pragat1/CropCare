@@ -45,7 +45,9 @@ export async function analyzeSoilImage(imageDataUrl: string): Promise<SoilResult
     fertility: parsed.fertility ?? "Unknown",
     water_retention: String(parsed.water_retention ?? ""),
     ph_range: String(parsed.ph_range ?? ""),
-    recommended_crops: Array.isArray(parsed.recommended_crops) ? parsed.recommended_crops.slice(0, 8) : [],
+    recommended_crops: Array.isArray(parsed.recommended_crops)
+      ? parsed.recommended_crops.slice(0, 8)
+      : [],
     maintenance: String(parsed.maintenance ?? "").slice(0, 500),
     tips: Array.isArray(parsed.tips) ? parsed.tips.slice(0, 6) : [],
     summary: String(parsed.summary ?? "").slice(0, 500),

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -7,7 +8,13 @@ import { Loader2, LineChart, TrendingUp, TrendingDown, Minus } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { compareTreatment } from "@/lib/treatment.functions";
@@ -17,6 +24,11 @@ import { CROP_LIST } from "@/lib/data/crops";
 import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/tracker")({
+  head: () =>
+    pageHead(
+      "Treatment Progress Tracker | LeafScan",
+      "Compare before and after leaf photos to measure recovery and confirm whether a treatment is working.",
+    ),
   component: TrackerPage,
 });
 
@@ -45,7 +57,8 @@ function TrackerPage() {
     const ext = (f.name.split(".").pop() || "jpg").toLowerCase();
     const path = `${uid}/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("treatment-images").upload(path, f, {
-      contentType: f.type || "image/jpeg", upsert: false,
+      contentType: f.type || "image/jpeg",
+      upsert: false,
     });
     if (error) throw error;
     return path;
@@ -63,7 +76,9 @@ function TrackerPage() {
     },
     onSuccess: () => {
       toast.success("Comparison saved");
-      setBefore(null); setAfter(null); setNotes("");
+      setBefore(null);
+      setAfter(null);
+      setNotes("");
       qc.invalidateQueries({ queryKey: ["treatment-history"] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Comparison failed"),
@@ -88,28 +103,69 @@ function TrackerPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="text-sm font-medium">Before treatment</label>
-            <div className="mt-2"><UploadZone label="Upload before photo" file={before} onFile={setBefore} disabled={mut.isPending} /></div>
+            <div className="mt-2">
+              <UploadZone
+                label="Upload before photo"
+                file={before}
+                onFile={setBefore}
+                disabled={mut.isPending}
+              />
+            </div>
           </div>
           <div>
             <label className="text-sm font-medium">After treatment</label>
-            <div className="mt-2"><UploadZone label="Upload after photo" file={after} onFile={setAfter} disabled={mut.isPending} /></div>
+            <div className="mt-2">
+              <UploadZone
+                label="Upload after photo"
+                file={after}
+                onFile={setAfter}
+                disabled={mut.isPending}
+              />
+            </div>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-[220px_1fr]">
           <div>
             <label className="text-sm font-medium">Crop</label>
             <Select value={crop} onValueChange={setCrop}>
-              <SelectTrigger className="mt-2"><SelectValue /></SelectTrigger>
-              <SelectContent>{CROP_LIST.map(c => <SelectItem key={c.key} value={c.name}>{c.emoji} {c.name}</SelectItem>)}</SelectContent>
+              <SelectTrigger className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CROP_LIST.map((c) => (
+                  <SelectItem key={c.key} value={c.name}>
+                    {c.emoji} {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
           <div>
             <label className="text-sm font-medium">Notes (optional)</label>
-            <Textarea className="mt-2" value={notes} maxLength={1000} onChange={e => setNotes(e.target.value)} placeholder="Treatment applied, timing, weather…" />
+            <Textarea
+              className="mt-2"
+              value={notes}
+              maxLength={1000}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Treatment applied, timing, weather…"
+            />
           </div>
         </div>
-        <Button size="lg" className="w-full gap-2" disabled={!before || !after || mut.isPending} onClick={() => mut.mutate()}>
-          {mut.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Comparing…</> : <><LineChart className="h-4 w-4" /> Compare progress</>}
+        <Button
+          size="lg"
+          className="w-full gap-2"
+          disabled={!before || !after || mut.isPending}
+          onClick={() => mut.mutate()}
+        >
+          {mut.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Comparing…
+            </>
+          ) : (
+            <>
+              <LineChart className="h-4 w-4" /> Compare progress
+            </>
+          )}
         </Button>
       </Card>
 
@@ -117,22 +173,31 @@ function TrackerPage() {
       <div className="mt-4 grid gap-3">
         {history.isLoading && <Card className="p-4 text-muted-foreground text-sm">Loading…</Card>}
         {history.data && history.data.length === 0 && (
-          <Card className="p-6 text-center text-muted-foreground border-dashed">No comparisons yet.</Card>
+          <Card className="p-6 text-center text-muted-foreground border-dashed">
+            No comparisons yet.
+          </Card>
         )}
         {history.data?.map((h) => {
           const a = (h.analysis ?? {}) as { summary?: string };
           return (
             <Card key={h.id} className="p-4">
               <div className="flex items-start gap-3">
-                <div className="grid place-items-center w-10 h-10 rounded-lg bg-primary/10">{statusIcon(h.status ?? "")}</div>
+                <div className="grid place-items-center w-10 h-10 rounded-lg bg-primary/10">
+                  {statusIcon(h.status ?? "")}
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{h.crop}</span>
                     <Badge variant="secondary">{h.status}</Badge>
-                    <span className="text-xs text-muted-foreground">{(h.improvement_percent ?? 0) > 0 ? "+" : ""}{h.improvement_percent ?? 0}%</span>
+                    <span className="text-xs text-muted-foreground">
+                      {(h.improvement_percent ?? 0) > 0 ? "+" : ""}
+                      {h.improvement_percent ?? 0}%
+                    </span>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">{a.summary}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{new Date(h.created_at).toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {new Date(h.created_at).toLocaleString()}
+                  </div>
                 </div>
               </div>
             </Card>

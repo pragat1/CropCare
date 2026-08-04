@@ -4,7 +4,10 @@ function encodeWav(chunks: Float32Array[], sampleRate: number, targetRate = 1600
   const total = chunks.reduce((n, c) => n + c.length, 0);
   const merged = new Float32Array(total);
   let o = 0;
-  for (const c of chunks) { merged.set(c, o); o += c.length; }
+  for (const c of chunks) {
+    merged.set(c, o);
+    o += c.length;
+  }
 
   const ratio = sampleRate / targetRate;
   const outLen = Math.floor(merged.length / ratio);
@@ -16,7 +19,9 @@ function encodeWav(chunks: Float32Array[], sampleRate: number, targetRate = 1600
 
   const buffer = new ArrayBuffer(44 + out.length * 2);
   const view = new DataView(buffer);
-  const str = (off: number, s: string) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+  const str = (off: number, s: string) => {
+    for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i));
+  };
   str(0, "RIFF");
   view.setUint32(4, 36 + out.length * 2, true);
   str(8, "WAVE");
@@ -37,7 +42,9 @@ function encodeWav(chunks: Float32Array[], sampleRate: number, targetRate = 1600
 export type Recorder = { stop: () => Promise<Blob> };
 
 export async function startRecording(): Promise<Recorder> {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: true, noiseSuppression: true },
+  });
   const ctx = new AudioContext();
   const source = ctx.createMediaStreamSource(stream);
   const node = ctx.createScriptProcessor(4096, 1, 1);

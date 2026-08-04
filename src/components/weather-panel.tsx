@@ -2,7 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Thermometer, Droplets, CloudRain, Wind, Sun, MapPin, Loader2, AlertTriangle, RotateCcw, ShieldCheck,
+  Thermometer,
+  Droplets,
+  CloudRain,
+  Wind,
+  Sun,
+  MapPin,
+  Loader2,
+  AlertTriangle,
+  RotateCcw,
+  ShieldCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +29,9 @@ function readCached(): Coords | null {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return null;
     const p = JSON.parse(raw);
-    return typeof p?.lat === "number" && typeof p?.lon === "number" ? { lat: p.lat, lon: p.lon } : null;
+    return typeof p?.lat === "number" && typeof p?.lon === "number"
+      ? { lat: p.lat, lon: p.lon }
+      : null;
   } catch {
     return null;
   }
@@ -33,7 +44,8 @@ export function useWeatherIntel(crop: string) {
   const [asked, setAsked] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: async (c: Coords) => call({ data: { lat: c.lat, lon: c.lon, crop } }) as Promise<WeatherIntel>,
+    mutationFn: async (c: Coords) =>
+      call({ data: { lat: c.lat, lon: c.lon, crop } }) as Promise<WeatherIntel>,
   });
 
   const requestLocation = useCallback(() => {
@@ -46,7 +58,11 @@ export function useWeatherIntel(crop: string) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const c = { lat: +pos.coords.latitude.toFixed(4), lon: +pos.coords.longitude.toFixed(4) };
-        try { localStorage.setItem(LS_KEY, JSON.stringify(c)); } catch { /* ignore */ }
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(c));
+        } catch {
+          /* ignore */
+        }
         setCoords(c);
         mutation.mutate(c);
       },
@@ -92,7 +108,9 @@ export function useWeatherIntel(crop: string) {
 function Metric({ icon: Icon, label, value }: { icon: typeof Sun; label: string; value: string }) {
   return (
     <div className="rounded-xl border border-border/50 bg-card/40 p-3">
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5" aria-hidden /> {label}</div>
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" aria-hidden /> {label}
+      </div>
       <div className="mt-1 text-lg font-semibold tabular-nums">{value}</div>
     </div>
   );
@@ -123,9 +141,12 @@ export function WeatherPanel({
         <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" aria-hidden />
         <h3 className="font-medium">Weather intelligence</h3>
         <p className="mx-auto mt-1 max-w-sm text-sm text-muted-foreground">
-          Allow location access to see live conditions and the weather-driven disease risk for your {crop.toLowerCase()} crop.
+          Allow location access to see live conditions and the weather-driven disease risk for your{" "}
+          {crop.toLowerCase()} crop.
         </p>
-        <Button className="mt-4 gap-2" onClick={onRequest}><MapPin className="h-4 w-4" /> Use my location</Button>
+        <Button className="mt-4 gap-2" onClick={onRequest}>
+          <MapPin className="h-4 w-4" /> Use my location
+        </Button>
       </Card>
     );
   }
@@ -143,9 +164,14 @@ export function WeatherPanel({
       <Card className="border-destructive/30 bg-destructive/5 p-5 text-sm">
         <div className="flex items-start gap-2 text-destructive">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          <div><div className="font-medium">Weather unavailable</div><p className="mt-1 text-muted-foreground">{error}</p></div>
+          <div>
+            <div className="font-medium">Weather unavailable</div>
+            <p className="mt-1 text-muted-foreground">{error}</p>
+          </div>
         </div>
-        <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={onRetry}><RotateCcw className="h-3.5 w-3.5" /> Try again</Button>
+        <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={onRetry}>
+          <RotateCcw className="h-3.5 w-3.5" /> Try again
+        </Button>
       </Card>
     );
   }
@@ -186,10 +212,15 @@ export function WeatherPanel({
               <div className="rounded-xl border border-border/50 bg-card/40 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm font-medium">{r.name}</span>
-                  <Badge variant="outline" className={`capitalize ${RISK_STYLES[r.level]}`}>{r.level} · {r.score}%</Badge>
+                  <Badge variant="outline" className={`capitalize ${RISK_STYLES[r.level]}`}>
+                    {r.level} · {r.score}%
+                  </Badge>
                 </div>
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-gradient-brand" style={{ width: `${r.score}%` }} />
+                  <div
+                    className="h-full rounded-full bg-gradient-brand"
+                    style={{ width: `${r.score}%` }}
+                  />
                 </div>
                 {!compact && <p className="mt-2 text-xs text-muted-foreground">{r.reason}</p>}
               </div>
@@ -199,9 +230,14 @@ export function WeatherPanel({
       </Card>
 
       <Card className="p-5">
-        <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" aria-hidden /><h3 className="font-medium">Preventive recommendations</h3></div>
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-primary" aria-hidden />
+          <h3 className="font-medium">Preventive recommendations</h3>
+        </div>
         <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-          {intel.recommendations.map((r, i) => <li key={i}>• {r}</li>)}
+          {intel.recommendations.map((r, i) => (
+            <li key={i}>• {r}</li>
+          ))}
         </ul>
       </Card>
     </div>

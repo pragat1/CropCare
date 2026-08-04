@@ -29,8 +29,8 @@ function AdminLayout() {
           <ShieldAlert className="mx-auto h-7 w-7 text-destructive" />
           <h1 className="mt-3 font-serif text-2xl font-semibold">Admins only</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            This area manages the shared content library. Your account doesn’t have the administrator role,
-            so the database also blocks any changes from here.
+            This area manages the shared content library. Your account doesn’t have the
+            administrator role, so the database also blocks any changes from here.
           </p>
           <Link to="/dashboard" className="mt-5 inline-block">
             <Button className="rounded-full">Back to dashboard</Button>

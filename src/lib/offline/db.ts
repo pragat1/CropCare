@@ -20,7 +20,8 @@ export function openDb(): Promise<IDBDatabase> {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
-      if (!db.objectStoreNames.contains(STORE_CONTENT)) db.createObjectStore(STORE_CONTENT, { keyPath: "key" });
+      if (!db.objectStoreNames.contains(STORE_CONTENT))
+        db.createObjectStore(STORE_CONTENT, { keyPath: "key" });
       if (!db.objectStoreNames.contains(STORE_SCANS)) {
         const s = db.createObjectStore(STORE_SCANS, { keyPath: "id" });
         s.createIndex("createdAt", "createdAt");
@@ -36,7 +37,11 @@ export function openDb(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-function run<T>(store: string, mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
+function run<T>(
+  store: string,
+  mode: IDBTransactionMode,
+  fn: (s: IDBObjectStore) => IDBRequest<T>,
+): Promise<T> {
   return openDb().then(
     (db) =>
       new Promise<T>((resolve, reject) => {

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,11 @@ import { PageHeader } from "@/components/page-header";
 import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/soil")({
+  head: () =>
+    pageHead(
+      "Soil Analysis | LeafScan",
+      "Upload a soil photo for AI analysis of soil type, fertility, water retention, pH range and recommended crops.",
+    ),
   component: SoilPage,
 });
 
@@ -46,7 +52,8 @@ function SoilPage() {
       if (!uid) throw new Error("Not signed in");
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
       const path = `${uid}/${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from("soil-images")
+      const { error } = await supabase.storage
+        .from("soil-images")
         .upload(path, file, { contentType: file.type || "image/jpeg", upsert: false });
       if (error) throw error;
       const res = await analyze({ data: { imagePath: path } });
@@ -84,7 +91,15 @@ function SoilPage() {
               disabled={!file || mutation.isPending}
               onClick={() => mutation.mutate()}
             >
-              {mutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Analyzing…</> : <><Sprout className="h-4 w-4" /> Analyze soil</>}
+              {mutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Analyzing…
+                </>
+              ) : (
+                <>
+                  <Sprout className="h-4 w-4" /> Analyze soil
+                </>
+              )}
             </Button>
           </Card>
 
@@ -94,7 +109,9 @@ function SoilPage() {
               <Card key={type} className="p-4">
                 <div className="font-semibold">{type}</div>
                 <p className="text-xs text-muted-foreground mt-1">{g.summary}</p>
-                <div className="mt-2 text-xs"><span className="text-muted-foreground">Fertility:</span> {g.fertility}</div>
+                <div className="mt-2 text-xs">
+                  <span className="text-muted-foreground">Fertility:</span> {g.fertility}
+                </div>
               </Card>
             ))}
           </div>
@@ -103,8 +120,12 @@ function SoilPage() {
         <FadeIn delay={0.15}>
           <h2 className="font-serif text-xl font-semibold">Recent soil scans</h2>
           <div className="mt-4 space-y-3">
-            {recent.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
-            {recent.error && <Card className="p-4 text-sm text-destructive">Couldn't load recent scans.</Card>}
+            {recent.isLoading && (
+              <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>
+            )}
+            {recent.error && (
+              <Card className="p-4 text-sm text-destructive">Couldn't load recent scans.</Card>
+            )}
             {recent.data && recent.data.length === 0 && (
               <Card className="p-6 text-center text-muted-foreground border-dashed">
                 No soil analyses yet. Upload your first sample.
@@ -119,7 +140,9 @@ function SoilPage() {
                   <div className="flex-1 min-w-0">
                     <div className="font-medium truncate">{s.soil_type ?? "Unknown"}</div>
                     <div className="text-xs text-muted-foreground truncate">{s.summary}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{new Date(s.created_at).toLocaleDateString()}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {new Date(s.created_at).toLocaleDateString()}
+                    </div>
                   </div>
                   <Badge variant="secondary">{s.fertility ?? "—"}</Badge>
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />

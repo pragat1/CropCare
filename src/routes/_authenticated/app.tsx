@@ -1,12 +1,27 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Upload, ScanLine, Loader2, CheckCircle2, AlertTriangle, Leaf, RotateCcw } from "lucide-react";
+import {
+  Upload,
+  ScanLine,
+  Loader2,
+  CheckCircle2,
+  AlertTriangle,
+  Leaf,
+  RotateCcw,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeDetection } from "@/lib/detect.functions";
@@ -22,11 +37,27 @@ import { CloudOff, Clock } from "lucide-react";
 import { useEffect } from "react";
 
 const CROPS = [
-  "Tomato", "Potato", "Rice", "Wheat", "Corn", "Cotton",
-  "Grape", "Apple", "Mango", "Sugarcane", "Soybean", "Pepper", "Other",
+  "Tomato",
+  "Potato",
+  "Rice",
+  "Wheat",
+  "Corn",
+  "Cotton",
+  "Grape",
+  "Apple",
+  "Mango",
+  "Sugarcane",
+  "Soybean",
+  "Pepper",
+  "Other",
 ];
 
 export const Route = createFileRoute("/_authenticated/app")({
+  head: () =>
+    pageHead(
+      "New Scan — Diagnose Crop Disease | LeafScan",
+      "Upload or capture a leaf photo to get an AI diagnosis with severity, affected plant part and treatment plan.",
+    ),
   component: DetectPage,
 });
 
@@ -86,7 +117,9 @@ function DetectPage() {
             ? {
                 level: intelForQueue.overall.level,
                 score: intelForQueue.overall.score,
-                top: intelForQueue.risks.slice(0, 3).map((r) => ({ name: r.name, level: r.level, score: r.score })),
+                top: intelForQueue.risks
+                  .slice(0, 3)
+                  .map((r) => ({ name: r.name, level: r.level, score: r.score })),
               }
             : undefined,
         });
@@ -112,7 +145,9 @@ function DetectPage() {
             ? {
                 level: intel.overall.level,
                 score: intel.overall.score,
-                top: intel.risks.slice(0, 3).map((r) => ({ name: r.name, level: r.level, score: r.score })),
+                top: intel.risks
+                  .slice(0, 3)
+                  .map((r) => ({ name: r.name, level: r.level, score: r.score })),
               }
             : undefined,
         },
@@ -166,83 +201,114 @@ function DetectPage() {
           />
 
           <FadeIn delay={0.1} className="mt-6">
-          <Card className="p-6">
-            <label className="block text-sm font-medium mb-2">Crop</label>
-            <Select value={crop} onValueChange={setCrop}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {CROPS.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <Card className="p-6">
+              <label className="block text-sm font-medium mb-2">Crop</label>
+              <Select value={crop} onValueChange={setCrop}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CROPS.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <div
-              className="mt-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-colors bg-muted/40 aspect-video grid place-items-center cursor-pointer overflow-hidden relative"
-              onClick={() => inputRef.current?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => { e.preventDefault(); onPick(e.dataTransfer.files?.[0] ?? null); }}
-            >
-              {preview ? (
-                <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-center text-muted-foreground p-6">
-                  <Upload className="h-6 w-6 mx-auto mb-2" />
-                  <p className="text-sm">Click or drop a leaf photo</p>
-                  <p className="text-xs mt-1">JPG or PNG, up to 8MB</p>
-                </div>
+              <div
+                className="mt-4 rounded-xl border-2 border-dashed border-border hover:border-primary/50 transition-colors bg-muted/40 aspect-video grid place-items-center cursor-pointer overflow-hidden relative"
+                onClick={() => inputRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  onPick(e.dataTransfer.files?.[0] ?? null);
+                }}
+              >
+                {preview ? (
+                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-center text-muted-foreground p-6">
+                    <Upload className="h-6 w-6 mx-auto mb-2" />
+                    <p className="text-sm">Click or drop a leaf photo</p>
+                    <p className="text-xs mt-1">JPG or PNG, up to 8MB</p>
+                  </div>
+                )}
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+                />
+              </div>
+
+              <Button
+                className="mt-4 w-full gap-2"
+                size="lg"
+                disabled={!file || mutation.isPending}
+                onClick={() => mutation.mutate()}
+              >
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />{" "}
+                    {online ? "Analyzing…" : "Saving offline…"}
+                  </>
+                ) : online ? (
+                  <>
+                    <ScanLine className="h-4 w-4" /> Analyze leaf
+                  </>
+                ) : (
+                  <>
+                    <CloudOff className="h-4 w-4" /> Save scan for later
+                  </>
+                )}
+              </Button>
+              {!online && (
+                <p className="mt-3 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-xs text-muted-foreground">
+                  <CloudOff className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
+                  You're offline. Scans are stored on this device and analyzed automatically as soon
+                  as the connection returns.
+                </p>
               )}
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => onPick(e.target.files?.[0] ?? null)}
-              />
-            </div>
-
-            <Button
-              className="mt-4 w-full gap-2"
-              size="lg"
-              disabled={!file || mutation.isPending}
-              onClick={() => mutation.mutate()}
-            >
-              {mutation.isPending
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> {online ? "Analyzing…" : "Saving offline…"}</>
-                : online
-                  ? <><ScanLine className="h-4 w-4" /> Analyze leaf</>
-                  : <><CloudOff className="h-4 w-4" /> Save scan for later</>}
-            </Button>
-            {!online && (
-              <p className="mt-3 flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 p-3 text-xs text-muted-foreground">
-                <CloudOff className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" aria-hidden />
-                You're offline. Scans are stored on this device and analyzed automatically as soon as the connection returns.
-              </p>
-            )}
-            {mutation.isError && (
-              <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
-                <div className="flex items-start gap-2 text-destructive">
-                  <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
-                  <div className="flex-1">
-                    <div className="font-medium">Analysis failed</div>
-                    <div className="text-muted-foreground mt-1">
-                      {mutation.error instanceof Error ? mutation.error.message : "Something went wrong. Please try again."}
+              {mutation.isError && (
+                <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm">
+                  <div className="flex items-start gap-2 text-destructive">
+                    <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+                    <div className="flex-1">
+                      <div className="font-medium">Analysis failed</div>
+                      <div className="text-muted-foreground mt-1">
+                        {mutation.error instanceof Error
+                          ? mutation.error.message
+                          : "Something went wrong. Please try again."}
+                      </div>
                     </div>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 gap-2"
+                    onClick={() => mutation.mutate()}
+                    disabled={!file || mutation.isPending}
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" /> Retry analysis
+                  </Button>
                 </div>
-                <Button variant="outline" size="sm" className="mt-3 gap-2" onClick={() => mutation.mutate()} disabled={!file || mutation.isPending}>
-                  <RotateCcw className="h-3.5 w-3.5" /> Retry analysis
-                </Button>
-              </div>
-            )}
-            {mutation.isPending && (
-              <p className="mt-3 text-xs text-muted-foreground text-center">This usually takes 5-15 seconds. Please keep this tab open.</p>
-            )}
-          </Card>
+              )}
+              {mutation.isPending && (
+                <p className="mt-3 text-xs text-muted-foreground text-center">
+                  This usually takes 5-15 seconds. Please keep this tab open.
+                </p>
+              )}
+            </Card>
           </FadeIn>
         </div>
 
         <FadeIn delay={0.18}>
           <h2 className="font-serif text-xl font-semibold">Weather intelligence</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Live conditions and risk for your selected crop — saved with each scan.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Live conditions and risk for your selected crop — saved with each scan.
+          </p>
           <div className="mt-4">
             <WeatherPanel
               crop={crop}
@@ -263,14 +329,31 @@ function DetectPage() {
                   <Clock className="h-4 w-4 text-warning" aria-hidden />
                   Waiting to sync ({pending})
                 </div>
-                <Button size="sm" variant="outline" className="rounded-full" disabled={!online || syncing} onClick={() => void syncNow()}>
-                  {syncing ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Syncing…</> : "Sync now"}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  disabled={!online || syncing}
+                  onClick={() => void syncNow()}
+                >
+                  {syncing ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Syncing…
+                    </>
+                  ) : (
+                    "Sync now"
+                  )}
                 </Button>
               </div>
               <ul className="mt-3 space-y-2 text-sm">
                 {queued.map((item) => (
-                  <li key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2">
-                    <span className="truncate">{item.crop} · {new Date(item.createdAt).toLocaleString()}</span>
+                  <li
+                    key={item.id}
+                    className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2"
+                  >
+                    <span className="truncate">
+                      {item.crop} · {new Date(item.createdAt).toLocaleString()}
+                    </span>
                     <Badge variant={item.lastError ? "destructive" : "secondary"}>
                       {item.lastError ? "Retry pending" : "Queued"}
                     </Badge>
@@ -283,7 +366,9 @@ function DetectPage() {
           <h2 className="mt-8 font-serif text-xl font-semibold">Recent scans</h2>
           <p className="text-muted-foreground text-sm mt-1">Your last three detections.</p>
           <Stagger className="mt-4 space-y-3">
-            {recent.isLoading && <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>}
+            {recent.isLoading && (
+              <Card className="p-4 text-sm text-muted-foreground">Loading…</Card>
+            )}
             {recent.data && recent.data.length === 0 && (
               <Card className="p-6 text-center text-muted-foreground border-dashed">
                 <Leaf className="h-6 w-6 mx-auto mb-2 opacity-60" />
@@ -292,21 +377,35 @@ function DetectPage() {
             )}
             {recent.data?.map((d) => (
               <StaggerItem key={d.id}>
-              <Link to="/detection/$id" params={{ id: d.id }}>
-                <Card className="flex items-center gap-3 p-4">
-                  <div className={`grid place-items-center w-10 h-10 rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}>
-                    {d.is_healthy ? <CheckCircle2 className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{d.is_healthy ? "Healthy" : (d.disease ?? "Unknown")}</div>
-                    <div className="text-xs text-muted-foreground">{d.crop} · {new Date(d.created_at).toLocaleDateString()}</div>
-                  </div>
-                  <Badge variant="secondary">{d.confidence ?? 0}%</Badge>
-                </Card>
-              </Link>
+                <Link to="/detection/$id" params={{ id: d.id }}>
+                  <Card className="flex items-center gap-3 p-4">
+                    <div
+                      className={`grid place-items-center w-10 h-10 rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}
+                    >
+                      {d.is_healthy ? (
+                        <CheckCircle2 className="h-5 w-5" />
+                      ) : (
+                        <AlertTriangle className="h-5 w-5" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">
+                        {d.is_healthy ? "Healthy" : (d.disease ?? "Unknown")}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {d.crop} · {new Date(d.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <Badge variant="secondary">{d.confidence ?? 0}%</Badge>
+                  </Card>
+                </Link>
               </StaggerItem>
             ))}
-            <Link to="/history"><Button variant="ghost" className="w-full rounded-xl">View all history →</Button></Link>
+            <Link to="/history">
+              <Button variant="ghost" className="w-full rounded-xl">
+                View all history →
+              </Button>
+            </Link>
           </Stagger>
         </FadeIn>
       </div>

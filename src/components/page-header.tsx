@@ -23,7 +23,9 @@ export function PageHeader({
             {Icon && <Icon className="h-3.5 w-3.5 text-primary" />} {eyebrow}
           </span>
         )}
-        <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+        <h1 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+          {title}
+        </h1>
         {description && <p className="mt-2 max-w-2xl text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="shrink-0">{actions}</div>}

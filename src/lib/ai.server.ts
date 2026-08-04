@@ -6,17 +6,17 @@ export type Severity = "low" | "medium" | "high";
 export type PlantPart = "leaf" | "stem" | "fruit" | "root" | "flower" | "whole plant" | "unknown";
 
 export type TreatmentPlan = {
-  name: string;              // product / method name
+  name: string; // product / method name
   active_ingredient?: string; // e.g. "Copper hydroxide" (chemical only)
-  dosage: string;            // e.g. "2 g/L of water"
-  frequency: string;         // e.g. "Every 7 days"
-  precautions: string;       // safety notes
+  dosage: string; // e.g. "2 g/L of water"
+  frequency: string; // e.g. "Every 7 days"
+  precautions: string; // safety notes
 };
 
 export type DiseaseCandidate = {
   disease: string;
-  confidence: number;   // 0-100
-  reasoning: string;    // why this disease was predicted
+  confidence: number; // 0-100
+  reasoning: string; // why this disease was predicted
 };
 
 export type Differential = {
@@ -27,8 +27,8 @@ export type Differential = {
 export type DetectionResult = {
   is_healthy: boolean;
   plant_part: PlantPart;
-  top: DiseaseCandidate;              // best guess
-  alternatives: DiseaseCandidate[];   // 2 more candidates (top 3 overall including `top`)
+  top: DiseaseCandidate; // best guess
+  alternatives: DiseaseCandidate[]; // 2 more candidates (top 3 overall including `top`)
   severity: Severity | null;
   symptoms: string[];
   causes: string[];
@@ -37,7 +37,7 @@ export type DetectionResult = {
   treatment_organic: TreatmentPlan[];
   treatment_chemical: TreatmentPlan[];
   differentials: Differential[];
-  recovery_time: string;              // e.g. "10-14 days with treatment"
+  recovery_time: string; // e.g. "10-14 days with treatment"
   summary: string;
 };
 
@@ -89,7 +89,11 @@ function arrStr(v: unknown, max = 8): string[] {
 }
 function normalizeCandidate(v: unknown): DiseaseCandidate {
   const o = (v ?? {}) as Record<string, unknown>;
-  return { disease: str(o.disease, 120) || "Unknown", confidence: num(o.confidence), reasoning: str(o.reasoning, 400) };
+  return {
+    disease: str(o.disease, 120) || "Unknown",
+    confidence: num(o.confidence),
+    reasoning: str(o.reasoning, 400),
+  };
 }
 function normalizeOrganic(v: unknown): TreatmentPlan {
   const o = (v ?? {}) as Record<string, unknown>;
@@ -115,14 +119,20 @@ function normalizeDiff(v: unknown): Differential {
   return { disease: str(o.disease, 120) || "Unknown", differentiator: str(o.differentiator, 300) };
 }
 
-export async function analyzeLeafImage(imageDataUrl: string, crop: string): Promise<DetectionResult> {
+export async function analyzeLeafImage(
+  imageDataUrl: string,
+  crop: string,
+): Promise<DetectionResult> {
   const text = await aiChatCompletion({
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       {
         role: "user",
         content: [
-          { type: "text", text: `Crop: ${crop}. Analyze this image and return the JSON described in the system prompt.` },
+          {
+            type: "text",
+            text: `Crop: ${crop}. Analyze this image and return the JSON described in the system prompt.`,
+          },
           { type: "image_url", image_url: { url: imageDataUrl } },
         ],
       },
@@ -135,12 +145,27 @@ export async function analyzeLeafImage(imageDataUrl: string, crop: string): Prom
   const alternatives = altsRaw.slice(0, 2).map(normalizeCandidate);
   // Pad to 2 alternatives if the model returned fewer.
   while (alternatives.length < 2) {
-    alternatives.push({ disease: "Unknown", confidence: 0, reasoning: "No additional candidate provided." });
+    alternatives.push({
+      disease: "Unknown",
+      confidence: 0,
+      reasoning: "No additional candidate provided.",
+    });
   }
   const severityRaw = String(parsed.severity ?? "").toLowerCase();
-  const severity: Severity | null = severityRaw === "low" || severityRaw === "medium" || severityRaw === "high" ? severityRaw : null;
+  const severity: Severity | null =
+    severityRaw === "low" || severityRaw === "medium" || severityRaw === "high"
+      ? severityRaw
+      : null;
   const partRaw = String(parsed.plant_part ?? "").toLowerCase() as PlantPart;
-  const allowedParts: PlantPart[] = ["leaf", "stem", "fruit", "root", "flower", "whole plant", "unknown"];
+  const allowedParts: PlantPart[] = [
+    "leaf",
+    "stem",
+    "fruit",
+    "root",
+    "flower",
+    "whole plant",
+    "unknown",
+  ];
   const plant_part: PlantPart = allowedParts.includes(partRaw) ? partRaw : "unknown";
 
   return {
@@ -153,9 +178,15 @@ export async function analyzeLeafImage(imageDataUrl: string, crop: string): Prom
     causes: arrStr(parsed.causes),
     immediate_actions: arrStr(parsed.immediate_actions),
     prevention: arrStr(parsed.prevention),
-    treatment_organic: (Array.isArray(parsed.treatment_organic) ? parsed.treatment_organic : []).slice(0, 6).map(normalizeOrganic),
-    treatment_chemical: (Array.isArray(parsed.treatment_chemical) ? parsed.treatment_chemical : []).slice(0, 6).map(normalizeChemical),
-    differentials: (Array.isArray(parsed.differentials) ? parsed.differentials : []).slice(0, 4).map(normalizeDiff),
+    treatment_organic: (Array.isArray(parsed.treatment_organic) ? parsed.treatment_organic : [])
+      .slice(0, 6)
+      .map(normalizeOrganic),
+    treatment_chemical: (Array.isArray(parsed.treatment_chemical) ? parsed.treatment_chemical : [])
+      .slice(0, 6)
+      .map(normalizeChemical),
+    differentials: (Array.isArray(parsed.differentials) ? parsed.differentials : [])
+      .slice(0, 4)
+      .map(normalizeDiff),
     recovery_time: str(parsed.recovery_time, 160) || "Unknown",
     summary: str(parsed.summary, 600),
   };

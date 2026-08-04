@@ -31,12 +31,13 @@ export async function readContent<T>(key: ContentKey): Promise<T | null> {
 /** Seeds every reference dataset shipped with the app into IndexedDB. */
 export async function seedOfflineContent(): Promise<void> {
   if (!idbAvailable()) return;
-  const [{ DISEASES }, { TIPS, CROP_TIPS }, { SEASONS, SEASON_LIST }, { QUIZZES }] = await Promise.all([
-    import("@/lib/data/diseases"),
-    import("@/lib/data/tips"),
-    import("@/lib/data/seasons"),
-    import("@/lib/data/quizzes"),
-  ]);
+  const [{ DISEASES }, { TIPS, CROP_TIPS }, { SEASONS, SEASON_LIST }, { QUIZZES }] =
+    await Promise.all([
+      import("@/lib/data/diseases"),
+      import("@/lib/data/tips"),
+      import("@/lib/data/seasons"),
+      import("@/lib/data/quizzes"),
+    ]);
   await Promise.all([
     cacheContent("diseases", DISEASES),
     cacheContent("tips", TIPS),

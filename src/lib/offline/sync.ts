@@ -138,12 +138,19 @@ export async function syncQueue(): Promise<{ synced: number; failed: number }> {
     } catch (e) {
       failed += 1;
       const message = e instanceof Error ? e.message : "Upload failed";
-      await idbPut<QueuedScan>(STORE_QUEUE, { ...item, attempts: item.attempts + 1, lastError: message });
+      await idbPut<QueuedScan>(STORE_QUEUE, {
+        ...item,
+        attempts: item.attempts + 1,
+        lastError: message,
+      });
       emit({ lastError: message });
     }
   }
   await refreshPending();
-  emit({ syncing: false, lastSyncedAt: synced > 0 ? new Date().toISOString() : state.lastSyncedAt });
+  emit({
+    syncing: false,
+    lastSyncedAt: synced > 0 ? new Date().toISOString() : state.lastSyncedAt,
+  });
   return { synced, failed };
 }
 
