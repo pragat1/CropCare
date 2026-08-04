@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,6 +24,10 @@ import { CROP_LIST } from "@/lib/data/crops";
 import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/tracker")({
+  head: () => pageHead(
+    "Treatment Progress Tracker | LeafScan",
+    "Compare before and after leaf photos to measure recovery and confirm whether a treatment is working.",
+  ),
   component: TrackerPage,
 });
 

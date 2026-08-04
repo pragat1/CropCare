@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { CheckCircle2, AlertTriangle, Leaf, CloudOff, Clock } from "lucide-react";
@@ -13,6 +14,10 @@ import { readScans, saveScans, type CachedScan } from "@/lib/offline/scan-cache"
 import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
 
 export const Route = createFileRoute("/_authenticated/history")({
+  head: () => pageHead(
+    "Scan History | LeafScan",
+    "Review every past leaf scan, its diagnosis, severity and treatment plan, including scans queued while offline.",
+  ),
   component: HistoryPage,
 });
 

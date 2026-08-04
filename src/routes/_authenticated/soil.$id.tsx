@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +12,10 @@ import { AppShell } from "@/components/app-shell";
 import { SOIL_GUIDE } from "@/lib/data/soil-guide";
 
 export const Route = createFileRoute("/_authenticated/soil/$id")({
+  head: () => pageHead(
+    "Soil Report | LeafScan",
+    "Detailed soil analysis report with fertility, pH range, recommended crops and maintenance guidance.",
+  ),
   component: SoilDetail,
 });
 

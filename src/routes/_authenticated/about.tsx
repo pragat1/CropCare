@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { Card } from "@/components/ui/card";
 import { AppShell } from "@/components/app-shell";
 import {
@@ -13,7 +14,13 @@ import {
 } from "lucide-react";
 import { Stagger, StaggerItem, FadeIn } from "@/components/motion";
 
-export const Route = createFileRoute("/_authenticated/about")({ component: AboutPage });
+export const Route = createFileRoute("/_authenticated/about")({
+  head: () => pageHead(
+    "About LeafScan | AI Crop Health Platform",
+    "How LeafScan combines AI vision, agronomy data and weather intelligence to help farmers catch crop disease early.",
+  ),
+  component: AboutPage,
+});
 
 const FEATURES = [
   {

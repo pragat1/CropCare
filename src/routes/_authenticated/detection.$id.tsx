@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -75,6 +76,10 @@ function WeatherAtScan({
 }
 
 export const Route = createFileRoute("/_authenticated/detection/$id")({
+  head: () => pageHead(
+    "Detection Report | LeafScan",
+    "Full AI diagnosis report with confidence ranking, symptoms, causes, organic and chemical treatments and prevention steps.",
+  ),
   component: DetectionPage,
 });
 

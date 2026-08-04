@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { Lightbulb } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AppShell } from "@/components/app-shell";
@@ -8,7 +9,13 @@ import { TIPS, CROP_TIPS } from "@/lib/data/tips";
 import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapTips } from "@/lib/admin/library";
 
-export const Route = createFileRoute("/_authenticated/tips")({ component: TipsPage });
+export const Route = createFileRoute("/_authenticated/tips")({
+  head: () => pageHead(
+    "Farming Tips & Best Practices | LeafScan",
+    "Practical crop care tips covering irrigation, nutrition, pest pressure and disease prevention for every crop.",
+  ),
+  component: TipsPage,
+});
 
 function TipsPage() {
   const source = useLibrary("tip", TIPS, mapTips);

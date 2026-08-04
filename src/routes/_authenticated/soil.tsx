@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +17,10 @@ import { PageHeader } from "@/components/page-header";
 import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/soil")({
+  head: () => pageHead(
+    "Soil Analysis | LeafScan",
+    "Upload a soil photo for AI analysis of soil type, fertility, water retention, pH range and recommended crops.",
+  ),
   component: SoilPage,
 });
 

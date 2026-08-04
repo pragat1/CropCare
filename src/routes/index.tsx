@@ -1,10 +1,15 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { Leaf, ShieldCheck, Sparkles, Camera, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { FadeIn, Stagger, StaggerItem, GlassCard } from "@/components/motion";
 
 export const Route = createFileRoute("/")({
+  head: () => pageHead(
+    "LeafScan — AI Crop Disease Detection for Farmers",
+    "Snap a leaf photo and get an instant AI diagnosis with organic and chemical treatment plans, weather risk and soil insights.",
+  ),
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();

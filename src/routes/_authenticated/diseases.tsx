@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -18,7 +19,13 @@ import { Stagger, StaggerItem } from "@/components/motion";
 import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapDiseases } from "@/lib/admin/library";
 
-export const Route = createFileRoute("/_authenticated/diseases")({ component: DiseasesPage });
+export const Route = createFileRoute("/_authenticated/diseases")({
+  head: () => pageHead(
+    "Crop Disease Database | LeafScan",
+    "Searchable database of common crop diseases with symptoms, causes, organic and chemical treatments and prevention.",
+  ),
+  component: DiseasesPage,
+});
 
 function DiseasesPage() {
   const [q, setQ] = useState("");

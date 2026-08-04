@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { pageHead } from "@/lib/seo";
 import { CalendarDays } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { AppShell } from "@/components/app-shell";
@@ -8,7 +9,13 @@ import { SEASONS, SEASON_LIST } from "@/lib/data/seasons";
 import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapSeasons, mapSeasonList } from "@/lib/admin/library";
 
-export const Route = createFileRoute("/_authenticated/seasons")({ component: SeasonsPage });
+export const Route = createFileRoute("/_authenticated/seasons")({
+  head: () => pageHead(
+    "Seasonal Crop Calendar | LeafScan",
+    "Season-by-season sowing, care and harvest guidance with the disease risks to watch for in each period.",
+  ),
+  component: SeasonsPage,
+});
 
 function SeasonsPage() {
   const seasonSource = useLibrary("season", SEASONS, mapSeasons);
