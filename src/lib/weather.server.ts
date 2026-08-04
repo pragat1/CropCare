@@ -42,11 +42,21 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherSna
 
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 12_000);
-  let json: Record<string, unknown> = {};
+  type ForecastResponse = {
+    current?: {
+      temperature_2m?: number;
+      relative_humidity_2m?: number;
+      precipitation?: number;
+      wind_speed_10m?: number;
+      weather_code?: number;
+    };
+    daily?: { precipitation_sum?: number[]; uv_index_max?: number[] };
+  };
+  let json: ForecastResponse = {};
   try {
     const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) throw new Error(`Weather service returned ${res.status}`);
-    json = (await res.json()) as Record<string, unknown>;
+    json = (await res.json()) as ForecastResponse;
   } catch (err) {
     throw new Error(
       err instanceof Error && err.name === "AbortError"
@@ -57,8 +67,8 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherSna
     clearTimeout(t);
   }
 
-  const cur = (json["current"] ?? {}) as Record<string, unknown>;
-  const daily = (json["daily"] ?? {}) as Record<string, number[] | undefined>;
+  const cur = json.current ?? {};
+  const daily = json.daily ?? {};
   const num = (v: unknown, fallback = 0) =>
     typeof v === "number" && Number.isFinite(v) ? v : fallback;
 
