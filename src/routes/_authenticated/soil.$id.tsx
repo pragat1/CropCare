@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useSignedUrl } from "@/hooks/use-signed-url";
 import { pageHead } from "@/lib/seo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -24,7 +25,6 @@ function SoilDetail() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["soil", id],
@@ -39,19 +39,7 @@ function SoilDetail() {
     },
   });
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      if (!q.data?.image_path) return;
-      const { data } = await supabase.storage
-        .from("soil-images")
-        .createSignedUrl(q.data.image_path, 3600);
-      if (alive) setImgUrl(data?.signedUrl ?? null);
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [q.data?.image_path]);
+  const imgUrl = useSignedUrl("soil-images", q.data?.image_path);
 
   const del = useMutation({
     mutationFn: async () => {

@@ -82,7 +82,7 @@ function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-background">
+    <div className="min-h-dvh grid md:grid-cols-2 bg-background">
       <div
         className="hidden md:flex flex-col justify-between p-10 text-primary-foreground"
         style={{ backgroundImage: "var(--gradient-hero)" }}

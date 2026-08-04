@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useSignedUrl } from "@/hooks/use-signed-url";
 import { pageHead } from "@/lib/seo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -88,7 +89,6 @@ function DetectionPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["detection", id],
@@ -99,19 +99,7 @@ function DetectionPage() {
     },
   });
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      if (!q.data?.image_path) return;
-      const { data } = await supabase.storage
-        .from("leaf-images")
-        .createSignedUrl(q.data.image_path, 60 * 60);
-      if (alive) setImgUrl(data?.signedUrl ?? null);
-    })();
-    return () => {
-      alive = false;
-    };
-  }, [q.data?.image_path]);
+  const imgUrl = useSignedUrl("leaf-images", q.data?.image_path);
 
   const del = useMutation({
     mutationFn: async () => {
