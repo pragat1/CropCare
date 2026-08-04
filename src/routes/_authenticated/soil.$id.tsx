@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { pageHead } from "@/lib/seo";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Sprout, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
