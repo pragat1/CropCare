@@ -14,10 +14,11 @@ import { readScans, saveScans, type CachedScan } from "@/lib/offline/scan-cache"
 import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
 
 export const Route = createFileRoute("/_authenticated/history")({
-  head: () => pageHead(
-    "Scan History | LeafScan",
-    "Review every past leaf scan, its diagnosis, severity and treatment plan, including scans queued while offline.",
-  ),
+  head: () =>
+    pageHead(
+      "Scan History | LeafScan",
+      "Review every past leaf scan, its diagnosis, severity and treatment plan, including scans queued while offline.",
+    ),
   component: HistoryPage,
 });
 

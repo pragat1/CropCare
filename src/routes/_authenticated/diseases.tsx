@@ -20,10 +20,11 @@ import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapDiseases } from "@/lib/admin/library";
 
 export const Route = createFileRoute("/_authenticated/diseases")({
-  head: () => pageHead(
-    "Crop Disease Database | LeafScan",
-    "Searchable database of common crop diseases with symptoms, causes, organic and chemical treatments and prevention.",
-  ),
+  head: () =>
+    pageHead(
+      "Crop Disease Database | LeafScan",
+      "Searchable database of common crop diseases with symptoms, causes, organic and chemical treatments and prevention.",
+    ),
   component: DiseasesPage,
 });
 

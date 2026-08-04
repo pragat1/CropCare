@@ -12,10 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
-  head: () => pageHead(
-    "Sign in to LeafScan | Crop Disease Detection",
-    "Sign in or create a free LeafScan account to scan crops, track treatments and review your diagnosis history.",
-  ),
+  head: () =>
+    pageHead(
+      "Sign in to LeafScan | Crop Disease Detection",
+      "Sign in or create a free LeafScan account to scan crops, track treatments and review your diagnosis history.",
+    ),
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();

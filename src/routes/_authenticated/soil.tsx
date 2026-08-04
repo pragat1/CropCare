@@ -17,10 +17,11 @@ import { PageHeader } from "@/components/page-header";
 import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/soil")({
-  head: () => pageHead(
-    "Soil Analysis | LeafScan",
-    "Upload a soil photo for AI analysis of soil type, fertility, water retention, pH range and recommended crops.",
-  ),
+  head: () =>
+    pageHead(
+      "Soil Analysis | LeafScan",
+      "Upload a soil photo for AI analysis of soil type, fertility, water retention, pH range and recommended crops.",
+    ),
   component: SoilPage,
 });
 

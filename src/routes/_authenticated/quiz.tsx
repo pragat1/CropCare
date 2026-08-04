@@ -14,10 +14,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/quiz")({
-  head: () => pageHead(
-    "Farming Knowledge Quiz | LeafScan",
-    "Test your crop protection knowledge with a short quiz on plant disease, prevention and treatment practices.",
-  ),
+  head: () =>
+    pageHead(
+      "Farming Knowledge Quiz | LeafScan",
+      "Test your crop protection knowledge with a short quiz on plant disease, prevention and treatment practices.",
+    ),
   component: QuizPage,
 });
 

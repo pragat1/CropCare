@@ -76,10 +76,11 @@ function WeatherAtScan({
 }
 
 export const Route = createFileRoute("/_authenticated/detection/$id")({
-  head: () => pageHead(
-    "Detection Report | LeafScan",
-    "Full AI diagnosis report with confidence ranking, symptoms, causes, organic and chemical treatments and prevention steps.",
-  ),
+  head: () =>
+    pageHead(
+      "Detection Report | LeafScan",
+      "Full AI diagnosis report with confidence ranking, symptoms, causes, organic and chemical treatments and prevention steps.",
+    ),
   component: DetectionPage,
 });
 

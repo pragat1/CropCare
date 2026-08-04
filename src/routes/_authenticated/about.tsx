@@ -15,10 +15,11 @@ import {
 import { Stagger, StaggerItem, FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/about")({
-  head: () => pageHead(
-    "About LeafScan | AI Crop Health Platform",
-    "How LeafScan combines AI vision, agronomy data and weather intelligence to help farmers catch crop disease early.",
-  ),
+  head: () =>
+    pageHead(
+      "About LeafScan | AI Crop Health Platform",
+      "How LeafScan combines AI vision, agronomy data and weather intelligence to help farmers catch crop disease early.",
+    ),
   component: AboutPage,
 });
 

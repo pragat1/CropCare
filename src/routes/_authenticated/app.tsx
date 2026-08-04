@@ -53,10 +53,11 @@ const CROPS = [
 ];
 
 export const Route = createFileRoute("/_authenticated/app")({
-  head: () => pageHead(
-    "New Scan — Diagnose Crop Disease | LeafScan",
-    "Upload or capture a leaf photo to get an AI diagnosis with severity, affected plant part and treatment plan.",
-  ),
+  head: () =>
+    pageHead(
+      "New Scan — Diagnose Crop Disease | LeafScan",
+      "Upload or capture a leaf photo to get an AI diagnosis with severity, affected plant part and treatment plan.",
+    ),
   component: DetectPage,
 });
 
