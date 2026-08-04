@@ -42,11 +42,11 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherSna
 
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 12_000);
-  let json: any;
+  let json: Record<string, unknown> = {};
   try {
     const res = await fetch(url, { signal: ctrl.signal });
     if (!res.ok) throw new Error(`Weather service returned ${res.status}`);
-    json = await res.json();
+    json = (await res.json()) as Record<string, unknown>;
   } catch (err) {
     throw new Error(
       err instanceof Error && err.name === "AbortError"
@@ -57,8 +57,8 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherSna
     clearTimeout(t);
   }
 
-  const cur = json?.current ?? {};
-  const daily = json?.daily ?? {};
+  const cur = (json["current"] ?? {}) as Record<string, unknown>;
+  const daily = (json["daily"] ?? {}) as Record<string, number[] | undefined>;
   const num = (v: unknown, fallback = 0) =>
     typeof v === "number" && Number.isFinite(v) ? v : fallback;
 
@@ -66,7 +66,9 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherSna
   try {
     const g = await fetch(`${GEO_URL}?latitude=${lat}&longitude=${lon}&count=1`);
     if (g.ok) {
-      const gj: any = await g.json();
+      const gj = (await g.json()) as {
+        results?: Array<{ name?: string; country_code?: string }>;
+      };
       const r = gj?.results?.[0];
       if (r?.name) place = [r.name, r.country_code].filter(Boolean).join(", ");
     }
