@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { QUIZZES } from "@/lib/data/quizzes";
 import { supabase } from "@/integrations/supabase/client";
 import { useOfflineData, useSyncStatus } from "@/hooks/use-offline";
+import { useLibrary, mapQuizzes } from "@/lib/admin/library";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,7 +19,8 @@ function QuizPage() {
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
-  const { data: quizzes } = useOfflineData("quizzes", QUIZZES);
+  const source = useLibrary("quiz", QUIZZES, mapQuizzes);
+  const { data: quizzes } = useOfflineData("quizzes", source);
   const { online } = useSyncStatus();
 
   const q = quizzes[i];

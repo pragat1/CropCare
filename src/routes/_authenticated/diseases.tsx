@@ -10,13 +10,15 @@ import { Search, BookOpen } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { useOfflineData } from "@/hooks/use-offline";
+import { useLibrary, mapDiseases } from "@/lib/admin/library";
 
 export const Route = createFileRoute("/_authenticated/diseases")({ component: DiseasesPage });
 
 function DiseasesPage() {
   const [q, setQ] = useState("");
   const [crop, setCrop] = useState<string>("all");
-  const { data: diseases } = useOfflineData("diseases", DISEASES);
+  const source = useLibrary("disease", DISEASES, mapDiseases);
+  const { data: diseases } = useOfflineData("diseases", source);
   const crops = useMemo(() => Array.from(new Set(diseases.map(d => d.crop))).sort(), [diseases]);
   const filtered = useMemo(() => diseases.filter(d =>
     (crop === "all" || d.crop === crop) &&
