@@ -25,18 +25,20 @@ export async function compressImage(
   const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const w = Math.round(bitmap.width * scale);
   const h = Math.round(bitmap.height * scale);
-  const canvas = typeof OffscreenCanvas !== "undefined"
-    ? new OffscreenCanvas(w, h)
-    : Object.assign(document.createElement("canvas"), { width: w, height: h });
+  const canvas =
+    typeof OffscreenCanvas !== "undefined"
+      ? new OffscreenCanvas(w, h)
+      : Object.assign(document.createElement("canvas"), { width: w, height: h });
   const ctx = (canvas as HTMLCanvasElement | OffscreenCanvas).getContext("2d");
   if (!ctx) return file;
   (ctx as CanvasRenderingContext2D).drawImage(bitmap, 0, 0, w, h);
 
-  const blob: Blob | null = "convertToBlob" in canvas
-    ? await (canvas as OffscreenCanvas).convertToBlob({ type: "image/jpeg", quality })
-    : await new Promise((resolve) =>
-        (canvas as HTMLCanvasElement).toBlob(resolve, "image/jpeg", quality),
-      );
+  const blob: Blob | null =
+    "convertToBlob" in canvas
+      ? await (canvas as OffscreenCanvas).convertToBlob({ type: "image/jpeg", quality })
+      : await new Promise((resolve) =>
+          (canvas as HTMLCanvasElement).toBlob(resolve, "image/jpeg", quality),
+        );
   if (!blob || blob.size >= file.size) return file;
   return new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
 }

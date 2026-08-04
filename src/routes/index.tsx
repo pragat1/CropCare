@@ -25,8 +25,14 @@ function Landing() {
             <span className="truncate">LeafScan</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Link to="/auth"><Button variant="ghost" className="rounded-full">Sign in</Button></Link>
-            <Link to="/auth"><Button className="rounded-full">Get started</Button></Link>
+            <Link to="/auth">
+              <Button variant="ghost" className="rounded-full">
+                Sign in
+              </Button>
+            </Link>
+            <Link to="/auth">
+              <Button className="rounded-full">Get started</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -40,13 +46,13 @@ function Landing() {
           </FadeIn>
           <FadeIn delay={0.08}>
             <h1 className="font-serif text-5xl font-semibold leading-[1.03] tracking-tight md:text-6xl">
-              Diagnose crop disease from{" "}
-              <span className="text-gradient">a single leaf photo.</span>
+              Diagnose crop disease from <span className="text-gradient">a single leaf photo.</span>
             </h1>
           </FadeIn>
           <FadeIn delay={0.16}>
             <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-              Upload a photo, pick your crop, and get an instant diagnosis with symptoms, likely causes, and a treatment plan — organic and chemical options included.
+              Upload a photo, pick your crop, and get an instant diagnosis with symptoms, likely
+              causes, and a treatment plan — organic and chemical options included.
             </p>
           </FadeIn>
           <FadeIn delay={0.24} className="mt-8 flex flex-wrap gap-3">
@@ -56,7 +62,11 @@ function Landing() {
               </Button>
             </Link>
             <Link to="/auth">
-              <Button size="lg" variant="outline" className="gap-2 rounded-full border-border/60 bg-card/40 px-6 backdrop-blur-md">
+              <Button
+                size="lg"
+                variant="outline"
+                className="gap-2 rounded-full border-border/60 bg-card/40 px-6 backdrop-blur-md"
+              >
                 Create free account <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -65,9 +75,21 @@ function Landing() {
 
         <Stagger className="mt-20 grid gap-5 md:grid-cols-3">
           {[
-            { icon: Camera, title: "Snap & upload", body: "Take a clear photo of the affected leaf. That's it — no forms, no waiting." },
-            { icon: Sparkles, title: "AI diagnosis", body: "Gemini-powered vision identifies disease, severity, and confidence." },
-            { icon: ShieldCheck, title: "Treatment plan", body: "Actionable organic and chemical treatments plus prevention tips." },
+            {
+              icon: Camera,
+              title: "Snap & upload",
+              body: "Take a clear photo of the affected leaf. That's it — no forms, no waiting.",
+            },
+            {
+              icon: Sparkles,
+              title: "AI diagnosis",
+              body: "Gemini-powered vision identifies disease, severity, and confidence.",
+            },
+            {
+              icon: ShieldCheck,
+              title: "Treatment plan",
+              body: "Actionable organic and chemical treatments plus prevention tips.",
+            },
           ].map(({ icon: Icon, title, body }) => (
             <StaggerItem key={title}>
               <GlassCard className="h-full">

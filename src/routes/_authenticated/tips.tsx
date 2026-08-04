@@ -24,28 +24,75 @@ function TipsPage() {
       />
 
       <Stagger className="mt-8 grid gap-5 md:grid-cols-2">
-        {tips.map(g => (
+        {tips.map((g) => (
           <StaggerItem key={g.cat}>
-          <Card className="h-full p-6">
-            <div className="flex items-center gap-2"><span className="text-xl" aria-hidden>{g.icon}</span><h2 className="font-semibold">{g.title}</h2></div>
-            <ul className="mt-3 text-sm space-y-1.5 text-muted-foreground">
-              {g.tips.map((t, i) => <li key={i}>• {t}</li>)}
-            </ul>
-          </Card>
+            <Card className="h-full p-6">
+              <div className="flex items-center gap-2">
+                <span className="text-xl" aria-hidden>
+                  {g.icon}
+                </span>
+                <h2 className="font-semibold">{g.title}</h2>
+              </div>
+              <ul className="mt-3 text-sm space-y-1.5 text-muted-foreground">
+                {g.tips.map((t, i) => (
+                  <li key={i}>• {t}</li>
+                ))}
+              </ul>
+            </Card>
           </StaggerItem>
         ))}
       </Stagger>
 
       <h2 className="font-serif text-2xl font-semibold mt-12">Crop-specific guides</h2>
       <div className="mt-4 grid gap-5 md:grid-cols-2">
-        {Object.values(cropTips).map(c => (
+        {Object.values(cropTips).map((c) => (
           <Card key={c.name} className="p-6">
-            <div className="flex items-center gap-2"><span className="text-xl" aria-hidden>{c.emoji}</span><h3 className="font-semibold">{c.name}</h3></div>
-            <details className="mt-3 text-sm"><summary className="cursor-pointer font-medium">Watering</summary><ul className="mt-2 text-muted-foreground space-y-1">{c.watering.map((t,i)=><li key={i}>• {t}</li>)}</ul></details>
-            <details className="mt-2 text-sm"><summary className="cursor-pointer font-medium">Soil</summary><ul className="mt-2 text-muted-foreground space-y-1">{c.soil.map((t,i)=><li key={i}>• {t}</li>)}</ul></details>
-            <details className="mt-2 text-sm"><summary className="cursor-pointer font-medium">Sunlight</summary><ul className="mt-2 text-muted-foreground space-y-1">{c.sunlight.map((t,i)=><li key={i}>• {t}</li>)}</ul></details>
-            <details className="mt-2 text-sm"><summary className="cursor-pointer font-medium">Fertilizer</summary><ul className="mt-2 text-muted-foreground space-y-1">{c.fertilizer.map((t,i)=><li key={i}>• {t}</li>)}</ul></details>
-            <details className="mt-2 text-sm"><summary className="cursor-pointer font-medium">Harvest</summary><ul className="mt-2 text-muted-foreground space-y-1">{c.harvest.map((t,i)=><li key={i}>• {t}</li>)}</ul></details>
+            <div className="flex items-center gap-2">
+              <span className="text-xl" aria-hidden>
+                {c.emoji}
+              </span>
+              <h3 className="font-semibold">{c.name}</h3>
+            </div>
+            <details className="mt-3 text-sm">
+              <summary className="cursor-pointer font-medium">Watering</summary>
+              <ul className="mt-2 text-muted-foreground space-y-1">
+                {c.watering.map((t, i) => (
+                  <li key={i}>• {t}</li>
+                ))}
+              </ul>
+            </details>
+            <details className="mt-2 text-sm">
+              <summary className="cursor-pointer font-medium">Soil</summary>
+              <ul className="mt-2 text-muted-foreground space-y-1">
+                {c.soil.map((t, i) => (
+                  <li key={i}>• {t}</li>
+                ))}
+              </ul>
+            </details>
+            <details className="mt-2 text-sm">
+              <summary className="cursor-pointer font-medium">Sunlight</summary>
+              <ul className="mt-2 text-muted-foreground space-y-1">
+                {c.sunlight.map((t, i) => (
+                  <li key={i}>• {t}</li>
+                ))}
+              </ul>
+            </details>
+            <details className="mt-2 text-sm">
+              <summary className="cursor-pointer font-medium">Fertilizer</summary>
+              <ul className="mt-2 text-muted-foreground space-y-1">
+                {c.fertilizer.map((t, i) => (
+                  <li key={i}>• {t}</li>
+                ))}
+              </ul>
+            </details>
+            <details className="mt-2 text-sm">
+              <summary className="cursor-pointer font-medium">Harvest</summary>
+              <ul className="mt-2 text-muted-foreground space-y-1">
+                {c.harvest.map((t, i) => (
+                  <li key={i}>• {t}</li>
+                ))}
+              </ul>
+            </details>
           </Card>
         ))}
       </div>

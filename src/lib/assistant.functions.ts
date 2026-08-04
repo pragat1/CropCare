@@ -29,11 +29,20 @@ export const askAssistant = createServerFn({ method: "POST" })
     let imageDataUrl: string | undefined;
     if (data.imagePath) {
       assertOwnedPath(data.imagePath, context.userId);
-      const img = await downloadImageAsDataUrl(context.supabase, "assistant-images", data.imagePath);
+      const img = await downloadImageAsDataUrl(
+        context.supabase,
+        "assistant-images",
+        data.imagePath,
+      );
       imageDataUrl = img.dataUrl;
     }
 
-    const res = await askAssistantAi(data.question, data.lang as AssistantLang, data.history, imageDataUrl);
+    const res = await askAssistantAi(
+      data.question,
+      data.lang as AssistantLang,
+      data.history,
+      imageDataUrl,
+    );
 
     const { error } = await context.supabase.from("assistant_messages").insert([
       {

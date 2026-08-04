@@ -81,18 +81,29 @@ Set "risk" whenever a plant problem is discussed (always when a photo is attache
   const known = new Set(DISEASES.map((d) => d.id));
   const rawRisk = parsed.risk as Partial<AssistantRisk> | null | undefined;
   const risk: AssistantRisk | null =
-    rawRisk && typeof rawRisk === "object" && ["low", "medium", "high"].includes(String(rawRisk.level))
+    rawRisk &&
+    typeof rawRisk === "object" &&
+    ["low", "medium", "high"].includes(String(rawRisk.level))
       ? {
           level: rawRisk.level as AssistantRisk["level"],
           crop: typeof rawRisk.crop === "string" ? rawRisk.crop : "",
           plantPart: typeof rawRisk.plantPart === "string" ? rawRisk.plantPart : "",
-          causes: Array.isArray(rawRisk.causes) ? rawRisk.causes.filter((c) => typeof c === "string").slice(0, 6) : [],
+          causes: Array.isArray(rawRisk.causes)
+            ? rawRisk.causes.filter((c) => typeof c === "string").slice(0, 6)
+            : [],
         }
       : null;
   return {
-    answer: typeof parsed.answer === "string" && parsed.answer.trim() ? parsed.answer.trim() : raw.slice(0, 800),
-    diseaseIds: Array.isArray(parsed.diseaseIds) ? parsed.diseaseIds.filter((i) => typeof i === "string" && known.has(i)).slice(0, 3) : [],
-    followUps: Array.isArray(parsed.followUps) ? parsed.followUps.filter((f) => typeof f === "string").slice(0, 3) : [],
+    answer:
+      typeof parsed.answer === "string" && parsed.answer.trim()
+        ? parsed.answer.trim()
+        : raw.slice(0, 800),
+    diseaseIds: Array.isArray(parsed.diseaseIds)
+      ? parsed.diseaseIds.filter((i) => typeof i === "string" && known.has(i)).slice(0, 3)
+      : [],
+    followUps: Array.isArray(parsed.followUps)
+      ? parsed.followUps.filter((f) => typeof f === "string").slice(0, 3)
+      : [],
     risk,
   };
 }
@@ -109,7 +120,8 @@ function apiKey(): string {
 export async function transcribeAudioBase64(base64: string, lang: AssistantLang): Promise<string> {
   const bytes = Buffer.from(base64, "base64");
   if (bytes.byteLength < 2048) throw new Error("That recording was empty — please try again.");
-  if (bytes.byteLength > 20 * 1024 * 1024) throw new Error("Recording is too long. Keep it under a minute.");
+  if (bytes.byteLength > 20 * 1024 * 1024)
+    throw new Error("Recording is too long. Keep it under a minute.");
 
   const form = new FormData();
   form.append("model", "openai/gpt-4o-transcribe");
@@ -124,7 +136,8 @@ export async function transcribeAudioBase64(base64: string, lang: AssistantLang)
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     if (res.status === 429) throw new Error("Too many requests — please wait a moment.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Please add credits to continue.");
+    if (res.status === 402)
+      throw new Error("AI credits exhausted. Please add credits to continue.");
     throw new Error(`Transcription failed [${res.status}]: ${text.slice(0, 200)}`);
   }
   const json = (await res.json()) as { text?: string };
@@ -149,7 +162,8 @@ export async function synthesizeSpeechBase64(text: string, lang: AssistantLang):
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
     if (res.status === 429) throw new Error("Too many requests — please wait a moment.");
-    if (res.status === 402) throw new Error("AI credits exhausted. Please add credits to continue.");
+    if (res.status === 402)
+      throw new Error("AI credits exhausted. Please add credits to continue.");
     throw new Error(`Speech failed [${res.status}]: ${detail.slice(0, 200)}`);
   }
   const buf = await res.arrayBuffer();

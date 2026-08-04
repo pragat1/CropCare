@@ -165,9 +165,21 @@
 /* ── Ambient background: soft green mesh gradients ───────────────── */
 @utility bg-mesh {
   background-image:
-    radial-gradient(60rem 40rem at 8% -10%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 60%),
-    radial-gradient(50rem 34rem at 100% 0%, color-mix(in oklab, var(--accent) 14%, transparent), transparent 62%),
-    radial-gradient(46rem 34rem at 50% 110%, color-mix(in oklab, var(--primary-glow) 12%, transparent), transparent 65%);
+    radial-gradient(
+      60rem 40rem at 8% -10%,
+      color-mix(in oklab, var(--primary) 16%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 34rem at 100% 0%,
+      color-mix(in oklab, var(--accent) 14%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      46rem 34rem at 50% 110%,
+      color-mix(in oklab, var(--primary-glow) 12%, transparent),
+      transparent 65%
+    );
   background-attachment: fixed;
 }
 
@@ -192,7 +204,10 @@
   backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
   box-shadow: var(--shadow-soft);
-  transition: box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease;
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.35s ease,
+    border-color 0.35s ease;
 
   &:hover {
     box-shadow: var(--shadow-elegant);
@@ -211,6 +226,7 @@
 }
 
 @utility ring-glow {
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--primary) 25%, transparent),
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--primary) 25%, transparent),
     0 10px 40px -12px color-mix(in oklab, var(--primary) 45%, transparent);
 }

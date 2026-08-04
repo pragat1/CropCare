@@ -1,6 +1,13 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { cacheContent, readContent, type ContentKey } from "@/lib/offline/content-cache";
-import { getServerSyncState, getSyncState, listQueue, subscribeSync, syncQueue, type QueuedScan } from "@/lib/offline/sync";
+import {
+  getServerSyncState,
+  getSyncState,
+  listQueue,
+  subscribeSync,
+  syncQueue,
+  type QueuedScan,
+} from "@/lib/offline/sync";
 
 /** Live connectivity + upload-queue status. */
 export function useSyncStatus() {

@@ -12,7 +12,11 @@ export const Route = createFileRoute("/_authenticated/seasons")({ component: Sea
 
 function SeasonsPage() {
   const seasonSource = useLibrary("season", SEASONS, mapSeasons);
-  const listSource = useLibrary("season", SEASON_LIST as Array<{ key: string; label: string }>, mapSeasonList);
+  const listSource = useLibrary(
+    "season",
+    SEASON_LIST as Array<{ key: string; label: string }>,
+    mapSeasonList,
+  );
   const { data: seasons } = useOfflineData("seasons", seasonSource);
   const { data: seasonList } = useOfflineData("seasonList", listSource);
   return (
@@ -24,21 +28,32 @@ function SeasonsPage() {
         description="What to plant and watch out for through the year. Available offline."
       />
       <Stagger className="mt-8 grid gap-5 md:grid-cols-2">
-        {seasonList.map(s => {
+        {seasonList.map((s) => {
           const data = seasons[s.key];
           if (!data) return null;
           return (
             <StaggerItem key={s.key}>
-            <Card className="h-full p-6">
-              <h2 className="font-semibold text-lg">{s.label}</h2>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {data.crops.map((c, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-lg bg-primary/8 border border-border/50 text-sm">{c.e} {c.n}</span>
-                ))}
-              </div>
-              <p className="mt-3 text-sm"><span className="font-medium">Tip:</span> <span className="text-muted-foreground">{data.tip}</span></p>
-              <p className="mt-2 text-sm"><span className="font-medium">Watch for:</span> <span className="text-muted-foreground">{data.disease}</span></p>
-            </Card>
+              <Card className="h-full p-6">
+                <h2 className="font-semibold text-lg">{s.label}</h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {data.crops.map((c, i) => (
+                    <span
+                      key={i}
+                      className="px-2.5 py-1 rounded-lg bg-primary/8 border border-border/50 text-sm"
+                    >
+                      {c.e} {c.n}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-3 text-sm">
+                  <span className="font-medium">Tip:</span>{" "}
+                  <span className="text-muted-foreground">{data.tip}</span>
+                </p>
+                <p className="mt-2 text-sm">
+                  <span className="font-medium">Watch for:</span>{" "}
+                  <span className="text-muted-foreground">{data.disease}</span>
+                </p>
+              </Card>
             </StaggerItem>
           );
         })}

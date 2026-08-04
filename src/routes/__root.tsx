@@ -84,10 +84,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "LeafScan — AI Crop Disease Detection" },
-      { name: "description", content: "Upload a leaf photo and get instant AI-powered crop disease diagnosis, treatment plans, and prevention advice." },
+      {
+        name: "description",
+        content:
+          "Upload a leaf photo and get instant AI-powered crop disease diagnosis, treatment plans, and prevention advice.",
+      },
       { name: "author", content: "LeafScan" },
       { property: "og:title", content: "LeafScan — AI Crop Disease Detection" },
-      { property: "og:description", content: "Instant AI diagnosis for crop diseases with organic and chemical treatment guidance." },
+      {
+        property: "og:description",
+        content:
+          "Instant AI diagnosis for crop diseases with organic and chemical treatment guidance.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#143a26" },

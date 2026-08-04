@@ -6,12 +6,7 @@ import type { Database } from "@/integrations/supabase/types";
 type Sb = SupabaseClient<Database>;
 
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB
-export const ALLOWED_IMAGE_MIME = new Set([
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-]);
+export const ALLOWED_IMAGE_MIME = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 /** Throws if the path does not start with `${userId}/` — prevents cross-user reads. */
 export function assertOwnedPath(path: string, userId: string): void {
@@ -116,7 +111,13 @@ export async function withAudit<T>(
     const result = await fn();
     const latencyMs = Date.now() - start;
     console.log(
-      JSON.stringify({ level: "info", action: ctx.action, userId: ctx.userId, latencyMs, status: "success" }),
+      JSON.stringify({
+        level: "info",
+        action: ctx.action,
+        userId: ctx.userId,
+        latencyMs,
+        status: "success",
+      }),
     );
     void auditLog({
       userId: ctx.userId,
@@ -131,7 +132,13 @@ export async function withAudit<T>(
     const latencyMs = Date.now() - start;
     const message = err instanceof Error ? err.message : String(err);
     console.error(
-      JSON.stringify({ level: "error", action: ctx.action, userId: ctx.userId, latencyMs, error: message }),
+      JSON.stringify({
+        level: "error",
+        action: ctx.action,
+        userId: ctx.userId,
+        latencyMs,
+        error: message,
+      }),
     );
     void auditLog({
       userId: ctx.userId,

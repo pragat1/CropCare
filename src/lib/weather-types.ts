@@ -1,15 +1,15 @@
 // Client-safe shared types for weather intelligence.
 export type WeatherSnapshot = {
-  temperature: number;      // °C
-  humidity: number;         // %
-  rainfall: number;         // mm (last 24h)
-  wind: number;             // km/h
+  temperature: number; // °C
+  humidity: number; // %
+  rainfall: number; // mm (last 24h)
+  wind: number; // km/h
   uvIndex: number;
   condition: string;
   latitude: number;
   longitude: number;
   place?: string | null;
-  observedAt: string;       // ISO
+  observedAt: string; // ISO
 };
 
 export type RiskLevel = "low" | "moderate" | "high";
@@ -17,7 +17,7 @@ export type RiskLevel = "low" | "moderate" | "high";
 export type DiseaseRisk = {
   name: string;
   level: RiskLevel;
-  score: number;            // 0-100
+  score: number; // 0-100
   reason: string;
 };
 

@@ -22,14 +22,21 @@ const SYSTEM_PROMPT = `You are a plant pathologist reviewing treatment progress.
 }
 No markdown, no commentary — JSON only.`;
 
-export async function compareTreatmentImages(beforeUrl: string, afterUrl: string, crop: string): Promise<TreatmentComparison> {
+export async function compareTreatmentImages(
+  beforeUrl: string,
+  afterUrl: string,
+  crop: string,
+): Promise<TreatmentComparison> {
   const text = await aiChatCompletion({
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       {
         role: "user",
         content: [
-          { type: "text", text: `Crop: ${crop}. First image is BEFORE treatment, second image is AFTER. Return the JSON.` },
+          {
+            type: "text",
+            text: `Crop: ${crop}. First image is BEFORE treatment, second image is AFTER. Return the JSON.`,
+          },
           { type: "image_url", image_url: { url: beforeUrl } },
           { type: "image_url", image_url: { url: afterUrl } },
         ],
@@ -39,8 +46,15 @@ export async function compareTreatmentImages(beforeUrl: string, afterUrl: string
   const parsed = safeJsonParse<TreatmentComparison>(text);
 
   const pct = Math.max(-100, Math.min(100, Math.round(Number(parsed.improvement_percent) || 0)));
-  const status: TreatmentComparison["status"] = ["Improved", "No Change", "Worse"].includes(parsed.status)
-    ? parsed.status : (pct > 10 ? "Improved" : pct < -10 ? "Worse" : "No Change");
+  const status: TreatmentComparison["status"] = ["Improved", "No Change", "Worse"].includes(
+    parsed.status,
+  )
+    ? parsed.status
+    : pct > 10
+      ? "Improved"
+      : pct < -10
+        ? "Worse"
+        : "No Change";
   return {
     status,
     improvement_percent: pct,

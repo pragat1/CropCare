@@ -42,19 +42,19 @@ export const compareTreatment = createServerFn({ method: "POST" })
         const result = await compareTreatmentImages(before.dataUrl, after.dataUrl, data.crop);
 
         const { data: row, error: insErr } = await supabase
-      .from("treatment_progress")
-      .insert({
-        user_id: userId,
-        crop: data.crop,
-        before_image_path: data.beforePath,
-        after_image_path: data.afterPath,
-        status: result.status,
-        improvement_percent: result.improvement_percent,
-        notes: data.notes ?? null,
-        analysis: JSON.parse(JSON.stringify(result)),
-      })
-      .select("id")
-      .single();
+          .from("treatment_progress")
+          .insert({
+            user_id: userId,
+            crop: data.crop,
+            before_image_path: data.beforePath,
+            after_image_path: data.afterPath,
+            status: result.status,
+            improvement_percent: result.improvement_percent,
+            notes: data.notes ?? null,
+            analysis: JSON.parse(JSON.stringify(result)),
+          })
+          .select("id")
+          .single();
         if (insErr || !row) throw new Error(insErr?.message ?? "Failed to save comparison");
         return { id: row.id as string };
       },

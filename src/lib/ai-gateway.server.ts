@@ -3,10 +3,7 @@
 
 export type ChatContent =
   | string
-  | Array<
-      | { type: "text"; text: string }
-      | { type: "image_url"; image_url: { url: string } }
-    >;
+  | Array<{ type: "text"; text: string } | { type: "image_url"; image_url: { url: string } }>;
 
 export type ChatMessage = { role: "system" | "user" | "assistant"; content: ChatContent };
 
@@ -90,16 +87,25 @@ export async function aiChatCompletion(opts: CompletionOptions): Promise<string>
       if (!res.ok) {
         const text = await res.text().catch(() => "");
         // Non-retryable client errors.
-        if (res.status === 429) throw makeError("Rate limit exceeded — please try again in a moment.", 429);
-        if (res.status === 402) throw makeError("AI credits exhausted. Please add credits to continue.", 402);
-        if (res.status === 401 || res.status === 403) throw makeError("AI provider rejected the request.", res.status);
+        if (res.status === 429)
+          throw makeError("Rate limit exceeded — please try again in a moment.", 429);
+        if (res.status === 402)
+          throw makeError("AI credits exhausted. Please add credits to continue.", 402);
+        if (res.status === 401 || res.status === 403)
+          throw makeError("AI provider rejected the request.", res.status);
         if (res.status >= 500) {
-          lastError = makeError(`AI upstream error [${res.status}]: ${text.slice(0, 200)}`, res.status, true);
+          lastError = makeError(
+            `AI upstream error [${res.status}]: ${text.slice(0, 200)}`,
+            res.status,
+            true,
+          );
         } else {
           throw makeError(`AI request failed [${res.status}]: ${text.slice(0, 200)}`, res.status);
         }
       } else {
-        const payload = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+        const payload = (await res.json()) as {
+          choices?: Array<{ message?: { content?: string } }>;
+        };
         const content = payload.choices?.[0]?.message?.content;
         if (!content) {
           lastError = makeError("AI returned an empty response.", 502, true);

@@ -1,11 +1,75 @@
-export type Season = { crops:Array<{e:string;n:string}>; tip:string; disease:string };
+export type Season = { crops: Array<{ e: string; n: string }>; tip: string; disease: string };
 export const SEASONS: Record<string, Season> = {
-  spring: {crops:[{e:'🍅',n:'Tomato'},{e:'🥒',n:'Cucumber'},{e:'🫑',n:'Peppers'},{e:'🌿',n:'Herbs'},{e:'🥬',n:'Lettuce'},{e:'🫘',n:'Beans'}],tip:'Prepare soil with compost before planting. Start seeds indoors 6 weeks before last frost. Begin hardening off seedlings mid-spring.',disease:'Watch for damping-off in seedlings, early blight in tomatoes, aphid infestations, and whitefly.'},
-  summer: {crops:[{e:'🌽',n:'Corn'},{e:'🍉',n:'Watermelon'},{e:'🍆',n:'Eggplant'},{e:'🌻',n:'Sunflower'},{e:'🥜',n:'Groundnut'},{e:'🌶️',n:'Chilli'}],tip:'Ensure adequate irrigation, mulch heavily to retain moisture, provide shade for sensitive crops, monitor for heat stress symptoms.',disease:'High risk: Powdery mildew, bacterial wilt, fruit borers, spider mites, and heat stress damage.'},
-  monsoon: {crops:[{e:'🌾',n:'Rice'},{e:'🎋',n:'Sugarcane'},{e:'🌿',n:'Turmeric'},{e:'🫚',n:'Ginger'},{e:'🥔',n:'Potato'},{e:'🌱',n:'Soybean'}],tip:'Ensure proper drainage infrastructure. Apply preventive fungicides before heavy rains. Use raised beds for vegetables. Avoid waterlogging at all costs.',disease:'Highest disease risk season: blast in rice, late blight in potato, red rot in sugarcane, anthracnose, and bacterial diseases.'},
-  autumn: {crops:[{e:'🥦',n:'Broccoli'},{e:'🥕',n:'Carrot'},{e:'🧅',n:'Onion'},{e:'🌿',n:'Wheat'},{e:'🥬',n:'Spinach'},{e:'🫒',n:'Mustard'}],tip:'Plant cool-season crops. Add organic matter to soil before winter. Harvest summer crops before frost. Begin land preparation for winter crops.',disease:'Watch for downy mildew in leafy greens, rust diseases in wheat, late season aphid outbreaks.'},
-  winter: {crops:[{e:'🌿',n:'Wheat'},{e:'🫒',n:'Mustard'},{e:'🥬',n:'Cabbage'},{e:'🥕',n:'Radish'},{e:'🌱',n:'Peas'},{e:'🧄',n:'Garlic'}],tip:'Protect crops from frost with covers. Reduce irrigation frequency. Apply phosphorus for root development. Plan and order seeds for next season.',disease:'Lower disease pressure but watch for frost damage, powdery mildew in protected crops, and storage rots.'},
+  spring: {
+    crops: [
+      { e: "🍅", n: "Tomato" },
+      { e: "🥒", n: "Cucumber" },
+      { e: "🫑", n: "Peppers" },
+      { e: "🌿", n: "Herbs" },
+      { e: "🥬", n: "Lettuce" },
+      { e: "🫘", n: "Beans" },
+    ],
+    tip: "Prepare soil with compost before planting. Start seeds indoors 6 weeks before last frost. Begin hardening off seedlings mid-spring.",
+    disease:
+      "Watch for damping-off in seedlings, early blight in tomatoes, aphid infestations, and whitefly.",
+  },
+  summer: {
+    crops: [
+      { e: "🌽", n: "Corn" },
+      { e: "🍉", n: "Watermelon" },
+      { e: "🍆", n: "Eggplant" },
+      { e: "🌻", n: "Sunflower" },
+      { e: "🥜", n: "Groundnut" },
+      { e: "🌶️", n: "Chilli" },
+    ],
+    tip: "Ensure adequate irrigation, mulch heavily to retain moisture, provide shade for sensitive crops, monitor for heat stress symptoms.",
+    disease:
+      "High risk: Powdery mildew, bacterial wilt, fruit borers, spider mites, and heat stress damage.",
+  },
+  monsoon: {
+    crops: [
+      { e: "🌾", n: "Rice" },
+      { e: "🎋", n: "Sugarcane" },
+      { e: "🌿", n: "Turmeric" },
+      { e: "🫚", n: "Ginger" },
+      { e: "🥔", n: "Potato" },
+      { e: "🌱", n: "Soybean" },
+    ],
+    tip: "Ensure proper drainage infrastructure. Apply preventive fungicides before heavy rains. Use raised beds for vegetables. Avoid waterlogging at all costs.",
+    disease:
+      "Highest disease risk season: blast in rice, late blight in potato, red rot in sugarcane, anthracnose, and bacterial diseases.",
+  },
+  autumn: {
+    crops: [
+      { e: "🥦", n: "Broccoli" },
+      { e: "🥕", n: "Carrot" },
+      { e: "🧅", n: "Onion" },
+      { e: "🌿", n: "Wheat" },
+      { e: "🥬", n: "Spinach" },
+      { e: "🫒", n: "Mustard" },
+    ],
+    tip: "Plant cool-season crops. Add organic matter to soil before winter. Harvest summer crops before frost. Begin land preparation for winter crops.",
+    disease:
+      "Watch for downy mildew in leafy greens, rust diseases in wheat, late season aphid outbreaks.",
+  },
+  winter: {
+    crops: [
+      { e: "🌿", n: "Wheat" },
+      { e: "🫒", n: "Mustard" },
+      { e: "🥬", n: "Cabbage" },
+      { e: "🥕", n: "Radish" },
+      { e: "🌱", n: "Peas" },
+      { e: "🧄", n: "Garlic" },
+    ],
+    tip: "Protect crops from frost with covers. Reduce irrigation frequency. Apply phosphorus for root development. Plan and order seeds for next season.",
+    disease:
+      "Lower disease pressure but watch for frost damage, powdery mildew in protected crops, and storage rots.",
+  },
 };
 export const SEASON_LIST = [
-  {key:'spring', label:'🌸 Spring'},{key:'summer', label:'☀️ Summer'},{key:'monsoon', label:'🌧️ Monsoon'},{key:'autumn', label:'🍂 Autumn'},{key:'winter', label:'❄️ Winter'}
+  { key: "spring", label: "🌸 Spring" },
+  { key: "summer", label: "☀️ Summer" },
+  { key: "monsoon", label: "🌧️ Monsoon" },
+  { key: "autumn", label: "🍂 Autumn" },
+  { key: "winter", label: "❄️ Winter" },
 ];

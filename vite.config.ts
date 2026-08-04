@@ -48,7 +48,9 @@ export default defineConfig({
             {
               // HTML navigations: always try the network first, fall back to cache offline.
               urlPattern: ({ request, url }) =>
-                request.mode === "navigate" && !url.pathname.startsWith("/~oauth") && !url.pathname.startsWith("/api"),
+                request.mode === "navigate" &&
+                !url.pathname.startsWith("/~oauth") &&
+                !url.pathname.startsWith("/api"),
               handler: "NetworkFirst",
               options: {
                 cacheName: "html-navigations",
@@ -59,7 +61,8 @@ export default defineConfig({
             {
               // Hashed, same-origin build assets.
               urlPattern: ({ url, sameOrigin }) =>
-                sameOrigin && (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/_build/")),
+                sameOrigin &&
+                (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/_build/")),
               handler: "CacheFirst",
               options: {
                 cacheName: "build-assets",
@@ -67,7 +70,9 @@ export default defineConfig({
               },
             },
             {
-              urlPattern: ({ url }) => url.origin === "https://fonts.gstatic.com" || url.origin === "https://fonts.googleapis.com",
+              urlPattern: ({ url }) =>
+                url.origin === "https://fonts.gstatic.com" ||
+                url.origin === "https://fonts.googleapis.com",
               handler: "StaleWhileRevalidate",
               options: { cacheName: "google-fonts" },
             },

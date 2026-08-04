@@ -7,7 +7,15 @@ import { QUIZZES } from "@/lib/data/quizzes";
 import { CROP_INFO, CROP_LIST } from "@/lib/data/crops";
 import { SOIL_GUIDE } from "@/lib/data/soil-guide";
 
-export const CATEGORIES = ["disease", "treatment", "quiz", "tip", "season", "crop", "soil"] as const;
+export const CATEGORIES = [
+  "disease",
+  "treatment",
+  "quiz",
+  "tip",
+  "season",
+  "crop",
+  "soil",
+] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 export type FieldType = "text" | "textarea" | "number" | "list" | "select";
@@ -32,7 +40,12 @@ export type ContentItem = {
   updated_at: string;
 };
 
-export type SeedItem = { slug: string; title: string; data: Record<string, unknown>; sort_order: number };
+export type SeedItem = {
+  slug: string;
+  title: string;
+  data: Record<string, unknown>;
+  sort_order: number;
+};
 
 export type CategoryDef = {
   key: Category;
@@ -45,12 +58,14 @@ export type CategoryDef = {
 };
 
 export function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 60) || "item";
+  return (
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 60) || "item"
+  );
 }
 
 export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
@@ -58,7 +73,8 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
     key: "disease",
     label: "Disease",
     plural: "Diseases",
-    description: "Crop disease entries shown in the disease library and used to ground the assistant.",
+    description:
+      "Crop disease entries shown in the disease library and used to ground the assistant.",
     emoji: "🦠",
     fields: [
       { key: "crop", label: "Crop", type: "text", required: true },
@@ -78,9 +94,16 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
         title: d.name,
         sort_order: i,
         data: {
-          crop: d.crop, emoji: d.emoji, severity: d.severity, confidence: d.confidence,
-          summary: d.summary, symptoms: d.symptoms, causes: d.causes,
-          organic: d.organic, chemical: d.chemical, preventive: d.preventive,
+          crop: d.crop,
+          emoji: d.emoji,
+          severity: d.severity,
+          confidence: d.confidence,
+          summary: d.summary,
+          symptoms: d.symptoms,
+          causes: d.causes,
+          organic: d.organic,
+          chemical: d.chemical,
+          preventive: d.preventive,
         },
       })),
   },
@@ -103,7 +126,12 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
       const seen = new Set<string>();
       const out: SeedItem[] = [];
       DISEASES.forEach((d) => {
-        ([["organic", d.organic], ["chemical", d.chemical]] as const).forEach(([type, list]) => {
+        (
+          [
+            ["organic", d.organic],
+            ["chemical", d.chemical],
+          ] as const
+        ).forEach(([type, list]) => {
           list.forEach((entry) => {
             const slug = slugify(`${d.crop}-${type}-${entry}`);
             if (seen.has(slug)) return;
@@ -112,7 +140,15 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
               slug,
               title: entry,
               sort_order: out.length,
-              data: { type, target: d.name, crop: d.crop, dosage: entry, interval: "", notes: "", safety: [] },
+              data: {
+                type,
+                target: d.name,
+                crop: d.crop,
+                dosage: entry,
+                interval: "",
+                notes: "",
+                safety: [],
+              },
             });
           });
         });
@@ -146,7 +182,13 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
     description: "Grouped farming tips shown on the tips page.",
     emoji: "💡",
     fields: [
-      { key: "cat", label: "Category key", type: "text", required: true, help: "e.g. water, soil, pest" },
+      {
+        key: "cat",
+        label: "Category key",
+        type: "text",
+        required: true,
+        help: "e.g. water, soil, pest",
+      },
       { key: "icon", label: "Icon (emoji)", type: "text" },
       { key: "tips", label: "Tips", type: "list", required: true },
     ],
@@ -165,8 +207,19 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
     description: "Season-by-season crop plans, tips and disease warnings.",
     emoji: "📅",
     fields: [
-      { key: "label", label: "Display label", type: "text", required: true, help: "e.g. 🌸 Spring" },
-      { key: "crops", label: "Recommended crops", type: "list", help: "One per line, e.g. 🍅 Tomato" },
+      {
+        key: "label",
+        label: "Display label",
+        type: "text",
+        required: true,
+        help: "e.g. 🌸 Spring",
+      },
+      {
+        key: "crops",
+        label: "Recommended crops",
+        type: "list",
+        help: "One per line, e.g. 🍅 Tomato",
+      },
       { key: "tip", label: "Season tip", type: "textarea" },
       { key: "disease", label: "Disease watch", type: "textarea" },
     ],
