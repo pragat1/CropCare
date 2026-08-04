@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard, CloudSun, MessageCircle, BarChart3 } from "lucide-react";
+import { Leaf, LogOut, ScanLine, History, Sprout, LineChart, BookOpen, Lightbulb, CalendarDays, Brain, Info, Menu, LayoutDashboard, CloudSun, MessageCircle, BarChart3, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,11 +11,13 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
 import { SyncStatus } from "@/components/sync-status";
+import { useIsAdmin } from "@/hooks/use-admin";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { isAdmin } = useIsAdmin();
 
   async function signOut() {
     await qc.cancelQueries();
@@ -25,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
-  const tabs = [
+  const baseTabs = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/analytics", label: "Analytics", icon: BarChart3 },
     { to: "/app", label: "Detect", icon: ScanLine },
@@ -40,6 +42,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/history", label: "History", icon: History },
     { to: "/about", label: "About", icon: Info },
   ] as const;
+
+  const tabs: Array<{ to: string; label: string; icon: typeof Info }> = isAdmin
+    ? [...baseTabs, { to: "/admin", label: "Admin", icon: ShieldCheck }]
+    : [...baseTabs];
 
   const [open, setOpen] = useState(false);
   function isActive(to: string) {

@@ -6,12 +6,15 @@ import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { SEASONS, SEASON_LIST } from "@/lib/data/seasons";
 import { useOfflineData } from "@/hooks/use-offline";
+import { useLibrary, mapSeasons, mapSeasonList } from "@/lib/admin/library";
 
 export const Route = createFileRoute("/_authenticated/seasons")({ component: SeasonsPage });
 
 function SeasonsPage() {
-  const { data: seasons } = useOfflineData("seasons", SEASONS);
-  const { data: seasonList } = useOfflineData("seasonList", SEASON_LIST);
+  const seasonSource = useLibrary("season", SEASONS, mapSeasons);
+  const listSource = useLibrary("season", SEASON_LIST as Array<{ key: string; label: string }>, mapSeasonList);
+  const { data: seasons } = useOfflineData("seasons", seasonSource);
+  const { data: seasonList } = useOfflineData("seasonList", listSource);
   return (
     <AppShell>
       <PageHeader

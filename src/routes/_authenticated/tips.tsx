@@ -6,11 +6,13 @@ import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { TIPS, CROP_TIPS } from "@/lib/data/tips";
 import { useOfflineData } from "@/hooks/use-offline";
+import { useLibrary, mapTips } from "@/lib/admin/library";
 
 export const Route = createFileRoute("/_authenticated/tips")({ component: TipsPage });
 
 function TipsPage() {
-  const { data: tips } = useOfflineData("tips", TIPS);
+  const source = useLibrary("tip", TIPS, mapTips);
+  const { data: tips } = useOfflineData("tips", source);
   const { data: cropTips } = useOfflineData("cropTips", CROP_TIPS);
   return (
     <AppShell>
