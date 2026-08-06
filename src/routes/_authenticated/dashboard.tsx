@@ -21,6 +21,9 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -34,6 +37,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
+import { useProfile } from "@/lib/profile";
+import { isOverdue, kindMeta, useReminders, useToggleReminder } from "@/lib/reminders";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -146,6 +153,9 @@ const chartTooltip = {
 
 function DashboardPage() {
   const { data, isLoading, isError, error, refetch, isFetching } = useDashboardData();
+  const { data: profile } = useProfile();
+  const { data: reminderRows } = useReminders();
+  const toggleReminder = useToggleReminder();
 
   const stats = useMemo(() => {
     const detections = data?.detections ?? [];
@@ -218,8 +228,26 @@ function DashboardPage() {
       monthly,
       reminders,
       recent: detections.slice(0, 5),
+      distribution: [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([name, value]) => ({ name, value })),
     };
   }, [data]);
+
+  const pending = useMemo(
+    () =>
+      (reminderRows ?? [])
+        .filter((r) => !r.done)
+        .sort((a, b) => Number(isOverdue(b)) - Number(isOverdue(a)))
+        .slice(0, 5),
+    [reminderRows],
+  );
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  })();
 
   if (isError) {
     return (
@@ -243,8 +271,12 @@ function DashboardPage() {
       <PageHeader
         icon={LayoutDashboard}
         eyebrow="Overview"
-        title="Farm dashboard"
-        description="Your crop health at a glance — scans, trends, and what needs attention next."
+        title={`${greeting}${profile?.display_name ? `, ${profile.display_name}` : ""}`}
+        description={
+          profile?.farm_place
+            ? `Crop health at ${profile.farm_place} — scans, trends, weather and what needs attention next.`
+            : "Your crop health at a glance — scans, trends, weather and what needs attention next."
+        }
         actions={
           <Link to="/app">
             <Button className="gap-2 rounded-full">
@@ -458,10 +490,43 @@ function DashboardPage() {
                   <h2 className="font-serif text-lg font-semibold">Treatment reminders</h2>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Diseased crops with no follow-up logged yet.
+                  Scheduled farm tasks plus diseased crops with no follow-up logged yet.
                 </p>
                 <div className="mt-4 space-y-3">
-                  {stats.reminders.length === 0 ? (
+                  {pending.map((r) => {
+                    const Icon = kindMeta(r.kind).icon;
+                    return (
+                      <div
+                        key={r.id}
+                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
+                      >
+                        <Checkbox
+                          checked={r.done}
+                          aria-label={`Mark ${r.title} as done`}
+                          onCheckedChange={() => toggleReminder.mutate(r)}
+                        />
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{r.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            due {new Date(r.due_at).toLocaleDateString()}
+                            {r.crop ? ` · ${r.crop}` : ""}
+                          </p>
+                        </div>
+                        {isOverdue(r) && (
+                          <Badge
+                            variant="outline"
+                            className="border-destructive/30 bg-destructive/10 text-destructive"
+                          >
+                            Overdue
+                          </Badge>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {pending.length === 0 && stats.reminders.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
                       <CheckCircle2 className="mx-auto mb-2 h-5 w-5 text-success" />
                       Nothing pending — all treated crops are up to date.
@@ -492,7 +557,59 @@ function DashboardPage() {
                     ))
                   )}
                 </div>
+                <Link to="/reminders" className="mt-4 inline-flex">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1 rounded-full text-muted-foreground"
+                  >
+                    Manage reminders <ArrowRight className="h-3.5 w-3.5" />
+                  </Button>
+                </Link>
               </Card>
+            </FadeIn>
+          </div>
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+            <FadeIn delay={0.05}>
+              <Card className="h-full p-6">
+                <h2 className="font-serif text-lg font-semibold">Disease distribution</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Which problems show up most across your scans.
+                </p>
+                {stats.distribution.length === 0 ? (
+                  <div className="mt-6 rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
+                    No diseases detected yet.
+                  </div>
+                ) : (
+                  <div className="mt-4 h-[240px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={stats.distribution}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={55}
+                          outerRadius={90}
+                          paddingAngle={3}
+                        >
+                          {stats.distribution.map((_, i) => (
+                            <Cell
+                              key={i}
+                              fill={`color-mix(in oklab, var(--primary) ${100 - i * 13}%, var(--muted))`}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip {...chartTooltip} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </Card>
+            </FadeIn>
+
+            <FadeIn delay={0.1}>
+              <DashboardWeather crop={profile?.primary_crop ?? "Tomato"} />
             </FadeIn>
           </div>
 
@@ -579,5 +696,21 @@ function DashboardPage() {
         </>
       )}
     </AppShell>
+  );
+}
+
+function DashboardWeather({ crop }: { crop: string }) {
+  const { intel, isLoading, error, asked, requestLocation, retry } = useWeatherIntel(crop);
+  return (
+    <WeatherPanel
+      crop={crop}
+      compact
+      intel={intel}
+      isLoading={isLoading}
+      error={error}
+      asked={asked}
+      onRequest={requestLocation}
+      onRetry={retry}
+    />
   );
 }

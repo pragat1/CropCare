@@ -37,11 +37,27 @@ export const askAssistant = createServerFn({ method: "POST" })
       imageDataUrl = img.dataUrl;
     }
 
+    // Ground answers in the farmer's own recent scan history.
+    const { data: recent } = await context.supabase
+      .from("detections")
+      .select("crop, disease, severity, is_healthy, created_at")
+      .order("created_at", { ascending: false })
+      .limit(8);
+    const farmContext = (recent ?? [])
+      .map(
+        (r) =>
+          `${new Date(r.created_at).toLocaleDateString()}: ${r.crop} — ${
+            r.is_healthy ? "healthy" : `${r.disease ?? "unknown disease"} (${r.severity ?? "n/a"} severity)`
+          }`,
+      )
+      .join("\n");
+
     const res = await askAssistantAi(
       data.question,
       data.lang as AssistantLang,
       data.history,
       imageDataUrl,
+      farmContext || undefined,
     );
 
     const { error } = await context.supabase.from("assistant_messages").insert([

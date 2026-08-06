@@ -43,6 +43,7 @@ export async function askAssistantAi(
   lang: AssistantLang,
   history: Array<{ role: "user" | "assistant"; content: string }>,
   imageDataUrl?: string,
+  farmContext?: string,
 ): Promise<AssistantAnswer> {
   const system = `You are CropCare's farming voice assistant. You ONLY answer using the disease database below plus general safe agronomy advice.
 
@@ -53,6 +54,7 @@ RULES
 - Mention likely disease name, why it matches, one organic and one chemical option with dosage if listed, and one prevention tip.
 - Always add a short safety note when recommending chemicals.
 ${imageDataUrl ? `- A photo of the plant is attached. Look at it carefully: describe what you actually see (spot colour, shape, location, wilting), then give the disease risk level and the likely causes. If the photo is not a plant, say so.` : ""}
+${farmContext ? `\nTHIS FARMER'S RECENT SCANS (use them for context when relevant; refer to them naturally)\n${farmContext}` : ""}
 
 DISEASE DATABASE
 ${diseaseContext()}

@@ -16,7 +16,9 @@ import { Route as AuthenticatedWeatherRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
 import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/tips'
 import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
+import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
@@ -29,6 +31,7 @@ import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminCategoryRouteImport } from './routes/_authenticated/admin.$category'
 
 const AuthRoute = AuthRouteImport.update({
@@ -65,9 +68,19 @@ const AuthenticatedSoilRoute = AuthenticatedSoilRouteImport.update({
   path: '/soil',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSeasonsRoute = AuthenticatedSeasonsRouteImport.update({
   id: '/seasons',
   path: '/seasons',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRemindersRoute = AuthenticatedRemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedQuizRoute = AuthenticatedQuizRouteImport.update({
@@ -131,6 +144,11 @@ const AuthenticatedDetectionIdRoute =
     path: '/detection/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminCategoryRoute =
   AuthenticatedAdminCategoryRouteImport.update({
     id: '/$category',
@@ -150,12 +168,15 @@ export interface FileRoutesByFullPath {
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
+  '/reminders': typeof AuthenticatedRemindersRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -171,12 +192,15 @@ export interface FileRoutesByTo {
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
+  '/reminders': typeof AuthenticatedRemindersRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -195,12 +219,15 @@ export interface FileRoutesById {
   '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
+  '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
   '/_authenticated/tips': typeof AuthenticatedTipsRoute
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
   '/_authenticated/weather': typeof AuthenticatedWeatherRoute
   '/_authenticated/admin/$category': typeof AuthenticatedAdminCategoryRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -219,12 +246,15 @@ export interface FileRouteTypes {
     | '/diseases'
     | '/history'
     | '/quiz'
+    | '/reminders'
     | '/seasons'
+    | '/settings'
     | '/soil'
     | '/tips'
     | '/tracker'
     | '/weather'
     | '/admin/$category'
+    | '/admin/users'
     | '/detection/$id'
     | '/soil/$id'
     | '/admin/'
@@ -240,12 +270,15 @@ export interface FileRouteTypes {
     | '/diseases'
     | '/history'
     | '/quiz'
+    | '/reminders'
     | '/seasons'
+    | '/settings'
     | '/soil'
     | '/tips'
     | '/tracker'
     | '/weather'
     | '/admin/$category'
+    | '/admin/users'
     | '/detection/$id'
     | '/soil/$id'
     | '/admin'
@@ -263,12 +296,15 @@ export interface FileRouteTypes {
     | '/_authenticated/diseases'
     | '/_authenticated/history'
     | '/_authenticated/quiz'
+    | '/_authenticated/reminders'
     | '/_authenticated/seasons'
+    | '/_authenticated/settings'
     | '/_authenticated/soil'
     | '/_authenticated/tips'
     | '/_authenticated/tracker'
     | '/_authenticated/weather'
     | '/_authenticated/admin/$category'
+    | '/_authenticated/admin/users'
     | '/_authenticated/detection/$id'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
@@ -331,11 +367,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSoilRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/seasons': {
       id: '/_authenticated/seasons'
       path: '/seasons'
       fullPath: '/seasons'
       preLoaderRoute: typeof AuthenticatedSeasonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reminders': {
+      id: '/_authenticated/reminders'
+      path: '/reminders'
+      fullPath: '/reminders'
+      preLoaderRoute: typeof AuthenticatedRemindersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/quiz': {
@@ -422,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDetectionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/$category': {
       id: '/_authenticated/admin/$category'
       path: '/$category'
@@ -434,11 +491,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCategoryRoute: typeof AuthenticatedAdminCategoryRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCategoryRoute: AuthenticatedAdminCategoryRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -466,7 +525,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
+  AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
   AuthenticatedTipsRoute: typeof AuthenticatedTipsRoute
   AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
@@ -484,7 +545,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
+  AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
   AuthenticatedTipsRoute: AuthenticatedTipsRoute,
   AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
