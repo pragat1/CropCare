@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, BarChart3, ShieldCheck, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Stagger, StaggerItem } from "@/components/motion";
@@ -89,6 +89,35 @@ function AdminHome() {
           );
         })}
       </Stagger>
+
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Link to="/admin/users" className="block">
+          <Card className="flex h-full items-center gap-4 p-6 transition-colors hover:border-primary/40">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Users className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="font-serif text-lg font-semibold">Users</h2>
+              <p className="text-sm text-muted-foreground">
+                Review accounts, activity and grant or revoke administrator access.
+              </p>
+            </div>
+          </Card>
+        </Link>
+        <Link to="/analytics" className="block">
+          <Card className="flex h-full items-center gap-4 p-6 transition-colors hover:border-primary/40">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+              <BarChart3 className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <h2 className="font-serif text-lg font-semibold">Analytics</h2>
+              <p className="text-sm text-muted-foreground">
+                Detection volume, crop distribution, treatment success and exportable reports.
+              </p>
+            </div>
+          </Card>
+        </Link>
+      </div>
     </AppShell>
   );
 }
