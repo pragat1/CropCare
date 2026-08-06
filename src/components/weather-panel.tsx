@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { getWeatherIntel } from "@/lib/weather.functions";
 import { RISK_STYLES, type WeatherIntel } from "@/lib/weather-types";
 import { Stagger, StaggerItem } from "@/components/motion";
+import { farmCoords, useProfile } from "@/lib/profile";
 
 const LS_KEY = "leafscan.geo";
 
@@ -39,6 +40,8 @@ function readCached(): Coords | null {
 
 export function useWeatherIntel(crop: string) {
   const call = useServerFn(getWeatherIntel);
+  const { data: profile } = useProfile();
+  const saved = farmCoords(profile);
   const [coords, setCoords] = useState<Coords | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [asked, setAsked] = useState(false);
@@ -77,16 +80,16 @@ export function useWeatherIntel(crop: string) {
     );
   }, [mutation]);
 
-  // Reuse a previously granted location without re-prompting.
+  // Prefer the saved farm location, then a previously granted browser location.
   useEffect(() => {
-    const cached = readCached();
-    if (cached && !coords) {
-      setCoords(cached);
-      setAsked(true);
-      mutation.mutate(cached);
-    }
+    if (coords) return;
+    const next = saved ?? readCached();
+    if (!next) return;
+    setCoords(next);
+    setAsked(true);
+    mutation.mutate(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [saved?.lat, saved?.lon]);
 
   // Refresh when the crop changes and we already have a location.
   useEffect(() => {

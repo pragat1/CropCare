@@ -30,12 +30,15 @@ import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { SyncStatus } from "@/components/sync-status";
 import { useIsAdmin } from "@/hooks/use-admin";
+import { useApplyTheme, useProfile } from "@/lib/profile";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { isAdmin } = useIsAdmin();
+  const { data: profile } = useProfile();
+  useApplyTheme(profile?.theme);
 
   async function signOut() {
     await qc.cancelQueries();
