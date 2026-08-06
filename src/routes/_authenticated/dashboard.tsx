@@ -37,7 +37,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { WeatherPanel } from "@/components/weather-panel";
+import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
 import { useProfile } from "@/lib/profile";
 import { isOverdue, kindMeta, useReminders, useToggleReminder } from "@/lib/reminders";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -609,7 +609,7 @@ function DashboardPage() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <WeatherPanel crop={profile?.primary_crop ?? "Tomato"} />
+              <DashboardWeather crop={profile?.primary_crop ?? "Tomato"} />
             </FadeIn>
           </div>
 
@@ -697,4 +697,9 @@ function DashboardPage() {
       )}
     </AppShell>
   );
+}
+
+function DashboardWeather({ crop }: { crop: string }) {
+  const weather = useWeatherIntel(crop);
+  return <WeatherPanel crop={crop} compact {...weather} />;
 }
