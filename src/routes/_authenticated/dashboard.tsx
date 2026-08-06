@@ -700,6 +700,17 @@ function DashboardPage() {
 }
 
 function DashboardWeather({ crop }: { crop: string }) {
-  const weather = useWeatherIntel(crop);
-  return <WeatherPanel crop={crop} compact {...weather} />;
+  const { intel, isLoading, error, asked, requestLocation, retry } = useWeatherIntel(crop);
+  return (
+    <WeatherPanel
+      crop={crop}
+      compact
+      intel={intel}
+      isLoading={isLoading}
+      error={error}
+      asked={asked}
+      onRequest={requestLocation}
+      onRetry={retry}
+    />
+  );
 }
