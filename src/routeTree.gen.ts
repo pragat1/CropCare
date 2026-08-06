@@ -16,6 +16,7 @@ import { Route as AuthenticatedWeatherRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedTrackerRouteImport } from './routes/_authenticated/tracker'
 import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/tips'
 import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
@@ -63,6 +64,11 @@ const AuthenticatedTipsRoute = AuthenticatedTipsRouteImport.update({
 const AuthenticatedSoilRoute = AuthenticatedSoilRouteImport.update({
   id: '/soil',
   path: '/soil',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSeasonsRoute = AuthenticatedSeasonsRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
@@ -196,6 +204,7 @@ export interface FileRoutesById {
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
   '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
   '/_authenticated/tips': typeof AuthenticatedTipsRoute
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/quiz'
     | '/seasons'
+    | '/settings'
     | '/soil'
     | '/tips'
     | '/tracker'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/quiz'
     | '/seasons'
+    | '/settings'
     | '/soil'
     | '/tips'
     | '/tracker'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/_authenticated/history'
     | '/_authenticated/quiz'
     | '/_authenticated/seasons'
+    | '/_authenticated/settings'
     | '/_authenticated/soil'
     | '/_authenticated/tips'
     | '/_authenticated/tracker'
@@ -329,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/soil'
       fullPath: '/soil'
       preLoaderRoute: typeof AuthenticatedSoilRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/seasons': {
@@ -467,6 +486,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
   AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
   AuthenticatedTipsRoute: typeof AuthenticatedTipsRoute
   AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
@@ -485,6 +505,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
   AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
   AuthenticatedTipsRoute: AuthenticatedTipsRoute,
   AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
@@ -503,13 +524,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
