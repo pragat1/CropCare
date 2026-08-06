@@ -16,7 +16,9 @@ import {
   GitCompare,
   Leaf,
   CloudSun,
+  FileDown,
 } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +27,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppShell } from "@/components/app-shell";
 import type { DiseaseCandidate, Differential, TreatmentPlan } from "@/lib/ai.server";
 import { RISK_STYLES, type RiskLevel, type WeatherSnapshot } from "@/lib/weather-types";
+import { generateDetectionPdf } from "@/lib/report-pdf";
+import { useProfile } from "@/lib/profile";
 
 function WeatherAtScan({
   weather,
@@ -99,6 +103,8 @@ function DetectionPage() {
   });
 
   const imgUrl = useSignedUrl("leaf-images", q.data?.image_path);
+  const { data: profile } = useProfile();
+  const [exporting, setExporting] = useState(false);
 
   const del = useMutation({
     mutationFn: async () => {
@@ -142,6 +148,35 @@ function DetectionPage() {
   const chemical = asPlans(d.treatment_chemical_detailed);
   const immediate = arr(d.immediate_actions);
 
+  async function downloadReport() {
+    setExporting(true);
+    try {
+      await generateDetectionPdf({
+        crop: d.crop,
+        isHealthy: healthy,
+        disease: d.disease,
+        confidence: d.confidence,
+        severity: d.severity,
+        plantPart: d.plant_part,
+        summary: d.summary,
+        symptoms: arr(d.symptoms),
+        causes: arr(d.causes),
+        organic: arr(d.treatment_organic),
+        chemical: arr(d.treatment_chemical),
+        prevention: arr(d.prevention),
+        weather: (d.weather as WeatherSnapshot | null) ?? null,
+        createdAt: d.created_at,
+        imageUrl: imgUrl,
+        location: profile?.farm_place ?? null,
+      });
+      toast.success("Report downloaded");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn’t generate the report");
+    } finally {
+      setExporting(false);
+    }
+  }
+
   return (
     <AppShell>
       <Link
@@ -163,9 +198,17 @@ function DetectionPage() {
               {new Date(d.created_at).toLocaleString()}
             </div>
             <Button
-              variant="outline"
               size="sm"
               className="w-full mt-3 gap-2"
+              onClick={downloadReport}
+              disabled={exporting}
+            >
+              <FileDown className="h-4 w-4" /> {exporting ? "Preparing…" : "Download report"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full mt-2 gap-2"
               onClick={() => del.mutate()}
               disabled={del.isPending}
             >
