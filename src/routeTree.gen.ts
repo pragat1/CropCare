@@ -31,6 +31,7 @@ import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminCategoryRouteImport } from './routes/_authenticated/admin.$category'
 
 const AuthRoute = AuthRouteImport.update({
@@ -143,6 +144,11 @@ const AuthenticatedDetectionIdRoute =
     path: '/detection/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminCategoryRoute =
   AuthenticatedAdminCategoryRouteImport.update({
     id: '/$category',
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/_authenticated/tracker': typeof AuthenticatedTrackerRoute
   '/_authenticated/weather': typeof AuthenticatedWeatherRoute
   '/_authenticated/admin/$category': typeof AuthenticatedAdminCategoryRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -245,6 +254,7 @@ export interface FileRouteTypes {
     | '/tracker'
     | '/weather'
     | '/admin/$category'
+    | '/admin/users'
     | '/detection/$id'
     | '/soil/$id'
     | '/admin/'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/tracker'
     | '/weather'
     | '/admin/$category'
+    | '/admin/users'
     | '/detection/$id'
     | '/soil/$id'
     | '/admin'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tracker'
     | '/_authenticated/weather'
     | '/_authenticated/admin/$category'
+    | '/_authenticated/admin/users'
     | '/_authenticated/detection/$id'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
@@ -460,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDetectionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/$category': {
       id: '/_authenticated/admin/$category'
       path: '/$category'
@@ -472,11 +491,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCategoryRoute: typeof AuthenticatedAdminCategoryRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCategoryRoute: AuthenticatedAdminCategoryRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
