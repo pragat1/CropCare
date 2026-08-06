@@ -212,6 +212,60 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          farm_lat: number | null
+          farm_lng: number | null
+          farm_place: string | null
+          id: string
+          language: string
+          notify_reminders: boolean
+          notify_scans: boolean
+          notify_weather: boolean
+          primary_crop: string | null
+          share_analytics: boolean
+          theme: string
+          units: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          farm_lat?: number | null
+          farm_lng?: number | null
+          farm_place?: string | null
+          id: string
+          language?: string
+          notify_reminders?: boolean
+          notify_scans?: boolean
+          notify_weather?: boolean
+          primary_crop?: string | null
+          share_analytics?: boolean
+          theme?: string
+          units?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          farm_lat?: number | null
+          farm_lng?: number | null
+          farm_place?: string | null
+          id?: string
+          language?: string
+          notify_reminders?: boolean
+          notify_scans?: boolean
+          notify_weather?: boolean
+          primary_crop?: string | null
+          share_analytics?: boolean
+          theme?: string
+          units?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quiz_attempts: {
         Row: {
           answers: Json
@@ -259,6 +313,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      reminders: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          crop: string | null
+          detection_id: string | null
+          done: boolean
+          due_at: string
+          id: string
+          kind: string
+          notes: string | null
+          repeat_days: number | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          crop?: string | null
+          detection_id?: string | null
+          done?: boolean
+          due_at?: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          repeat_days?: number | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          crop?: string | null
+          detection_id?: string | null
+          done?: boolean
+          due_at?: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          repeat_days?: number | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_detection_id_fkey"
+            columns: ["detection_id"]
+            isOneToOne: false
+            referencedRelation: "detections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       soil_analyses: {
         Row: {
@@ -373,6 +483,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_list_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          last_sign_in_at: string
+          roles: string[]
+          scan_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
