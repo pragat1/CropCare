@@ -18,6 +18,7 @@ import { Route as AuthenticatedTipsRouteImport } from './routes/_authenticated/t
 import { Route as AuthenticatedSoilRouteImport } from './routes/_authenticated/soil'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticated/seasons'
+import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
@@ -74,6 +75,11 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
 const AuthenticatedSeasonsRoute = AuthenticatedSeasonsRouteImport.update({
   id: '/seasons',
   path: '/seasons',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRemindersRoute = AuthenticatedRemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedQuizRoute = AuthenticatedQuizRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
+  '/reminders': typeof AuthenticatedRemindersRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
+  '/reminders': typeof AuthenticatedRemindersRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/soil': typeof AuthenticatedSoilRouteWithChildren
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
+  '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/seasons': typeof AuthenticatedSeasonsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/soil': typeof AuthenticatedSoilRouteWithChildren
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/diseases'
     | '/history'
     | '/quiz'
+    | '/reminders'
     | '/seasons'
     | '/settings'
     | '/soil'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/diseases'
     | '/history'
     | '/quiz'
+    | '/reminders'
     | '/seasons'
     | '/settings'
     | '/soil'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/_authenticated/diseases'
     | '/_authenticated/history'
     | '/_authenticated/quiz'
+    | '/_authenticated/reminders'
     | '/_authenticated/seasons'
     | '/_authenticated/settings'
     | '/_authenticated/soil'
@@ -355,6 +367,13 @@ declare module '@tanstack/react-router' {
       path: '/seasons'
       fullPath: '/seasons'
       preLoaderRoute: typeof AuthenticatedSeasonsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reminders': {
+      id: '/_authenticated/reminders'
+      path: '/reminders'
+      fullPath: '/reminders'
+      preLoaderRoute: typeof AuthenticatedRemindersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/quiz': {
@@ -485,6 +504,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
+  AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedSeasonsRoute: typeof AuthenticatedSeasonsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedSoilRoute: typeof AuthenticatedSoilRouteWithChildren
@@ -504,6 +524,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
+  AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedSeasonsRoute: AuthenticatedSeasonsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedSoilRoute: AuthenticatedSoilRouteWithChildren,
