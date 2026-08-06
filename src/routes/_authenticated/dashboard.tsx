@@ -21,6 +21,9 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -34,6 +37,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { WeatherPanel } from "@/components/weather-panel";
+import { useProfile } from "@/lib/profile";
+import { isOverdue, kindMeta, useReminders, useToggleReminder } from "@/lib/reminders";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -146,6 +153,9 @@ const chartTooltip = {
 
 function DashboardPage() {
   const { data, isLoading, isError, error, refetch, isFetching } = useDashboardData();
+  const { data: profile } = useProfile();
+  const { data: reminderRows } = useReminders();
+  const toggleReminder = useToggleReminder();
 
   const stats = useMemo(() => {
     const detections = data?.detections ?? [];
@@ -218,8 +228,26 @@ function DashboardPage() {
       monthly,
       reminders,
       recent: detections.slice(0, 5),
+      distribution: [...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([name, value]) => ({ name, value })),
     };
   }, [data]);
+
+  const pending = useMemo(
+    () =>
+      (reminderRows ?? [])
+        .filter((r) => !r.done)
+        .sort((a, b) => Number(isOverdue(b)) - Number(isOverdue(a)))
+        .slice(0, 5),
+    [reminderRows],
+  );
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+  })();
 
   if (isError) {
     return (
@@ -243,8 +271,12 @@ function DashboardPage() {
       <PageHeader
         icon={LayoutDashboard}
         eyebrow="Overview"
-        title="Farm dashboard"
-        description="Your crop health at a glance — scans, trends, and what needs attention next."
+        title={`${greeting}${profile?.display_name ? `, ${profile.display_name}` : ""}`}
+        description={
+          profile?.farm_place
+            ? `Crop health at ${profile.farm_place} — scans, trends, weather and what needs attention next.`
+            : "Your crop health at a glance — scans, trends, weather and what needs attention next."
+        }
         actions={
           <Link to="/app">
             <Button className="gap-2 rounded-full">
