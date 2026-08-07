@@ -1,34 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { Suspense, lazy, useMemo, useState } from "react";
 import {
   Activity,
   AlertTriangle,
-  CalendarDays,
+  BookOpen,
+  Brain,
+  Bell,
   CheckCircle2,
+  CloudSun,
+  History,
   LayoutDashboard,
   Leaf,
   LineChart as LineChartIcon,
+  MapPin,
   ScanLine,
   Sprout,
-  Bell,
   ArrowRight,
-  Brain,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
@@ -36,11 +26,20 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { supabase } from "@/integrations/supabase/client";
-import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
-import { useProfile } from "@/lib/profile";
-import { isOverdue, kindMeta, useReminders, useToggleReminder } from "@/lib/reminders";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
+import { useSignedUrl } from "@/hooks/use-signed-url";
+import { farmCoords, useProfile } from "@/lib/profile";
+import { isOverdue, kindMeta, useReminders, useToggleReminder } from "@/lib/reminders";
+import { getWeatherIntel } from "@/lib/weather.functions";
+import { RISK_STYLES, type WeatherIntel } from "@/lib/weather-types";
+
+const ActivityChart = lazy(() =>
+  import("@/components/dashboard/charts").then((m) => ({ default: m.ActivityChart })),
+);
+const DistributionChart = lazy(() =>
+  import("@/components/dashboard/charts").then((m) => ({ default: m.DistributionChart })),
+);
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -71,36 +70,64 @@ type Detection = {
   is_healthy: boolean;
   confidence: number | null;
   severity: string | null;
+  image_path: string | null;
   created_at: string;
 };
-type Tracker = { id: string; crop: string | null; created_at: string };
 
 const DAY = 86_400_000;
 
-function useDashboardData() {
+/** All dashboard numbers come from this single scan query — nothing is synthesised. */
+function useDetections() {
   return useQuery({
     queryKey: ["dashboard"],
-    queryFn: async () => {
-      const [det, trk] = await Promise.all([
-        supabase
-          .from("detections")
-          .select("id, crop, disease, is_healthy, confidence, severity, created_at")
-          .order("created_at", { ascending: false })
-          .limit(500),
-        supabase
-          .from("treatment_progress")
-          .select("id, crop, created_at")
-          .order("created_at", { ascending: false })
-          .limit(200),
-      ]);
-      if (det.error) throw det.error;
-      if (trk.error) throw trk.error;
-      return {
-        detections: (det.data ?? []) as Detection[],
-        trackers: (trk.data ?? []) as Tracker[],
-      };
+    queryFn: async (): Promise<Detection[]> => {
+      const { data, error } = await supabase
+        .from("detections")
+        .select("id, crop, disease, is_healthy, confidence, severity, image_path, created_at")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+      if (error) throw error;
+      return (data ?? []) as Detection[];
     },
   });
+}
+
+function relativeTime(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.round(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} minute${mins === 1 ? "" : "s"} ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+  const days = Math.round(hours / 24);
+  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+const QUICK_ACTIONS = [
+  { to: "/app", label: "Scan crop", icon: ScanLine },
+  { to: "/soil", label: "Scan soil", icon: Sprout },
+  { to: "/history", label: "View history", icon: History },
+  { to: "/diseases", label: "Disease library", icon: BookOpen },
+  { to: "/weather", label: "Weather", icon: CloudSun },
+  { to: "/assistant", label: "Assistant", icon: Brain },
+] as const;
+
+function QuickActions() {
+  return (
+    <Stagger className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      {QUICK_ACTIONS.map(({ to, label, icon: Icon }) => (
+        <StaggerItem key={to}>
+          <Link to={to}>
+            <Button variant="secondary" className="h-20 w-full flex-col gap-2 rounded-2xl">
+              <Icon className="h-5 w-5 text-primary" aria-hidden />
+              <span className="text-xs sm:text-sm">{label}</span>
+            </Button>
+          </Link>
+        </StaggerItem>
+      ))}
+    </Stagger>
+  );
 }
 
 function StatCard({
@@ -123,119 +150,136 @@ function StatCard({
         ? "bg-destructive/10 text-destructive"
         : "bg-primary/10 text-primary";
   return (
-    <Card className="p-5">
+    <Card className="h-full p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
             {label}
           </p>
-          <p className="mt-2 font-serif text-3xl font-semibold tracking-tight">{value}</p>
-          {hint && <p className="mt-1 truncate text-xs text-muted-foreground">{hint}</p>}
+          <p className="mt-2 truncate font-serif text-3xl font-semibold tracking-tight">{value}</p>
+          {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
         </div>
         <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${toneCls}`}>
-          <Icon className="h-5 w-5" />
+          <Icon className="h-5 w-5" aria-hidden />
         </span>
       </div>
     </Card>
   );
 }
 
-const chartTooltip = {
-  contentStyle: {
-    background: "var(--card)",
-    border: "1px solid var(--border)",
-    borderRadius: "12px",
-    fontSize: "12px",
-    color: "var(--foreground)",
-  },
-  cursor: { fill: "var(--muted)", opacity: 0.35 },
-} as const;
+function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
+  const url = useSignedUrl("leaf-images", path);
+  if (!url) {
+    return (
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+        <Leaf className="h-5 w-5" aria-hidden />
+      </span>
+    );
+  }
+  return (
+    <img
+      src={url}
+      alt={alt}
+      loading="lazy"
+      className="h-12 w-12 shrink-0 rounded-lg object-cover"
+    />
+  );
+}
+
+function EmptyOnboarding() {
+  return (
+    <FadeIn className="mt-8">
+      <Card className="mx-auto max-w-2xl p-10 text-center">
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <Leaf className="h-7 w-7" aria-hidden />
+        </span>
+        <h2 className="mt-4 font-serif text-2xl font-semibold">Welcome to LeafScan</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          Start by scanning a crop leaf to build your dashboard. Your stats, charts and health score
+          appear here as soon as you have your first scan.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link to="/app">
+            <Button className="gap-2 rounded-full">
+              <ScanLine className="h-4 w-4" /> Scan crop
+            </Button>
+          </Link>
+          <Link to="/diseases">
+            <Button variant="outline" className="gap-2 rounded-full">
+              <BookOpen className="h-4 w-4" /> Open disease library
+            </Button>
+          </Link>
+        </div>
+      </Card>
+    </FadeIn>
+  );
+}
 
 function DashboardPage() {
-  const { data, isLoading, isError, error, refetch, isFetching } = useDashboardData();
+  const { data: detections, isLoading, isError, error, refetch, isFetching } = useDetections();
   const { data: profile } = useProfile();
   const { data: reminderRows } = useReminders();
   const toggleReminder = useToggleReminder();
+  const [range, setRange] = useState<7 | 30>(7);
 
   const stats = useMemo(() => {
-    const detections = data?.detections ?? [];
-    const total = detections.length;
-    const healthy = detections.filter((d) => d.is_healthy).length;
+    const rows = detections ?? [];
+    const total = rows.length;
+    const healthy = rows.filter((d) => d.is_healthy).length;
     const diseased = total - healthy;
 
     const counts = new Map<string, number>();
-    for (const d of detections) {
+    for (const d of rows) {
       if (d.is_healthy || !d.disease) continue;
       counts.set(d.disease, (counts.get(d.disease) ?? 0) + 1);
     }
-    const top = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
-
-    // Health score: share of healthy scans, penalised by high-severity findings.
-    const highSeverity = detections.filter(
-      (d) => !d.is_healthy && (d.severity ?? "").toLowerCase() === "high",
-    ).length;
-    const score = total
-      ? Math.max(
-          0,
-          Math.min(100, Math.round((healthy / total) * 100 - (highSeverity / total) * 15)),
-        )
-      : null;
-
-    const now = Date.now();
-    const weekly = Array.from({ length: 7 }, (_, idx) => {
-      const day = new Date(now - (6 - idx) * DAY);
-      const key = day.toDateString();
-      const rows = detections.filter((d) => new Date(d.created_at).toDateString() === key);
-      return {
-        name: day.toLocaleDateString(undefined, { weekday: "short" }),
-        healthy: rows.filter((r) => r.is_healthy).length,
-        diseased: rows.filter((r) => !r.is_healthy).length,
-      };
-    });
-
-    const monthly = Array.from({ length: 6 }, (_, idx) => {
-      const d = new Date();
-      d.setDate(1);
-      d.setMonth(d.getMonth() - (5 - idx));
-      const rows = detections.filter((r) => {
-        const c = new Date(r.created_at);
-        return c.getMonth() === d.getMonth() && c.getFullYear() === d.getFullYear();
-      });
-      return { name: d.toLocaleDateString(undefined, { month: "short" }), scans: rows.length };
-    });
-
-    // Reminders: diseased crops from the last 21 days with no follow-up tracker entry after the scan.
-    const trackers = data?.trackers ?? [];
-    const reminders = detections
-      .filter((d) => !d.is_healthy && now - new Date(d.created_at).getTime() < 21 * DAY)
-      .filter(
-        (d) =>
-          !trackers.some(
-            (t) =>
-              (t.crop ?? "").toLowerCase() === d.crop.toLowerCase() &&
-              new Date(t.created_at).getTime() > new Date(d.created_at).getTime(),
-          ),
-      )
-      .slice(0, 4);
+    const distribution = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, value]) => ({ name, value }));
 
     return {
       total,
       healthy,
       diseased,
-      top,
-      score,
-      weekly,
-      monthly,
-      reminders,
-      recent: detections.slice(0, 5),
-      distribution: [...counts.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6)
-        .map(([name, value]) => ({ name, value })),
+      top: distribution[0] ?? null,
+      score: total ? Math.round((healthy / total) * 100) : null,
+      last: rows[0] ?? null,
+      recent: rows.slice(0, 5),
+      distribution: distribution.slice(0, 6),
     };
-  }, [data]);
+  }, [detections]);
 
-  const pending = useMemo(
+  const activity = useMemo(() => {
+    const rows = detections ?? [];
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const buckets = new Map<string, { healthy: number; diseased: number }>();
+    for (const d of rows) {
+      const day = new Date(d.created_at);
+      day.setHours(0, 0, 0, 0);
+      if (start.getTime() - day.getTime() > (range - 1) * DAY) continue;
+      const key = day.toDateString();
+      const cur = buckets.get(key) ?? { healthy: 0, diseased: 0 };
+      if (d.is_healthy) cur.healthy += 1;
+      else cur.diseased += 1;
+      buckets.set(key, cur);
+    }
+    const points = Array.from({ length: range }, (_, idx) => {
+      const day = new Date(start.getTime() - (range - 1 - idx) * DAY);
+      const b = buckets.get(day.toDateString()) ?? { healthy: 0, diseased: 0 };
+      return {
+        name:
+          range === 7
+            ? day.toLocaleDateString(undefined, { weekday: "short" })
+            : day.toLocaleDateString(undefined, { day: "numeric", month: "short" }),
+        ...b,
+      };
+    });
+    const hasData = points.some((p) => p.healthy + p.diseased > 0);
+    return { points, hasData };
+  }, [detections, range]);
+
+  const pendingReminders = useMemo(
     () =>
       (reminderRows ?? [])
         .filter((r) => !r.done)
@@ -244,16 +288,16 @@ function DashboardPage() {
     [reminderRows],
   );
 
-  const greeting = (() => {
+  const greeting = useMemo(() => {
     const h = new Date().getHours();
     return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
-  })();
+  }, []);
 
   if (isError) {
     return (
       <AppShell>
         <Card className="mx-auto max-w-lg p-8 text-center">
-          <AlertTriangle className="mx-auto h-6 w-6 text-destructive" />
+          <AlertTriangle className="mx-auto h-6 w-6 text-destructive" aria-hidden />
           <h2 className="mt-3 font-serif text-xl font-semibold">Couldn’t load your dashboard</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {error instanceof Error ? error.message : "Something went wrong."}
@@ -265,6 +309,8 @@ function DashboardPage() {
       </AppShell>
     );
   }
+
+  const empty = !isLoading && stats.total === 0 && (reminderRows ?? []).length === 0;
 
   return (
     <AppShell>
@@ -286,21 +332,25 @@ function DashboardPage() {
         }
       />
 
+      <QuickActions />
+
       {isLoading ? (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-[122px] rounded-2xl" />
           ))}
         </div>
+      ) : empty ? (
+        <EmptyOnboarding />
       ) : (
         <>
-          <Stagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stagger className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StaggerItem>
               <StatCard
                 icon={ScanLine}
                 label="Total scans"
                 value={stats.total}
-                hint="All-time leaf analyses"
+                hint={stats.total ? "All-time leaf analyses" : "Start by scanning your first crop."}
               />
             </StaggerItem>
             <StaggerItem>
@@ -332,240 +382,141 @@ function DashboardPage() {
             <StaggerItem>
               <StatCard
                 icon={Activity}
-                label="Most common disease"
-                value={stats.top ? stats.top[0] : "—"}
+                label="Most detected disease"
+                value={stats.top ? stats.top.name : "—"}
                 hint={
                   stats.top
-                    ? `${stats.top[1]} detection${stats.top[1] > 1 ? "s" : ""}`
+                    ? `${stats.top.value} detection${stats.top.value > 1 ? "s" : ""}`
                     : "No diseases detected"
                 }
               />
             </StaggerItem>
           </Stagger>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.6fr]">
+          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1.4fr]">
             <FadeIn delay={0.05}>
               <Card className="flex h-full flex-col items-center justify-center p-6 text-center">
                 <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
                   Crop health score
                 </p>
-                <div
-                  className="relative mt-5 grid h-40 w-40 place-items-center rounded-full"
-                  style={{
-                    background: `conic-gradient(var(--primary) ${(stats.score ?? 0) * 3.6}deg, var(--muted) 0deg)`,
-                  }}
-                  role="img"
-                  aria-label={`Crop health score ${stats.score ?? 0} out of 100`}
-                >
-                  <div className="grid h-32 w-32 place-items-center rounded-full bg-card">
-                    <span className="font-serif text-4xl font-semibold">{stats.score ?? "—"}</span>
-                    <span className="text-xs text-muted-foreground">out of 100</span>
+                {stats.score === null ? (
+                  <p className="mt-6 max-w-xs text-sm text-muted-foreground">
+                    No score available yet. Scan a crop to calculate it.
+                  </p>
+                ) : (
+                  <>
+                    <div
+                      className="relative mt-5 grid h-36 w-36 place-items-center rounded-full"
+                      style={{
+                        background: `conic-gradient(var(--primary) ${stats.score * 3.6}deg, var(--muted) 0deg)`,
+                      }}
+                      role="img"
+                      aria-label={`Crop health score ${stats.score} out of 100`}
+                    >
+                      <div className="grid h-28 w-28 place-items-center rounded-full bg-card">
+                        <span className="font-serif text-3xl font-semibold">{stats.score}</span>
+                        <span className="text-xs text-muted-foreground">out of 100</span>
+                      </div>
+                    </div>
+                    <p className="mt-4 max-w-xs text-xs text-muted-foreground">
+                      {stats.healthy} healthy of {stats.total} scans
+                    </p>
+                  </>
+                )}
+              </Card>
+            </FadeIn>
+
+            <FadeIn delay={0.08}>
+              <Card className="flex h-full flex-col p-6">
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                  Last scan
+                </p>
+                {!stats.last ? (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    No scans yet. Your latest diagnosis will appear here.
+                  </p>
+                ) : (
+                  <div className="mt-4 flex flex-1 flex-col">
+                    <div className="flex items-center gap-3">
+                      <ScanThumb path={stats.last.image_path} alt={`${stats.last.crop} leaf`} />
+                      <div className="min-w-0">
+                        <p className="truncate font-serif text-xl font-semibold">
+                          {stats.last.crop}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {relativeTime(stats.last.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`mt-4 w-fit ${
+                        stats.last.is_healthy
+                          ? "border-success/30 bg-success/10 text-success"
+                          : "border-destructive/30 bg-destructive/10 text-destructive"
+                      }`}
+                    >
+                      {stats.last.is_healthy
+                        ? "Healthy"
+                        : (stats.last.disease ?? "Disease detected")}
+                    </Badge>
+                    <Link
+                      to="/detection/$id"
+                      params={{ id: stats.last.id }}
+                      className="mt-auto pt-4"
+                    >
+                      <Button variant="ghost" size="sm" className="gap-1 rounded-full px-0">
+                        View report <ArrowRight className="h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </Card>
+            </FadeIn>
+
+            <FadeIn delay={0.12}>
+              <Card className="h-full p-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <LineChartIcon className="h-4 w-4 text-primary" aria-hidden />
+                    <h2 className="font-serif text-lg font-semibold">Scan activity</h2>
+                  </div>
+                  <div className="flex gap-1 rounded-full bg-muted p-1">
+                    {([7, 30] as const).map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setRange(r)}
+                        aria-pressed={range === r}
+                        className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                          range === r
+                            ? "bg-card text-foreground shadow-sm"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {r} days
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <p className="mt-5 max-w-xs text-sm text-muted-foreground">
-                  {stats.score === null
-                    ? "Run your first scan to generate a health score."
-                    : stats.score >= 80
-                      ? "Excellent — your fields are largely healthy."
-                      : stats.score >= 50
-                        ? "Moderate — a few crops need treatment."
-                        : "At risk — several diseased crops detected."}
-                </p>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={0.1}>
-              <Card className="h-full p-6">
-                <div className="flex items-center gap-2">
-                  <LineChartIcon className="h-4 w-4 text-primary" />
-                  <h2 className="font-serif text-lg font-semibold">Weekly activity</h2>
-                </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Healthy vs diseased scans over the last 7 days.
+                  Daily healthy vs diseased scans.
                 </p>
-                <div className="mt-4 h-[240px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart
-                      data={stats.weekly}
-                      margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
-                    >
-                      <defs>
-                        <linearGradient id="gHealthy" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.5} />
-                          <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                        </linearGradient>
-                        <linearGradient id="gDiseased" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--destructive)" stopOpacity={0.45} />
-                          <stop offset="95%" stopColor="var(--destructive)" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="var(--border)"
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={12}
-                        stroke="var(--muted-foreground)"
-                      />
-                      <YAxis
-                        allowDecimals={false}
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={12}
-                        stroke="var(--muted-foreground)"
-                      />
-                      <Tooltip {...chartTooltip} />
-                      <Area
-                        type="monotone"
-                        dataKey="healthy"
-                        stroke="var(--primary)"
-                        fill="url(#gHealthy)"
-                        strokeWidth={2}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="diseased"
-                        stroke="var(--destructive)"
-                        fill="url(#gDiseased)"
-                        strokeWidth={2}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
-            </FadeIn>
-          </div>
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
-            <FadeIn delay={0.05}>
-              <Card className="h-full p-6">
-                <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-primary" />
-                  <h2 className="font-serif text-lg font-semibold">Monthly scans</h2>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Scan volume over the last 6 months.
-                </p>
-                <div className="mt-4 h-[220px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={stats.monthly}
-                      margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="var(--border)"
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={12}
-                        stroke="var(--muted-foreground)"
-                      />
-                      <YAxis
-                        allowDecimals={false}
-                        tickLine={false}
-                        axisLine={false}
-                        fontSize={12}
-                        stroke="var(--muted-foreground)"
-                      />
-                      <Tooltip {...chartTooltip} />
-                      <Bar dataKey="scans" radius={[8, 8, 0, 0]} fill="var(--primary)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={0.1}>
-              <Card className="h-full p-6">
-                <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4 text-primary" />
-                  <h2 className="font-serif text-lg font-semibold">Treatment reminders</h2>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Scheduled farm tasks plus diseased crops with no follow-up logged yet.
-                </p>
-                <div className="mt-4 space-y-3">
-                  {pending.map((r) => {
-                    const Icon = kindMeta(r.kind).icon;
-                    return (
-                      <div
-                        key={r.id}
-                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
-                      >
-                        <Checkbox
-                          checked={r.done}
-                          aria-label={`Mark ${r.title} as done`}
-                          onCheckedChange={() => toggleReminder.mutate(r)}
-                        />
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
-                          <Icon className="h-4 w-4" />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">{r.title}</p>
-                          <p className="text-xs text-muted-foreground">
-                            due {new Date(r.due_at).toLocaleDateString()}
-                            {r.crop ? ` · ${r.crop}` : ""}
-                          </p>
-                        </div>
-                        {isOverdue(r) && (
-                          <Badge
-                            variant="outline"
-                            className="border-destructive/30 bg-destructive/10 text-destructive"
-                          >
-                            Overdue
-                          </Badge>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {pending.length === 0 && stats.reminders.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
-                      <CheckCircle2 className="mx-auto mb-2 h-5 w-5 text-success" />
-                      Nothing pending — all treated crops are up to date.
+                {activity.hasData ? (
+                  <Suspense fallback={<Skeleton className="mt-4 h-[260px] w-full rounded-xl" />}>
+                    <div className="mt-4">
+                      <ActivityChart data={activity.points} />
                     </div>
-                  ) : (
-                    stats.reminders.map((r) => (
-                      <div
-                        key={r.id}
-                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
-                      >
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-destructive/10 text-destructive">
-                          <AlertTriangle className="h-4 w-4" />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">
-                            {r.disease ?? "Unknown disease"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {r.crop} · scanned {new Date(r.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <Link to="/tracker">
-                          <Button size="sm" variant="secondary" className="rounded-lg">
-                            Log
-                          </Button>
-                        </Link>
-                      </div>
-                    ))
-                  )}
-                </div>
-                <Link to="/reminders" className="mt-4 inline-flex">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="gap-1 rounded-full text-muted-foreground"
-                  >
-                    Manage reminders <ArrowRight className="h-3.5 w-3.5" />
-                  </Button>
-                </Link>
+                  </Suspense>
+                ) : (
+                  <div className="mt-4 grid h-[260px] place-items-center rounded-xl border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
+                    <div>
+                      <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
+                      <p className="font-medium text-foreground">No activity yet</p>
+                      <p className="mt-1">Start your first scan.</p>
+                    </div>
+                  </div>
+                )}
               </Card>
             </FadeIn>
           </div>
@@ -579,37 +530,73 @@ function DashboardPage() {
                 </p>
                 {stats.distribution.length === 0 ? (
                   <div className="mt-6 rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
-                    No diseases detected yet.
+                    No disease data available.
                   </div>
                 ) : (
-                  <div className="mt-4 h-[240px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={stats.distribution}
-                          dataKey="value"
-                          nameKey="name"
-                          innerRadius={55}
-                          outerRadius={90}
-                          paddingAngle={3}
-                        >
-                          {stats.distribution.map((_, i) => (
-                            <Cell
-                              key={i}
-                              fill={`color-mix(in oklab, var(--primary) ${100 - i * 13}%, var(--muted))`}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip {...chartTooltip} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
+                  <Suspense fallback={<Skeleton className="mt-4 h-[260px] w-full rounded-xl" />}>
+                    <div className="mt-4">
+                      <DistributionChart data={stats.distribution} />
+                    </div>
+                  </Suspense>
                 )}
               </Card>
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <DashboardWeather crop={profile?.primary_crop ?? "Tomato"} />
+              <Card className="h-full p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-primary" aria-hidden />
+                    <h2 className="font-serif text-lg font-semibold">Upcoming reminders</h2>
+                  </div>
+                  <Link to="/reminders">
+                    <Button size="sm" variant="secondary" className="rounded-full">
+                      Create reminder
+                    </Button>
+                  </Link>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {pendingReminders.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
+                      No reminders yet.
+                    </div>
+                  ) : (
+                    pendingReminders.map((r) => {
+                      const Icon = kindMeta(r.kind).icon;
+                      return (
+                        <div
+                          key={r.id}
+                          className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
+                        >
+                          <Checkbox
+                            checked={r.done}
+                            aria-label={`Mark ${r.title} as done`}
+                            onCheckedChange={() => toggleReminder.mutate(r)}
+                          />
+                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                            <Icon className="h-4 w-4" aria-hidden />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium">{r.title}</p>
+                            <p className="text-xs text-muted-foreground">
+                              due {new Date(r.due_at).toLocaleDateString()}
+                              {r.crop ? ` · ${r.crop}` : ""}
+                            </p>
+                          </div>
+                          {isOverdue(r) && (
+                            <Badge
+                              variant="outline"
+                              className="border-destructive/30 bg-destructive/10 text-destructive"
+                            >
+                              Overdue
+                            </Badge>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </Card>
             </FadeIn>
           </div>
 
@@ -631,33 +618,32 @@ function DashboardPage() {
                 <div className="mt-4 space-y-3">
                   {stats.recent.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
-                      <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" />
+                      <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
                       No scans yet. Start with your first leaf analysis.
                     </div>
                   ) : (
                     stats.recent.map((d) => (
-                      <Link key={d.id} to="/detection/$id" params={{ id: d.id }} className="block">
-                        <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3 transition-colors hover:border-primary/30">
-                          <span
-                            className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${d.is_healthy ? "bg-success/15 text-success" : "bg-destructive/10 text-destructive"}`}
-                          >
-                            {d.is_healthy ? (
-                              <CheckCircle2 className="h-4 w-4" />
-                            ) : (
-                              <AlertTriangle className="h-4 w-4" />
-                            )}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium">
-                              {d.is_healthy ? "Healthy" : (d.disease ?? "Unknown")}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {d.crop} · {new Date(d.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <Badge variant="secondary">{d.confidence ?? 0}%</Badge>
+                      <div
+                        key={d.id}
+                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
+                      >
+                        <ScanThumb path={d.image_path} alt={`${d.crop} leaf`} />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium">{d.crop}</p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {d.is_healthy ? "Healthy" : (d.disease ?? "Disease detected")}
+                            {d.confidence != null ? ` · ${d.confidence}% confidence` : ""}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {relativeTime(d.created_at)}
+                          </p>
                         </div>
-                      </Link>
+                        <Link to="/detection/$id" params={{ id: d.id }}>
+                          <Button size="sm" variant="secondary" className="rounded-lg">
+                            View report
+                          </Button>
+                        </Link>
+                      </div>
                     ))
                   )}
                 </div>
@@ -665,32 +651,10 @@ function DashboardPage() {
             </FadeIn>
 
             <FadeIn delay={0.1}>
-              <Card className="h-full p-6">
-                <h2 className="font-serif text-lg font-semibold">Quick actions</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Jump straight into the tools you use most.
-                </p>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  {(
-                    [
-                      { to: "/app", label: "New scan", icon: ScanLine },
-                      { to: "/soil", label: "Soil test", icon: Sprout },
-                      { to: "/tracker", label: "Tracker", icon: LineChartIcon },
-                      { to: "/quiz", label: "Quiz", icon: Brain },
-                    ] as const
-                  ).map(({ to, label, icon: Icon }) => (
-                    <Link key={to} to={to}>
-                      <Button
-                        variant="secondary"
-                        className="h-24 w-full flex-col gap-2 rounded-2xl"
-                      >
-                        <Icon className="h-5 w-5 text-primary" />
-                        <span className="text-sm">{label}</span>
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
-              </Card>
+              <div className="space-y-6">
+                <FarmWeatherCard crop={stats.last?.crop ?? profile?.primary_crop ?? null} />
+                <AssistantCard />
+              </div>
             </FadeIn>
           </div>
         </>
@@ -699,18 +663,131 @@ function DashboardPage() {
   );
 }
 
-function DashboardWeather({ crop }: { crop: string }) {
-  const { intel, isLoading, error, asked, requestLocation, retry } = useWeatherIntel(crop);
+/** Live weather + weather-driven risk. Rendered only when a farm location is saved. */
+function FarmWeatherCard({ crop }: { crop: string | null }) {
+  const { data: profile } = useProfile();
+  const coords = farmCoords(profile);
+  const call = useServerFn(getWeatherIntel);
+
+  const weather = useQuery({
+    queryKey: ["weather-intel", coords?.lat, coords?.lon, crop],
+    enabled: Boolean(coords && crop),
+    staleTime: 10 * 60 * 1000,
+    queryFn: () =>
+      call({
+        data: { lat: coords!.lat, lon: coords!.lon, crop: crop as string },
+      }) as Promise<WeatherIntel>,
+  });
+
+  if (!coords) {
+    return (
+      <Card className="p-6 text-center">
+        <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" aria-hidden />
+        <h3 className="font-medium">Weather</h3>
+        <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
+          Add your farm location in Settings to enable weather.
+        </p>
+        <Link to="/settings" className="mt-4 inline-flex">
+          <Button variant="outline" size="sm" className="rounded-full">
+            Open settings
+          </Button>
+        </Link>
+      </Card>
+    );
+  }
+
+  if (weather.isLoading) return <Skeleton className="h-[220px] w-full rounded-2xl" />;
+
+  const intel = weather.data;
+  if (!intel) {
+    return (
+      <Card className="p-6 text-sm text-muted-foreground">
+        <h3 className="font-medium text-foreground">Weather</h3>
+        <p className="mt-1">Live weather is unavailable right now.</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-3 rounded-full"
+          onClick={() => weather.refetch()}
+        >
+          Try again
+        </Button>
+      </Card>
+    );
+  }
+
+  const w = intel.weather;
   return (
-    <WeatherPanel
-      crop={crop}
-      compact
-      intel={intel}
-      isLoading={isLoading}
-      error={error}
-      asked={asked}
-      onRequest={requestLocation}
-      onRetry={retry}
-    />
+    <Card className="p-6">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5" aria-hidden />
+            {profile?.farm_place ??
+              w.place ??
+              `${w.latitude.toFixed(2)}, ${w.longitude.toFixed(2)}`}
+          </div>
+          <h3 className="mt-0.5 font-serif text-lg font-semibold">{w.condition}</h3>
+        </div>
+        <span className="font-serif text-3xl font-semibold">{w.temperature}°C</span>
+      </div>
+      <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <dt className="text-xs text-muted-foreground">Humidity</dt>
+          <dd className="font-medium tabular-nums">{w.humidity}%</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Rainfall 24h</dt>
+          <dd className="font-medium tabular-nums">{w.rainfall} mm</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">Wind</dt>
+          <dd className="font-medium tabular-nums">{w.wind} km/h</dd>
+        </div>
+        <div>
+          <dt className="text-xs text-muted-foreground">UV index</dt>
+          <dd className="font-medium tabular-nums">{w.uvIndex}</dd>
+        </div>
+      </dl>
+      <div className="mt-5 rounded-xl border border-border/50 bg-card/40 p-4">
+        <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+          Disease risk for {intel.crop}
+        </p>
+        <Badge variant="outline" className={`mt-2 capitalize ${RISK_STYLES[intel.overall.level]}`}>
+          {intel.overall.level} · {intel.overall.score}%
+        </Badge>
+        {intel.risks[0] && (
+          <p className="mt-2 text-xs text-muted-foreground">{intel.risks[0].reason}</p>
+        )}
+        <Link to="/weather" className="mt-3 inline-flex">
+          <Button variant="ghost" size="sm" className="gap-1 rounded-full px-0">
+            Prevention tips <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        </Link>
+      </div>
+    </Card>
+  );
+}
+
+/** No canned/fake answers — the assistant only responds after the user submits a prompt. */
+function AssistantCard() {
+  return (
+    <Card className="p-6">
+      <div className="flex items-center gap-2">
+        <Brain className="h-4 w-4 text-primary" aria-hidden />
+        <h3 className="font-serif text-lg font-semibold">AI farming assistant</h3>
+      </div>
+      <p className="mt-1 text-sm text-muted-foreground">Ask anything about crops. Examples:</p>
+      <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
+        <li>• Why are my tomato leaves yellow?</li>
+        <li>• Best fertilizer for wheat?</li>
+        <li>• How to treat leaf spot?</li>
+      </ul>
+      <Link to="/assistant" className="mt-4 inline-flex">
+        <Button variant="secondary" size="sm" className="rounded-full">
+          Open assistant
+        </Button>
+      </Link>
+    </Card>
   );
 }
