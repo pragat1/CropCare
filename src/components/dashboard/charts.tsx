@@ -88,7 +88,14 @@ export const DistributionChart = memo(function DistributionChart({ data }: { dat
     <div className="h-[260px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
-          <Pie data={data} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
+          <Pie
+            data={data}
+            dataKey="value"
+            nameKey="name"
+            innerRadius={55}
+            outerRadius={90}
+            paddingAngle={3}
+          >
             {data.map((entry, i) => (
               <Cell
                 key={entry.name}
