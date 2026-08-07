@@ -13,8 +13,10 @@ export const Route = createFileRoute("/")({
     ),
   ssr: false,
   beforeLoad: async () => {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
+    // getUser() revalidates: a stale localStorage session must not bounce
+    // between "/" and the auth gate forever.
+    const { data, error } = await supabase.auth.getUser();
+    if (!error && data.user) throw redirect({ to: "/dashboard" });
   },
   component: Landing,
 });
