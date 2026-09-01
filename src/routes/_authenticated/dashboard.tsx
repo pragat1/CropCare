@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { farmCoords, useProfile } from "@/lib/profile";
@@ -49,13 +50,13 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       {
         name: "description",
         content:
-          "Track scans, crop health score, disease trends and treatment reminders in one AI-powered farming dashboard.",
+          "Track scans, healthy scan rate, disease trends, farm weather and treatment reminders in one AI-powered farming dashboard.",
       },
       { property: "og:title", content: "Dashboard · LeafScan Crop Health" },
       {
         property: "og:description",
         content:
-          "Track scans, crop health score, disease trends and treatment reminders in one AI-powered farming dashboard.",
+          "Track scans, healthy scan rate, disease trends, farm weather and treatment reminders in one AI-powered farming dashboard.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -100,33 +101,43 @@ function relativeTime(iso: string) {
   const hours = Math.round(mins / 60);
   if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
   const days = Math.round(hours / 24);
-  if (days < 30) return `${days} day${days === 1 ? "" : "s"} ago`;
+  if (days === 1) return "yesterday";
+  if (days < 30) return `${days} days ago`;
   return new Date(iso).toLocaleDateString();
 }
 
 const QUICK_ACTIONS = [
-  { to: "/app", label: "Scan crop", icon: ScanLine },
-  { to: "/soil", label: "Scan soil", icon: Sprout },
-  { to: "/history", label: "View history", icon: History },
-  { to: "/diseases", label: "Disease library", icon: BookOpen },
-  { to: "/weather", label: "Weather", icon: CloudSun },
-  { to: "/assistant", label: "Assistant", icon: Brain },
+  { to: "/app", label: "New scan", hint: "Detect disease", icon: ScanLine },
+  { to: "/soil", label: "Soil analysis", hint: "Check soil health", icon: Sprout },
+  { to: "/weather", label: "Weather", hint: "Field conditions", icon: CloudSun },
+  { to: "/assistant", label: "AI assistant", hint: "Ask anything", icon: Brain },
+  { to: "/history", label: "History", hint: "All past scans", icon: History },
+  { to: "/diseases", label: "Disease library", hint: "Browse diseases", icon: BookOpen },
 ] as const;
 
 function QuickActions() {
   return (
-    <Stagger className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-      {QUICK_ACTIONS.map(({ to, label, icon: Icon }) => (
-        <StaggerItem key={to}>
-          <Link to={to}>
-            <Button variant="secondary" className="h-20 w-full flex-col gap-2 rounded-2xl">
-              <Icon className="h-5 w-5 text-primary" aria-hidden />
-              <span className="text-xs sm:text-sm">{label}</span>
-            </Button>
-          </Link>
-        </StaggerItem>
-      ))}
-    </Stagger>
+    <Card className="p-6">
+      <h2 className="font-serif text-lg font-semibold">Quick actions</h2>
+      <Stagger className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {QUICK_ACTIONS.map(({ to, label, hint, icon: Icon }) => (
+          <StaggerItem key={to}>
+            <Link
+              to={to}
+              className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="h-5 w-5" aria-hidden />
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-medium">{label}</span>
+                <span className="block truncate text-xs text-muted-foreground">{hint}</span>
+              </span>
+            </Link>
+          </StaggerItem>
+        ))}
+      </Stagger>
+    </Card>
   );
 }
 
@@ -188,25 +199,25 @@ function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
 
 function EmptyOnboarding() {
   return (
-    <FadeIn className="mt-8">
+    <FadeIn className="mt-6">
       <Card className="mx-auto max-w-2xl p-10 text-center">
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
           <Leaf className="h-7 w-7" aria-hidden />
         </span>
         <h2 className="mt-4 font-serif text-2xl font-semibold">Welcome to LeafScan</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          Start by scanning a crop leaf to build your dashboard. Your stats, charts and health score
-          appear here as soon as you have your first scan.
+          You haven’t scanned any crops yet. Start your first scan to begin monitoring your farm —
+          stats, trends and insights appear here automatically.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link to="/app">
             <Button className="gap-2 rounded-full">
-              <ScanLine className="h-4 w-4" /> Scan crop
+              <ScanLine className="h-4 w-4" /> Scan a crop
             </Button>
           </Link>
-          <Link to="/diseases">
+          <Link to="/settings">
             <Button variant="outline" className="gap-2 rounded-full">
-              <BookOpen className="h-4 w-4" /> Open disease library
+              <MapPin className="h-4 w-4" /> Add farm location
             </Button>
           </Link>
         </div>
@@ -220,7 +231,7 @@ function DashboardPage() {
   const { data: profile } = useProfile();
   const { data: reminderRows } = useReminders();
   const toggleReminder = useToggleReminder();
-  const [range, setRange] = useState<7 | 30>(7);
+  const [range, setRange] = useState<7 | 30 | 90>(7);
 
   const stats = useMemo(() => {
     const rows = detections ?? [];
@@ -236,16 +247,39 @@ function DashboardPage() {
     const distribution = [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
       .map(([name, value]) => ({ name, value }));
+    const diseaseTotal = distribution.reduce((sum, d) => sum + d.value, 0);
+
+    const crops = new Map<string, { scans: number; healthy: number }>();
+    for (const d of rows) {
+      const cur = crops.get(d.crop) ?? { scans: 0, healthy: 0 };
+      cur.scans += 1;
+      if (d.is_healthy) cur.healthy += 1;
+      crops.set(d.crop, cur);
+    }
+    const topCrops = [...crops.entries()]
+      .sort((a, b) => b[1].scans - a[1].scans)
+      .slice(0, 5)
+      .map(([name, v]) => ({
+        name,
+        scans: v.scans,
+        health: Math.round((v.healthy / v.scans) * 100),
+      }));
+
+    const weekAgo = Date.now() - 7 * DAY;
+    const lastWeek = rows.filter((d) => new Date(d.created_at).getTime() >= weekAgo).length;
 
     return {
       total,
       healthy,
       diseased,
       top: distribution[0] ?? null,
-      score: total ? Math.round((healthy / total) * 100) : null,
+      diseaseTotal,
+      healthyRate: total ? Math.round((healthy / total) * 100) : null,
       last: rows[0] ?? null,
       recent: rows.slice(0, 5),
       distribution: distribution.slice(0, 6),
+      topCrops,
+      lastWeek,
     };
   }, [detections]);
 
@@ -275,8 +309,9 @@ function DashboardPage() {
         ...b,
       };
     });
-    const hasData = points.some((p) => p.healthy + p.diseased > 0);
-    return { points, hasData };
+    const healthy = points.reduce((s, p) => s + p.healthy, 0);
+    const diseased = points.reduce((s, p) => s + p.diseased, 0);
+    return { points, hasData: healthy + diseased > 0, healthy, diseased, total: healthy + diseased };
   }, [detections, range]);
 
   const pendingReminders = useMemo(
@@ -318,11 +353,7 @@ function DashboardPage() {
         icon={LayoutDashboard}
         eyebrow="Overview"
         title={`${greeting}${profile?.display_name ? `, ${profile.display_name}` : ""}`}
-        description={
-          profile?.farm_place
-            ? `Crop health at ${profile.farm_place} — scans, trends, weather and what needs attention next.`
-            : "Your crop health at a glance — scans, trends, weather and what needs attention next."
-        }
+        description="Here’s what’s happening with your farm today."
         actions={
           <Link to="/app">
             <Button className="gap-2 rounded-full">
@@ -332,37 +363,42 @@ function DashboardPage() {
         }
       />
 
-      <QuickActions />
-
       {isLoading ? (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-[122px] rounded-2xl" />
           ))}
+          <Skeleton className="h-[320px] rounded-2xl sm:col-span-2 lg:col-span-3" />
+          <Skeleton className="h-[320px] rounded-2xl sm:col-span-2 lg:col-span-1" />
+          <span className="sr-only">Loading scan statistics…</span>
         </div>
       ) : empty ? (
         <EmptyOnboarding />
       ) : (
         <>
-          <Stagger className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stagger className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StaggerItem>
               <StatCard
                 icon={ScanLine}
                 label="Total scans"
                 value={stats.total}
-                hint={stats.total ? "All-time leaf analyses" : "Start by scanning your first crop."}
+                hint={
+                  stats.total
+                    ? `${stats.lastWeek} in the last 7 days`
+                    : "Start by scanning your first crop."
+                }
               />
             </StaggerItem>
             <StaggerItem>
               <StatCard
                 icon={CheckCircle2}
                 tone="success"
-                label="Healthy crops"
+                label="Healthy scans"
                 value={stats.healthy}
                 hint={
                   stats.total
                     ? `${Math.round((stats.healthy / stats.total) * 100)}% of scans`
-                    : "No scans yet"
+                    : "No healthy scan data yet."
                 }
               />
             </StaggerItem>
@@ -370,292 +406,332 @@ function DashboardPage() {
               <StatCard
                 icon={AlertTriangle}
                 tone="danger"
-                label="Diseased crops"
+                label="Diseased scans"
                 value={stats.diseased}
                 hint={
                   stats.total
                     ? `${Math.round((stats.diseased / stats.total) * 100)}% of scans`
-                    : "No scans yet"
+                    : "No diagnosis data yet."
                 }
               />
             </StaggerItem>
             <StaggerItem>
               <StatCard
                 icon={Activity}
-                label="Most detected disease"
-                value={stats.top ? stats.top.name : "—"}
+                label="Healthy scan rate"
+                value={stats.healthyRate === null ? "—" : `${stats.healthyRate}%`}
                 hint={
-                  stats.top
-                    ? `${stats.top.value} detection${stats.top.value > 1 ? "s" : ""}`
-                    : "No diseases detected"
+                  stats.healthyRate === null
+                    ? "Complete a few crop scans."
+                    : `${stats.healthy} healthy of ${stats.total} scans`
                 }
               />
             </StaggerItem>
           </Stagger>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1.4fr]">
-            <FadeIn delay={0.05}>
-              <Card className="flex h-full flex-col items-center justify-center p-6 text-center">
-                <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                  Crop health score
-                </p>
-                {stats.score === null ? (
-                  <p className="mt-6 max-w-xs text-sm text-muted-foreground">
-                    No score available yet. Scan a crop to calculate it.
-                  </p>
-                ) : (
-                  <>
-                    <div
-                      className="relative mt-5 grid h-36 w-36 place-items-center rounded-full"
-                      style={{
-                        background: `conic-gradient(var(--primary) ${stats.score * 3.6}deg, var(--muted) 0deg)`,
-                      }}
-                      role="img"
-                      aria-label={`Crop health score ${stats.score} out of 100`}
-                    >
-                      <div className="grid h-28 w-28 place-items-center rounded-full bg-card">
-                        <span className="font-serif text-3xl font-semibold">{stats.score}</span>
-                        <span className="text-xs text-muted-foreground">out of 100</span>
+          <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+            {/* Main column */}
+            <div className="min-w-0 space-y-6">
+              <FadeIn delay={0.04}>
+                <Card className="p-6">
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <LineChartIcon className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                        <h2 className="truncate font-serif text-lg font-semibold">Scan activity</h2>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Daily healthy vs diseased scans.
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 gap-1 rounded-full bg-muted p-1">
+                      {([7, 30, 90] as const).map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => setRange(r)}
+                          aria-pressed={range === r}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                            range === r
+                              ? "bg-card text-foreground shadow-sm"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {r}d
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {activity.hasData ? (
+                    <>
+                      <Suspense
+                        fallback={<Skeleton className="mt-4 h-[260px] w-full rounded-xl" />}
+                      >
+                        <div className="mt-4">
+                          <ActivityChart data={activity.points} />
+                        </div>
+                      </Suspense>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        Last {range} days — total scans: {activity.total}. Healthy:{" "}
+                        {activity.healthy}. Diseased: {activity.diseased}.
+                      </p>
+                    </>
+                  ) : (
+                    <div className="mt-4 grid h-[260px] place-items-center rounded-xl border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
+                      <div>
+                        <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
+                        <p className="font-medium text-foreground">No scan activity available</p>
+                        <p className="mt-1">
+                          Scan your first crop to start building your history.
+                        </p>
                       </div>
                     </div>
-                    <p className="mt-4 max-w-xs text-xs text-muted-foreground">
-                      {stats.healthy} healthy of {stats.total} scans
-                    </p>
-                  </>
-                )}
-              </Card>
-            </FadeIn>
+                  )}
+                </Card>
+              </FadeIn>
 
-            <FadeIn delay={0.08}>
-              <Card className="flex h-full flex-col p-6">
-                <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-                  Last scan
-                </p>
-                {!stats.last ? (
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    No scans yet. Your latest diagnosis will appear here.
-                  </p>
-                ) : (
-                  <div className="mt-4 flex flex-1 flex-col">
-                    <div className="flex items-center gap-3">
-                      <ScanThumb path={stats.last.image_path} alt={`${stats.last.crop} leaf`} />
-                      <div className="min-w-0">
-                        <p className="truncate font-serif text-xl font-semibold">
-                          {stats.last.crop}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {relativeTime(stats.last.created_at)}
-                        </p>
+              <FadeIn delay={0.06}>
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <Card className="min-w-0 p-6">
+                    <h2 className="font-serif text-lg font-semibold">Disease distribution</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Breakdown of detected diseases.
+                    </p>
+                    {stats.distribution.length === 0 ? (
+                      <div className="mt-6 rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
+                        No diseases detected yet. Your disease distribution appears after disease
+                        detections.
                       </div>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`mt-4 w-fit ${
-                        stats.last.is_healthy
-                          ? "border-success/30 bg-success/10 text-success"
-                          : "border-destructive/30 bg-destructive/10 text-destructive"
-                      }`}
-                    >
-                      {stats.last.is_healthy
-                        ? "Healthy"
-                        : (stats.last.disease ?? "Disease detected")}
-                    </Badge>
-                    <Link
-                      to="/detection/$id"
-                      params={{ id: stats.last.id }}
-                      className="mt-auto pt-4"
-                    >
-                      <Button variant="ghost" size="sm" className="gap-1 rounded-full px-0">
-                        View report <ArrowRight className="h-3.5 w-3.5" />
+                    ) : (
+                      <>
+                        <Suspense
+                          fallback={<Skeleton className="mt-4 h-[260px] w-full rounded-xl" />}
+                        >
+                          <div className="mt-4">
+                            <DistributionChart data={stats.distribution} />
+                          </div>
+                        </Suspense>
+                        <ul className="mt-3 space-y-1.5 text-sm">
+                          {stats.distribution.map((d) => (
+                            <li key={d.name} className="flex items-center justify-between gap-3">
+                              <span className="min-w-0 truncate text-muted-foreground">
+                                {d.name}
+                              </span>
+                              <span className="shrink-0 tabular-nums">
+                                {Math.round((d.value / stats.diseaseTotal) * 100)}%
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </Card>
+
+                  <Card className="min-w-0 p-6">
+                    <h2 className="font-serif text-lg font-semibold">Crops you scan most</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Healthy scan rate per crop.
+                    </p>
+                    {stats.topCrops.length === 0 ? (
+                      <div className="mt-6 rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
+                        No crop data yet.
+                      </div>
+                    ) : (
+                      <ul className="mt-4 space-y-4">
+                        {stats.topCrops.map((c) => (
+                          <li key={c.name}>
+                            <div className="flex items-center justify-between gap-3 text-sm">
+                              <span className="min-w-0 truncate font-medium">{c.name}</span>
+                              <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+                                {c.scans} scan{c.scans === 1 ? "" : "s"} · {c.health}% healthy
+                              </span>
+                            </div>
+                            <Progress
+                              value={c.health}
+                              className="mt-2 h-2"
+                              aria-label={`${c.name}: ${c.health}% of scans healthy`}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Card>
+                </div>
+              </FadeIn>
+
+              <FadeIn delay={0.08}>
+                <Card className="p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="font-serif text-lg font-semibold">Recent scans</h2>
+                    <Link to="/history">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-1 rounded-full text-muted-foreground"
+                      >
+                        View all <ArrowRight className="h-3.5 w-3.5" />
                       </Button>
                     </Link>
                   </div>
-                )}
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={0.12}>
-              <Card className="h-full p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <LineChartIcon className="h-4 w-4 text-primary" aria-hidden />
-                    <h2 className="font-serif text-lg font-semibold">Scan activity</h2>
-                  </div>
-                  <div className="flex gap-1 rounded-full bg-muted p-1">
-                    {([7, 30] as const).map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => setRange(r)}
-                        aria-pressed={range === r}
-                        className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                          range === r
-                            ? "bg-card text-foreground shadow-sm"
-                            : "text-muted-foreground"
-                        }`}
-                      >
-                        {r} days
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Daily healthy vs diseased scans.
-                </p>
-                {activity.hasData ? (
-                  <Suspense fallback={<Skeleton className="mt-4 h-[260px] w-full rounded-xl" />}>
-                    <div className="mt-4">
-                      <ActivityChart data={activity.points} />
-                    </div>
-                  </Suspense>
-                ) : (
-                  <div className="mt-4 grid h-[260px] place-items-center rounded-xl border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
-                    <div>
-                      <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
-                      <p className="font-medium text-foreground">No activity yet</p>
-                      <p className="mt-1">Start your first scan.</p>
-                    </div>
-                  </div>
-                )}
-              </Card>
-            </FadeIn>
-          </div>
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
-            <FadeIn delay={0.05}>
-              <Card className="h-full p-6">
-                <h2 className="font-serif text-lg font-semibold">Disease distribution</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Which problems show up most across your scans.
-                </p>
-                {stats.distribution.length === 0 ? (
-                  <div className="mt-6 rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
-                    No disease data available.
-                  </div>
-                ) : (
-                  <Suspense fallback={<Skeleton className="mt-4 h-[260px] w-full rounded-xl" />}>
-                    <div className="mt-4">
-                      <DistributionChart data={stats.distribution} />
-                    </div>
-                  </Suspense>
-                )}
-              </Card>
-            </FadeIn>
-
-            <FadeIn delay={0.1}>
-              <Card className="h-full p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-primary" aria-hidden />
-                    <h2 className="font-serif text-lg font-semibold">Upcoming reminders</h2>
-                  </div>
-                  <Link to="/reminders">
-                    <Button size="sm" variant="secondary" className="rounded-full">
-                      Create reminder
-                    </Button>
-                  </Link>
-                </div>
-                <div className="mt-4 space-y-3">
-                  {pendingReminders.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
-                      No reminders yet.
-                    </div>
-                  ) : (
-                    pendingReminders.map((r) => {
-                      const Icon = kindMeta(r.kind).icon;
-                      return (
-                        <div
-                          key={r.id}
-                          className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
-                        >
-                          <Checkbox
-                            checked={r.done}
-                            aria-label={`Mark ${r.title} as done`}
-                            onCheckedChange={() => toggleReminder.mutate(r)}
-                          />
-                          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
-                            <Icon className="h-4 w-4" aria-hidden />
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium">{r.title}</p>
-                            <p className="text-xs text-muted-foreground">
-                              due {new Date(r.due_at).toLocaleDateString()}
-                              {r.crop ? ` · ${r.crop}` : ""}
-                            </p>
-                          </div>
-                          {isOverdue(r) && (
-                            <Badge
-                              variant="outline"
-                              className="border-destructive/30 bg-destructive/10 text-destructive"
-                            >
-                              Overdue
-                            </Badge>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </Card>
-            </FadeIn>
-          </div>
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-            <FadeIn delay={0.05}>
-              <Card className="h-full p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-serif text-lg font-semibold">Recent scans</h2>
-                  <Link to="/history">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="gap-1 rounded-full text-muted-foreground"
-                    >
-                      View all <ArrowRight className="h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
-                </div>
-                <div className="mt-4 space-y-3">
-                  {stats.recent.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
-                      <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
-                      No scans yet. Start with your first leaf analysis.
-                    </div>
-                  ) : (
-                    stats.recent.map((d) => (
-                      <div
-                        key={d.id}
-                        className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
-                      >
-                        <ScanThumb path={d.image_path} alt={`${d.crop} leaf`} />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium">{d.crop}</p>
-                          <p className="truncate text-xs text-muted-foreground">
-                            {d.is_healthy ? "Healthy" : (d.disease ?? "Disease detected")}
-                            {d.confidence != null ? ` · ${d.confidence}% confidence` : ""}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {relativeTime(d.created_at)}
-                          </p>
-                        </div>
-                        <Link to="/detection/$id" params={{ id: d.id }}>
-                          <Button size="sm" variant="secondary" className="rounded-lg">
-                            View report
+                  <div className="mt-4 space-y-3">
+                    {stats.recent.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
+                        <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
+                        <p className="font-medium text-foreground">No scans yet</p>
+                        <p className="mt-1">
+                          Scan a crop leaf to see your diagnosis history here.
+                        </p>
+                        <Link to="/app" className="mt-4 inline-flex">
+                          <Button size="sm" className="rounded-full">
+                            Scan a crop
                           </Button>
                         </Link>
                       </div>
-                    ))
-                  )}
-                </div>
-              </Card>
-            </FadeIn>
+                    ) : (
+                      stats.recent.map((d) => (
+                        <Link
+                          key={d.id}
+                          to="/detection/$id"
+                          params={{ id: d.id }}
+                          className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3 transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          <ScanThumb path={d.image_path} alt={`${d.crop} leaf scan`} />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-sm font-medium">{d.crop}</span>
+                            <span className="block truncate text-xs text-muted-foreground">
+                              {d.is_healthy ? "Healthy" : (d.disease ?? "Disease detected")}
+                              {d.severity ? ` · ${d.severity} severity` : ""}
+                              {d.confidence != null ? ` · ${d.confidence}% confidence` : ""}
+                            </span>
+                            <span className="block text-xs text-muted-foreground">
+                              {relativeTime(d.created_at)}
+                            </span>
+                          </span>
+                          <ArrowRight
+                            className="h-4 w-4 shrink-0 text-muted-foreground"
+                            aria-hidden
+                          />
+                        </Link>
+                      ))
+                    )}
+                  </div>
+                </Card>
+              </FadeIn>
 
-            <FadeIn delay={0.1}>
-              <div className="space-y-6">
+              <FadeIn delay={0.1}>
+                <QuickActions />
+              </FadeIn>
+            </div>
+
+            {/* Right rail */}
+            <div className="min-w-0 space-y-6">
+              <FadeIn delay={0.04}>
                 <FarmWeatherCard crop={stats.last?.crop ?? profile?.primary_crop ?? null} />
+              </FadeIn>
+
+              <FadeIn delay={0.06}>
+                <Card className="p-6">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Bell className="h-4 w-4 shrink-0 text-primary" aria-hidden />
+                      <h2 className="truncate font-serif text-lg font-semibold">
+                        Upcoming reminders
+                      </h2>
+                    </div>
+                    <Link to="/reminders">
+                      <Button size="sm" variant="ghost" className="rounded-full">
+                        View all
+                      </Button>
+                    </Link>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {pendingReminders.length === 0 ? (
+                      <div className="rounded-xl border border-dashed border-border/70 p-6 text-center text-sm text-muted-foreground">
+                        <p>No upcoming reminders.</p>
+                        <p className="mt-1">Create a reminder to stay on top of crop care.</p>
+                        <Link to="/reminders" className="mt-4 inline-flex">
+                          <Button size="sm" variant="secondary" className="rounded-full">
+                            Create reminder
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      pendingReminders.map((r) => {
+                        const Icon = kindMeta(r.kind).icon;
+                        const due = new Date(r.due_at);
+                        return (
+                          <div
+                            key={r.id}
+                            className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3"
+                          >
+                            <Checkbox
+                              checked={r.done}
+                              aria-label={`Mark ${r.title} as done`}
+                              onCheckedChange={() => toggleReminder.mutate(r)}
+                            />
+                            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                              <Icon className="h-4 w-4" aria-hidden />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium">{r.title}</p>
+                              <p className="truncate text-xs text-muted-foreground">
+                                {due.toLocaleString(undefined, {
+                                  dateStyle: "medium",
+                                  timeStyle: "short",
+                                })}
+                                {r.crop ? ` · ${r.crop}` : ""}
+                              </p>
+                            </div>
+                            {isOverdue(r) && (
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 border-destructive/30 bg-destructive/10 text-destructive"
+                              >
+                                Overdue
+                              </Badge>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </Card>
+              </FadeIn>
+
+              <FadeIn delay={0.08}>
+                <Card className="p-6">
+                  <h2 className="font-serif text-lg font-semibold">Disease insights</h2>
+                  {stats.diseaseTotal === 0 ? (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {stats.total === 0
+                        ? "Complete a crop scan to unlock insights from your own data."
+                        : "No diseases detected in your scans so far."}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Based on your scans: {stats.diseaseTotal} disease detection
+                      {stats.diseaseTotal === 1 ? "" : "s"} across {stats.total} scan
+                      {stats.total === 1 ? "" : "s"}
+                      {stats.top
+                        ? `, most often ${stats.top.name} (${stats.top.value} time${
+                            stats.top.value === 1 ? "" : "s"
+                          })`
+                        : ""}
+                      .
+                    </p>
+                  )}
+                  <Link to="/diseases" className="mt-3 inline-flex">
+                    <Button variant="ghost" size="sm" className="gap-1 rounded-full px-0">
+                      View disease library <ArrowRight className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </Card>
+              </FadeIn>
+
+              <FadeIn delay={0.1}>
                 <AssistantCard />
-              </div>
-            </FadeIn>
+              </FadeIn>
+            </div>
           </div>
         </>
       )}
@@ -683,11 +759,27 @@ function FarmWeatherCard({ crop }: { crop: string | null }) {
     return (
       <Card className="p-6 text-center">
         <MapPin className="mx-auto mb-2 h-6 w-6 text-primary" aria-hidden />
-        <h3 className="font-medium">Weather</h3>
+        <h2 className="font-serif text-lg font-semibold">Weather unavailable</h2>
         <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
-          Add your farm location in Settings to enable weather.
+          Add your farm location to see local weather.
         </p>
         <Link to="/settings" className="mt-4 inline-flex">
+          <Button variant="outline" size="sm" className="rounded-full">
+            Add location
+          </Button>
+        </Link>
+      </Card>
+    );
+  }
+
+  if (!crop) {
+    return (
+      <Card className="p-6">
+        <h2 className="font-serif text-lg font-semibold">Today’s weather</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Set a primary crop in Settings, or complete a scan, to load weather and crop disease risk.
+        </p>
+        <Link to="/settings" className="mt-3 inline-flex">
           <Button variant="outline" size="sm" className="rounded-full">
             Open settings
           </Button>
@@ -696,14 +788,18 @@ function FarmWeatherCard({ crop }: { crop: string | null }) {
     );
   }
 
-  if (weather.isLoading) return <Skeleton className="h-[220px] w-full rounded-2xl" />;
+  if (weather.isLoading) return <Skeleton className="h-[280px] w-full rounded-2xl" />;
 
   const intel = weather.data;
   if (!intel) {
     return (
       <Card className="p-6 text-sm text-muted-foreground">
-        <h3 className="font-medium text-foreground">Weather</h3>
-        <p className="mt-1">Live weather is unavailable right now.</p>
+        <h2 className="font-serif text-lg font-semibold text-foreground">Unable to load weather</h2>
+        <p className="mt-1">
+          {typeof navigator !== "undefined" && navigator.onLine === false
+            ? "Weather requires an internet connection."
+            : "Please try again."}
+        </p>
         <Button
           variant="outline"
           size="sm"
@@ -720,16 +816,18 @@ function FarmWeatherCard({ crop }: { crop: string | null }) {
   return (
     <Card className="p-6">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" aria-hidden />
-            {profile?.farm_place ??
-              w.place ??
-              `${w.latitude.toFixed(2)}, ${w.longitude.toFixed(2)}`}
+            <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="truncate">
+              {profile?.farm_place ??
+                w.place ??
+                `${w.latitude.toFixed(2)}, ${w.longitude.toFixed(2)}`}
+            </span>
           </div>
-          <h3 className="mt-0.5 font-serif text-lg font-semibold">{w.condition}</h3>
+          <h2 className="mt-0.5 font-serif text-lg font-semibold">{w.condition}</h2>
         </div>
-        <span className="font-serif text-3xl font-semibold">{w.temperature}°C</span>
+        <span className="font-serif text-3xl font-semibold tabular-nums">{w.temperature}°C</span>
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div>
@@ -751,10 +849,10 @@ function FarmWeatherCard({ crop }: { crop: string | null }) {
       </dl>
       <div className="mt-5 rounded-xl border border-border/50 bg-card/40 p-4">
         <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-          Disease risk for {intel.crop}
+          Weather-based disease risk for {intel.crop}
         </p>
         <Badge variant="outline" className={`mt-2 capitalize ${RISK_STYLES[intel.overall.level]}`}>
-          {intel.overall.level} · {intel.overall.score}%
+          {intel.overall.level} risk · {intel.overall.score}/100
         </Badge>
         {intel.risks[0] && (
           <p className="mt-2 text-xs text-muted-foreground">{intel.risks[0].reason}</p>
@@ -769,23 +867,21 @@ function FarmWeatherCard({ crop }: { crop: string | null }) {
   );
 }
 
-/** No canned/fake answers — the assistant only responds after the user submits a prompt. */
+/** No canned answers — the assistant only responds after the user submits a prompt. */
 function AssistantCard() {
   return (
     <Card className="p-6">
       <div className="flex items-center gap-2">
         <Brain className="h-4 w-4 text-primary" aria-hidden />
-        <h3 className="font-serif text-lg font-semibold">AI farming assistant</h3>
+        <h2 className="font-serif text-lg font-semibold">AI farming assistant</h2>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">Ask anything about crops. Examples:</p>
-      <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-        <li>• Why are my tomato leaves yellow?</li>
-        <li>• Best fertilizer for wheat?</li>
-        <li>• How to treat leaf spot?</li>
-      </ul>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Have a question about your crop? The assistant answers from your scan history and the
+        disease library — always verify serious cases with an agronomist.
+      </p>
       <Link to="/assistant" className="mt-4 inline-flex">
-        <Button variant="secondary" size="sm" className="rounded-full">
-          Open assistant
+        <Button variant="secondary" size="sm" className="gap-1 rounded-full">
+          Ask the AI assistant <ArrowRight className="h-3.5 w-3.5" />
         </Button>
       </Link>
     </Card>
