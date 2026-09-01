@@ -1,44 +1,31 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import {
-  Leaf,
-  LogOut,
-  ScanLine,
-  History,
-  Sprout,
-  LineChart,
-  BookOpen,
-  Lightbulb,
-  CalendarDays,
-  Brain,
-  Info,
-  Menu,
-  LayoutDashboard,
-  CloudSun,
-  MessageCircle,
-  BarChart3,
-  ShieldCheck,
-  Bell,
-  Settings,
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { Bell, MapPin } from "lucide-react";
+import { useMemo } from "react";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar, initialsOf } from "@/components/app-sidebar";
+import { SyncStatus } from "@/components/sync-status";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { SyncStatus } from "@/components/sync-status";
-import { useIsAdmin } from "@/hooks/use-admin";
 import { useApplyTheme, useProfile } from "@/lib/profile";
+import { isOverdue, useReminders } from "@/lib/reminders";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const path = useRouterState({ select: (s) => s.location.pathname });
-  const { isAdmin } = useIsAdmin();
   const { data: profile } = useProfile();
+  const { data: reminders } = useReminders();
   useApplyTheme(profile?.theme);
+
+  // Real notification count: reminders that are overdue or due within 24h.
+  const dueCount = useMemo(() => {
+    const soon = Date.now() + 86_400_000;
+    return (reminders ?? []).filter(
+      (r) => !r.done && (isOverdue(r) || new Date(r.due_at).getTime() <= soon),
+    ).length;
+  }, [reminders]);
 
   async function signOut() {
     await qc.cancelQueries();
@@ -48,126 +35,53 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", replace: true });
   }
 
-  const baseTabs = [
-    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/analytics", label: "Analytics", icon: BarChart3 },
-    { to: "/app", label: "Detect", icon: ScanLine },
-    { to: "/assistant", label: "Assistant", icon: MessageCircle },
-    { to: "/soil", label: "Soil", icon: Sprout },
-    { to: "/weather", label: "Weather", icon: CloudSun },
-    { to: "/tracker", label: "Tracker", icon: LineChart },
-    { to: "/reminders", label: "Reminders", icon: Bell },
-    { to: "/diseases", label: "Diseases", icon: BookOpen },
-    { to: "/tips", label: "Tips", icon: Lightbulb },
-    { to: "/seasons", label: "Seasons", icon: CalendarDays },
-    { to: "/quiz", label: "Quiz", icon: Brain },
-    { to: "/history", label: "History", icon: History },
-    { to: "/settings", label: "Settings", icon: Settings },
-    { to: "/about", label: "About", icon: Info },
-  ] as const;
-
-  const tabs: Array<{ to: string; label: string; icon: typeof Info }> = isAdmin
-    ? [...baseTabs, { to: "/admin", label: "Admin", icon: ShieldCheck }]
-    : [...baseTabs];
-
-  const [open, setOpen] = useState(false);
-  function isActive(to: string) {
-    return to === "/app" ? path === "/app" : path.startsWith(to);
-  }
-
   return (
-    <div className="min-h-dvh bg-background bg-mesh">
-      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/60 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 md:px-6">
-          <Link
-            to="/dashboard"
-            className="flex shrink-0 items-center gap-2.5 font-serif text-lg font-semibold tracking-tight"
-          >
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-brand text-primary-foreground ring-glow">
-              <Leaf className="h-4.5 w-4.5" />
-            </span>
-            LeafScan
-          </Link>
-          <nav className="hidden items-center gap-0.5 rounded-full border border-border/50 bg-card/40 p-1 backdrop-blur-md lg:flex">
-            {tabs.map(({ to, label, icon: Icon }) => {
-              const active = isActive(to);
-              return (
-                <Link key={to} to={to} className="relative">
-                  <span
-                    className={`relative z-10 flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
-                      active
-                        ? "text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                    <span className="hidden xl:inline">{label}</span>
-                  </span>
-                  <AnimatePresence>
-                    {active && (
-                      <motion.span
-                        layoutId="nav-pill"
-                        className="absolute inset-0 rounded-full bg-gradient-brand"
-                        transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                      />
-                    )}
-                  </AnimatePresence>
-                </Link>
-              );
-            })}
-          </nav>
-          <SyncStatus className="ml-auto lg:ml-1" />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={signOut}
-            className="ml-1 hidden gap-2 rounded-full text-muted-foreground lg:inline-flex"
-            aria-label="Sign out"
-          >
-            <LogOut className="h-4 w-4" /> <span className="hidden xl:inline">Sign out</span>
-          </Button>
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Open menu"
-                className="min-h-11 min-w-11 rounded-xl lg:hidden"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-72 glass-strong">
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
-              </SheetHeader>
-              <div className="mt-4 flex flex-col gap-1">
-                {tabs.map(({ to, label, icon: Icon }) => (
-                  <Link key={to} to={to} onClick={() => setOpen(false)}>
-                    <Button
-                      variant={isActive(to) ? "secondary" : "ghost"}
-                      className="w-full justify-start gap-2 rounded-xl"
-                    >
-                      <Icon className="h-4 w-4" /> {label}
-                    </Button>
-                  </Link>
-                ))}
+    <SidebarProvider>
+      <div className="flex min-h-dvh w-full bg-background bg-mesh">
+        <AppSidebar onSignOut={signOut} />
+        <SidebarInset className="min-w-0 bg-transparent">
+          <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border/50 bg-background/70 px-3 backdrop-blur-xl md:px-6">
+            <SidebarTrigger className="min-h-10 min-w-10" />
+            <Link
+              to="/settings"
+              className="flex min-w-0 items-center gap-1.5 rounded-full border border-border/50 bg-card/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
+              <span className="truncate">{profile?.farm_place ?? "Add farm location"}</span>
+            </Link>
+            <div className="ml-auto flex items-center gap-2">
+              <SyncStatus className="hidden sm:flex" />
+              <Link to="/reminders" className="relative">
                 <Button
                   variant="ghost"
-                  onClick={() => {
-                    setOpen(false);
-                    signOut();
-                  }}
-                  className="mt-2 w-full justify-start gap-2 rounded-xl"
+                  size="icon"
+                  className="min-h-10 min-w-10 rounded-full"
+                  aria-label={
+                    dueCount > 0 ? `${dueCount} reminders need attention` : "Reminders"
+                  }
                 >
-                  <LogOut className="h-4 w-4" /> Sign out
+                  <Bell className="h-4.5 w-4.5" aria-hidden />
                 </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-12">{children}</main>
-    </div>
+                {dueCount > 0 && (
+                  <span className="pointer-events-none absolute -right-0.5 -top-0.5 grid h-4.5 min-w-4.5 place-items-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
+                    {dueCount}
+                  </span>
+                )}
+              </Link>
+              <Link
+                to="/settings"
+                aria-label="Profile settings"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-brand text-xs font-semibold text-primary-foreground"
+              >
+                {initialsOf(profile?.display_name)}
+              </Link>
+            </div>
+          </header>
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6 md:py-10">
+            {children}
+          </main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
