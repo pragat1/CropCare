@@ -15,7 +15,8 @@ import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   component: AdminUsersPage,
-  head: () => pageHead("User Management | CropCare Admin", "Administer CropCare accounts and roles."),
+  head: () =>
+    pageHead("User Management | CropCare Admin", "Administer CropCare accounts and roles."),
 });
 
 type AdminUser = {

@@ -198,10 +198,7 @@ function SettingsPage() {
             </div>
             <div>
               <Label htmlFor="primary-crop">Primary crop</Label>
-              <Select
-                value={form.primary_crop ?? ""}
-                onValueChange={(v) => set("primary_crop", v)}
-              >
+              <Select value={form.primary_crop ?? ""} onValueChange={(v) => set("primary_crop", v)}>
                 <SelectTrigger id="primary-crop" className="mt-2">
                   <SelectValue placeholder="Choose a crop" />
                 </SelectTrigger>

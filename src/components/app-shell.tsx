@@ -56,9 +56,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   variant="ghost"
                   size="icon"
                   className="min-h-10 min-w-10 rounded-full"
-                  aria-label={
-                    dueCount > 0 ? `${dueCount} reminders need attention` : "Reminders"
-                  }
+                  aria-label={dueCount > 0 ? `${dueCount} reminders need attention` : "Reminders"}
                 >
                   <Bell className="h-4.5 w-4.5" aria-hidden />
                 </Button>

@@ -86,9 +86,7 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
     { label: "Learn", items: LEARN },
     {
       label: "Account",
-      items: isAdmin
-        ? [...ACCOUNT, { to: "/admin", label: "Admin", icon: ShieldCheck }]
-        : ACCOUNT,
+      items: isAdmin ? [...ACCOUNT, { to: "/admin", label: "Admin", icon: ShieldCheck }] : ACCOUNT,
     },
   ];
 
@@ -109,7 +107,9 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
               <span className="block truncate font-serif text-base font-semibold tracking-tight">
                 LeafScan
               </span>
-              <span className="block truncate text-xs text-muted-foreground">Smart Agriculture</span>
+              <span className="block truncate text-xs text-muted-foreground">
+                Smart Agriculture
+              </span>
             </span>
           )}
         </Link>

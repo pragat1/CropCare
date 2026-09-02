@@ -83,7 +83,10 @@ function ReminderRow({ r }: { r: Reminder }) {
         {r.notes && <p className="mt-1.5 text-xs text-muted-foreground">{r.notes}</p>}
       </div>
       {overdue && (
-        <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive">
+        <Badge
+          variant="outline"
+          className="border-destructive/30 bg-destructive/10 text-destructive"
+        >
           Overdue
         </Badge>
       )}

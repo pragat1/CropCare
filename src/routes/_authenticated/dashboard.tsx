@@ -311,7 +311,13 @@ function DashboardPage() {
     });
     const healthy = points.reduce((s, p) => s + p.healthy, 0);
     const diseased = points.reduce((s, p) => s + p.diseased, 0);
-    return { points, hasData: healthy + diseased > 0, healthy, diseased, total: healthy + diseased };
+    return {
+      points,
+      hasData: healthy + diseased > 0,
+      healthy,
+      diseased,
+      total: healthy + diseased,
+    };
   }, [detections, range]);
 
   const pendingReminders = useMemo(
@@ -481,9 +487,7 @@ function DashboardPage() {
                       <div>
                         <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
                         <p className="font-medium text-foreground">No scan activity available</p>
-                        <p className="mt-1">
-                          Scan your first crop to start building your history.
-                        </p>
+                        <p className="mt-1">Scan your first crop to start building your history.</p>
                       </div>
                     </div>
                   )}
@@ -578,9 +582,7 @@ function DashboardPage() {
                       <div className="rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
                         <Leaf className="mx-auto mb-2 h-5 w-5 opacity-60" aria-hidden />
                         <p className="font-medium text-foreground">No scans yet</p>
-                        <p className="mt-1">
-                          Scan a crop leaf to see your diagnosis history here.
-                        </p>
+                        <p className="mt-1">Scan a crop leaf to see your diagnosis history here.</p>
                         <Link to="/app" className="mt-4 inline-flex">
                           <Button size="sm" className="rounded-full">
                             Scan a crop

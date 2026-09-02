@@ -47,7 +47,9 @@ export const askAssistant = createServerFn({ method: "POST" })
       .map(
         (r) =>
           `${new Date(r.created_at).toLocaleDateString()}: ${r.crop} — ${
-            r.is_healthy ? "healthy" : `${r.disease ?? "unknown disease"} (${r.severity ?? "n/a"} severity)`
+            r.is_healthy
+              ? "healthy"
+              : `${r.disease ?? "unknown disease"} (${r.severity ?? "n/a"} severity)`
           }`,
       )
       .join("\n");
