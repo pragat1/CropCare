@@ -70,11 +70,7 @@ export async function generateDetectionPdf(input: ReportInput) {
   doc.setFont("helvetica", "bold").setFontSize(19);
   doc.text("CropCare — Crop Diagnosis Report", M, 36);
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(
-    `${input.crop} · Generated ${new Date().toLocaleString()}`,
-    M,
-    54,
-  );
+  doc.text(`${input.crop} · Generated ${new Date().toLocaleString()}`, M, 54);
   y = 110;
   doc.setTextColor(20, 20, 20);
 
