@@ -28,8 +28,10 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedSoilIndexRouteImport } from './routes/_authenticated/soil.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
+import { Route as AuthenticatedSoilTypesTypeRouteImport } from './routes/_authenticated/soil-types.$type'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminCategoryRouteImport } from './routes/_authenticated/admin.$category'
@@ -128,6 +130,11 @@ const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSoilIndexRoute = AuthenticatedSoilIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedSoilRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -138,6 +145,12 @@ const AuthenticatedSoilIdRoute = AuthenticatedSoilIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedSoilRoute,
 } as any)
+const AuthenticatedSoilTypesTypeRoute =
+  AuthenticatedSoilTypesTypeRouteImport.update({
+    id: '/soil-types/$type',
+    path: '/soil-types/$type',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDetectionIdRoute =
   AuthenticatedDetectionIdRouteImport.update({
     id: '/detection/$id',
@@ -178,8 +191,10 @@ export interface FileRoutesByFullPath {
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/soil/': typeof AuthenticatedSoilIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -195,15 +210,16 @@ export interface FileRoutesByTo {
   '/reminders': typeof AuthenticatedRemindersRoute
   '/seasons': typeof AuthenticatedSeasonsRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/soil': typeof AuthenticatedSoilRouteWithChildren
   '/tips': typeof AuthenticatedTipsRoute
   '/tracker': typeof AuthenticatedTrackerRoute
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/soil': typeof AuthenticatedSoilIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -229,8 +245,10 @@ export interface FileRoutesById {
   '/_authenticated/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/_authenticated/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/soil/': typeof AuthenticatedSoilIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -256,8 +274,10 @@ export interface FileRouteTypes {
     | '/admin/$category'
     | '/admin/users'
     | '/detection/$id'
+    | '/soil-types/$type'
     | '/soil/$id'
     | '/admin/'
+    | '/soil/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -273,15 +293,16 @@ export interface FileRouteTypes {
     | '/reminders'
     | '/seasons'
     | '/settings'
-    | '/soil'
     | '/tips'
     | '/tracker'
     | '/weather'
     | '/admin/$category'
     | '/admin/users'
     | '/detection/$id'
+    | '/soil-types/$type'
     | '/soil/$id'
     | '/admin'
+    | '/soil'
   id:
     | '__root__'
     | '/'
@@ -306,8 +327,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/$category'
     | '/_authenticated/admin/users'
     | '/_authenticated/detection/$id'
+    | '/_authenticated/soil-types/$type'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
+    | '/_authenticated/soil/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -451,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAboutRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/soil/': {
+      id: '/_authenticated/soil/'
+      path: '/'
+      fullPath: '/soil/'
+      preLoaderRoute: typeof AuthenticatedSoilIndexRouteImport
+      parentRoute: typeof AuthenticatedSoilRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -464,6 +494,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/soil/$id'
       preLoaderRoute: typeof AuthenticatedSoilIdRouteImport
       parentRoute: typeof AuthenticatedSoilRoute
+    }
+    '/_authenticated/soil-types/$type': {
+      id: '/_authenticated/soil-types/$type'
+      path: '/soil-types/$type'
+      fullPath: '/soil-types/$type'
+      preLoaderRoute: typeof AuthenticatedSoilTypesTypeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/detection/$id': {
       id: '/_authenticated/detection/$id'
@@ -506,10 +543,12 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedSoilRouteChildren {
   AuthenticatedSoilIdRoute: typeof AuthenticatedSoilIdRoute
+  AuthenticatedSoilIndexRoute: typeof AuthenticatedSoilIndexRoute
 }
 
 const AuthenticatedSoilRouteChildren: AuthenticatedSoilRouteChildren = {
   AuthenticatedSoilIdRoute: AuthenticatedSoilIdRoute,
+  AuthenticatedSoilIndexRoute: AuthenticatedSoilIndexRoute,
 }
 
 const AuthenticatedSoilRouteWithChildren =
@@ -533,6 +572,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTrackerRoute: typeof AuthenticatedTrackerRoute
   AuthenticatedWeatherRoute: typeof AuthenticatedWeatherRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
+  AuthenticatedSoilTypesTypeRoute: typeof AuthenticatedSoilTypesTypeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -553,6 +593,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTrackerRoute: AuthenticatedTrackerRoute,
   AuthenticatedWeatherRoute: AuthenticatedWeatherRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
+  AuthenticatedSoilTypesTypeRoute: AuthenticatedSoilTypesTypeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
