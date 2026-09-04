@@ -12,10 +12,7 @@ import { pageHead } from "@/lib/seo";
 export const Route = createFileRoute("/_authenticated/soil-types/$type")({
   head: ({ params }) => {
     const name = SOIL_SLUGS[params.type.toLowerCase()];
-    if (!name)
-      return pageHead("Soil type | LeafScan", "Soil type reference guide from LeafScan.", {
-        robots: "noindex",
-      });
+    if (!name) return pageHead("Soil type | LeafScan", "Soil type reference guide from LeafScan.");
     const g = SOIL_GUIDE[name];
     return pageHead(`${name} soil guide | LeafScan`, g?.summary ?? "Soil type reference guide.");
   },
