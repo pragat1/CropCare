@@ -147,12 +147,14 @@ function StatCard({
   value,
   hint,
   tone = "default",
+  cta,
 }: {
   icon: typeof Leaf;
   label: string;
   value: string | number;
   hint?: string;
   tone?: "default" | "success" | "danger";
+  cta?: { to: string; label: string };
 }) {
   const toneCls =
     tone === "success"
@@ -169,6 +171,14 @@ function StatCard({
           </p>
           <p className="mt-2 truncate font-serif text-3xl font-semibold tracking-tight">{value}</p>
           {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+          {cta && (
+            <Link
+              to={cta.to}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              {cta.label} <ArrowRight className="h-3 w-3" aria-hidden />
+            </Link>
+          )}
         </div>
         <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${toneCls}`}>
           <Icon className="h-5 w-5" aria-hidden />
@@ -197,39 +207,108 @@ function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
   );
 }
 
-function EmptyOnboarding() {
+/** Shown only while the account has zero scans. Contains no data claims. */
+function WelcomeCard() {
   return (
-    <FadeIn className="mt-6">
-      <Card className="mx-auto max-w-2xl p-10 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+    <Card className="mt-6 overflow-hidden p-6 md:p-8">
+      <div className="grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
+        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
           <Leaf className="h-7 w-7" aria-hidden />
         </span>
-        <h2 className="mt-4 font-serif text-2xl font-semibold">Welcome to LeafScan</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          You haven’t scanned any crops yet. Start your first scan to begin monitoring your farm —
-          stats, trends and insights appear here automatically.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/app">
-            <Button className="gap-2 rounded-full">
-              <ScanLine className="h-4 w-4" /> Scan a crop
-            </Button>
-          </Link>
-          <Link to="/settings">
-            <Button variant="outline" className="gap-2 rounded-full">
-              <MapPin className="h-4 w-4" /> Add farm location
-            </Button>
-          </Link>
+        <div className="min-w-0">
+          <h2 className="font-serif text-2xl font-semibold tracking-tight">Welcome to LeafScan</h2>
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+            Start monitoring your crops with your first disease scan. Your dashboard will build
+            itself automatically as you use LeafScan.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link to="/app">
+              <Button className="gap-2 rounded-full">
+                <ScanLine className="h-4 w-4" aria-hidden /> Scan a crop
+              </Button>
+            </Link>
+            <Link to="/settings">
+              <Button variant="outline" className="gap-2 rounded-full">
+                <MapPin className="h-4 w-4" aria-hidden /> Add farm location
+              </Button>
+            </Link>
+          </div>
         </div>
-      </Card>
-    </FadeIn>
+      </div>
+    </Card>
   );
+}
+
+/** Setup checklist driven strictly by real profile / scan / soil records. */
+function FarmSetupCard({
+  hasLocation,
+  scans,
+  soil,
+}: {
+  hasLocation: boolean;
+  scans: number;
+  soil: number;
+}) {
+  const steps = [
+    { done: hasLocation, label: "Add farm location", to: "/settings" },
+    { done: scans > 0, label: "Scan your first crop", to: "/app" },
+    { done: soil > 0, label: "Analyze your soil", to: "/soil" },
+  ] as const;
+  const complete = steps.filter((s) => s.done).length;
+  if (complete === steps.length) return null;
+  return (
+    <Card className="p-6">
+      <h2 className="font-serif text-lg font-semibold">Complete your farm setup</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {complete} of {steps.length} steps done.
+      </p>
+      <ul className="mt-4 space-y-2">
+        {steps.map((s) => (
+          <li key={s.label}>
+            <Link
+              to={s.to}
+              className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3 text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
+            >
+              {s.done ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden />
+              ) : (
+                <span className="h-4 w-4 shrink-0 rounded-full border border-border" aria-hidden />
+              )}
+              <span
+                className={`min-w-0 flex-1 truncate ${s.done ? "text-muted-foreground line-through" : "font-medium"}`}
+              >
+                {s.label}
+              </span>
+              {!s.done && (
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+              )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+/** Real count of stored soil analyses — used only for the setup checklist. */
+function useSoilCount() {
+  return useQuery({
+    queryKey: ["soil-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("soil_analyses")
+        .select("id", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
 }
 
 function DashboardPage() {
   const { data: detections, isLoading, isError, error, refetch, isFetching } = useDetections();
   const { data: profile } = useProfile();
   const { data: reminderRows } = useReminders();
+  const { data: soilCount } = useSoilCount();
   const toggleReminder = useToggleReminder();
   const [range, setRange] = useState<7 | 30 | 90>(7);
 
@@ -351,7 +430,7 @@ function DashboardPage() {
     );
   }
 
-  const empty = !isLoading && stats.total === 0 && (reminderRows ?? []).length === 0;
+  const noScans = stats.total === 0;
 
   return (
     <AppShell>
@@ -363,7 +442,7 @@ function DashboardPage() {
         actions={
           <Link to="/app">
             <Button className="gap-2 rounded-full">
-              <ScanLine className="h-4 w-4" /> New scan
+              <ScanLine className="h-4 w-4" /> {noScans ? "Start first scan" : "New scan"}
             </Button>
           </Link>
         }
@@ -378,21 +457,17 @@ function DashboardPage() {
           <Skeleton className="h-[320px] rounded-2xl sm:col-span-2 lg:col-span-1" />
           <span className="sr-only">Loading scan statistics…</span>
         </div>
-      ) : empty ? (
-        <EmptyOnboarding />
       ) : (
         <>
+          {noScans && <WelcomeCard />}
           <Stagger className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StaggerItem>
               <StatCard
                 icon={ScanLine}
                 label="Total scans"
                 value={stats.total}
-                hint={
-                  stats.total
-                    ? `${stats.lastWeek} in the last 7 days`
-                    : "Start by scanning your first crop."
-                }
+                hint={noScans ? "No scans yet" : `${stats.lastWeek} in the last 7 days`}
+                cta={noScans ? { to: "/app", label: "Start scanning" } : undefined}
               />
             </StaggerItem>
             <StaggerItem>
@@ -400,11 +475,11 @@ function DashboardPage() {
                 icon={CheckCircle2}
                 tone="success"
                 label="Healthy scans"
-                value={stats.healthy}
+                value={noScans ? "—" : stats.healthy}
                 hint={
-                  stats.total
-                    ? `${Math.round((stats.healthy / stats.total) * 100)}% of scans`
-                    : "No healthy scan data yet."
+                  noScans
+                    ? "Available after your first scan"
+                    : `${Math.round((stats.healthy / stats.total) * 100)}% of scans`
                 }
               />
             </StaggerItem>
@@ -413,11 +488,11 @@ function DashboardPage() {
                 icon={AlertTriangle}
                 tone="danger"
                 label="Diseased scans"
-                value={stats.diseased}
+                value={noScans ? "—" : stats.diseased}
                 hint={
-                  stats.total
-                    ? `${Math.round((stats.diseased / stats.total) * 100)}% of scans`
-                    : "No diagnosis data yet."
+                  noScans
+                    ? "Available after disease detection"
+                    : `${Math.round((stats.diseased / stats.total) * 100)}% of scans`
                 }
               />
             </StaggerItem>
@@ -428,7 +503,7 @@ function DashboardPage() {
                 value={stats.healthyRate === null ? "—" : `${stats.healthyRate}%`}
                 hint={
                   stats.healthyRate === null
-                    ? "Complete a few crop scans."
+                    ? "Builds up as you scan crops"
                     : `${stats.healthy} healthy of ${stats.total} scans`
                 }
               />
@@ -438,6 +513,10 @@ function DashboardPage() {
           <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
             {/* Main column */}
             <div className="min-w-0 space-y-6">
+              <FadeIn delay={0.02}>
+                <QuickActions />
+              </FadeIn>
+
               <FadeIn delay={0.04}>
                 <Card className="p-6">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
@@ -619,14 +698,18 @@ function DashboardPage() {
                   </div>
                 </Card>
               </FadeIn>
-
-              <FadeIn delay={0.1}>
-                <QuickActions />
-              </FadeIn>
             </div>
 
             {/* Right rail */}
             <div className="min-w-0 space-y-6">
+              <FadeIn delay={0.02}>
+                <FarmSetupCard
+                  hasLocation={Boolean(profile?.farm_place)}
+                  scans={stats.total}
+                  soil={soilCount ?? 0}
+                />
+              </FadeIn>
+
               <FadeIn delay={0.04}>
                 <FarmWeatherCard crop={stats.last?.crop ?? profile?.primary_crop ?? null} />
               </FadeIn>
