@@ -208,34 +208,94 @@ function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
   );
 }
 
-function EmptyOnboarding() {
+/** Shown only while the account has zero scans. Contains no data claims. */
+function WelcomeCard() {
   return (
-    <FadeIn className="mt-6">
-      <Card className="mx-auto max-w-2xl p-10 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+    <Card className="mt-6 overflow-hidden p-6 md:p-8">
+      <div className="grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
+        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
           <Leaf className="h-7 w-7" aria-hidden />
         </span>
-        <h2 className="mt-4 font-serif text-2xl font-semibold">Welcome to LeafScan</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          You haven’t scanned any crops yet. Start your first scan to begin monitoring your farm —
-          stats, trends and insights appear here automatically.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link to="/app">
-            <Button className="gap-2 rounded-full">
-              <ScanLine className="h-4 w-4" /> Scan a crop
-            </Button>
-          </Link>
-          <Link to="/settings">
-            <Button variant="outline" className="gap-2 rounded-full">
-              <MapPin className="h-4 w-4" /> Add farm location
-            </Button>
-          </Link>
+        <div className="min-w-0">
+          <h2 className="font-serif text-2xl font-semibold tracking-tight">Welcome to LeafScan</h2>
+          <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+            Start monitoring your crops with your first disease scan. Your dashboard will build
+            itself automatically as you use LeafScan.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link to="/app">
+              <Button className="gap-2 rounded-full">
+                <ScanLine className="h-4 w-4" aria-hidden /> Scan a crop
+              </Button>
+            </Link>
+            <Link to="/settings">
+              <Button variant="outline" className="gap-2 rounded-full">
+                <MapPin className="h-4 w-4" aria-hidden /> Add farm location
+              </Button>
+            </Link>
+          </div>
         </div>
-      </Card>
-    </FadeIn>
+      </div>
+    </Card>
   );
 }
+
+/** Setup checklist driven strictly by real profile / scan / soil records. */
+function FarmSetupCard({ hasLocation, scans, soil }: { hasLocation: boolean; scans: number; soil: number }) {
+  const steps = [
+    { done: hasLocation, label: "Add farm location", to: "/settings" },
+    { done: scans > 0, label: "Scan your first crop", to: "/app" },
+    { done: soil > 0, label: "Analyze your soil", to: "/soil" },
+  ] as const;
+  const complete = steps.filter((s) => s.done).length;
+  if (complete === steps.length) return null;
+  return (
+    <Card className="p-6">
+      <h2 className="font-serif text-lg font-semibold">Complete your farm setup</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {complete} of {steps.length} steps done.
+      </p>
+      <ul className="mt-4 space-y-2">
+        {steps.map((s) => (
+          <li key={s.label}>
+            <Link
+              to={s.to}
+              className="flex items-center gap-3 rounded-xl border border-border/50 bg-card/40 p-3 text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
+            >
+              {s.done ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden />
+              ) : (
+                <span
+                  className="h-4 w-4 shrink-0 rounded-full border border-border"
+                  aria-hidden
+                />
+              )}
+              <span className={`min-w-0 flex-1 truncate ${s.done ? "text-muted-foreground line-through" : "font-medium"}`}>
+                {s.label}
+              </span>
+              {!s.done && <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
+/** Real count of stored soil analyses — used only for the setup checklist. */
+function useSoilCount() {
+  return useQuery({
+    queryKey: ["soil-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("soil_analyses")
+        .select("id", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+}
+
 
 function DashboardPage() {
   const { data: detections, isLoading, isError, error, refetch, isFetching } = useDetections();
