@@ -147,12 +147,14 @@ function StatCard({
   value,
   hint,
   tone = "default",
+  cta,
 }: {
   icon: typeof Leaf;
   label: string;
   value: string | number;
   hint?: string;
   tone?: "default" | "success" | "danger";
+  cta?: { to: string; label: string };
 }) {
   const toneCls =
     tone === "success"
@@ -169,6 +171,14 @@ function StatCard({
           </p>
           <p className="mt-2 truncate font-serif text-3xl font-semibold tracking-tight">{value}</p>
           {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+          {cta && (
+            <Link
+              to={cta.to}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              {cta.label} <ArrowRight className="h-3 w-3" aria-hidden />
+            </Link>
+          )}
         </div>
         <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${toneCls}`}>
           <Icon className="h-5 w-5" aria-hidden />
@@ -177,6 +187,7 @@ function StatCard({
     </Card>
   );
 }
+
 
 function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
   const url = useSignedUrl("leaf-images", path);
