@@ -151,7 +151,6 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
           </div>
         )}
         <SidebarMenu>
-
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Settings">
               <Link to="/settings" onClick={close}>

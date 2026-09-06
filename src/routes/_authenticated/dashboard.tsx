@@ -188,7 +188,6 @@ function StatCard({
   );
 }
 
-
 function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
   const url = useSignedUrl("leaf-images", path);
   if (!url) {
@@ -241,7 +240,15 @@ function WelcomeCard() {
 }
 
 /** Setup checklist driven strictly by real profile / scan / soil records. */
-function FarmSetupCard({ hasLocation, scans, soil }: { hasLocation: boolean; scans: number; soil: number }) {
+function FarmSetupCard({
+  hasLocation,
+  scans,
+  soil,
+}: {
+  hasLocation: boolean;
+  scans: number;
+  soil: number;
+}) {
   const steps = [
     { done: hasLocation, label: "Add farm location", to: "/settings" },
     { done: scans > 0, label: "Scan your first crop", to: "/app" },
@@ -265,15 +272,16 @@ function FarmSetupCard({ hasLocation, scans, soil }: { hasLocation: boolean; sca
               {s.done ? (
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden />
               ) : (
-                <span
-                  className="h-4 w-4 shrink-0 rounded-full border border-border"
-                  aria-hidden
-                />
+                <span className="h-4 w-4 shrink-0 rounded-full border border-border" aria-hidden />
               )}
-              <span className={`min-w-0 flex-1 truncate ${s.done ? "text-muted-foreground line-through" : "font-medium"}`}>
+              <span
+                className={`min-w-0 flex-1 truncate ${s.done ? "text-muted-foreground line-through" : "font-medium"}`}
+              >
                 {s.label}
               </span>
-              {!s.done && <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />}
+              {!s.done && (
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+              )}
             </Link>
           </li>
         ))}
@@ -296,7 +304,6 @@ function useSoilCount() {
   });
 }
 
-
 function DashboardPage() {
   const { data: detections, isLoading, isError, error, refetch, isFetching } = useDetections();
   const { data: profile } = useProfile();
@@ -304,7 +311,6 @@ function DashboardPage() {
   const { data: soilCount } = useSoilCount();
   const toggleReminder = useToggleReminder();
   const [range, setRange] = useState<7 | 30 | 90>(7);
-
 
   const stats = useMemo(() => {
     const rows = detections ?? [];
@@ -512,7 +518,6 @@ function DashboardPage() {
               </FadeIn>
 
               <FadeIn delay={0.04}>
-
                 <Card className="p-6">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
                     <div className="min-w-0">
@@ -695,7 +700,6 @@ function DashboardPage() {
               </FadeIn>
             </div>
 
-
             {/* Right rail */}
             <div className="min-w-0 space-y-6">
               <FadeIn delay={0.02}>
@@ -709,7 +713,6 @@ function DashboardPage() {
               <FadeIn delay={0.04}>
                 <FarmWeatherCard crop={stats.last?.crop ?? profile?.primary_crop ?? null} />
               </FadeIn>
-
 
               <FadeIn delay={0.06}>
                 <Card className="p-6">
