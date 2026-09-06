@@ -138,7 +138,19 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
       </SidebarContent>
 
       <SidebarFooter>
+        {!collapsed && (
+          <div className="mb-1 rounded-xl border border-border/60 bg-primary/5 p-3">
+            <p className="text-sm font-medium">Go Premium</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Advanced analytics and priority support are coming soon.
+            </p>
+            <Button size="sm" variant="secondary" className="mt-3 w-full rounded-full" disabled>
+              Upgrade Now
+            </Button>
+          </div>
+        )}
         <SidebarMenu>
+
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Settings">
               <Link to="/settings" onClick={close}>
