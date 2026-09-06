@@ -32,6 +32,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { useProfile } from "@/lib/profile";
 
