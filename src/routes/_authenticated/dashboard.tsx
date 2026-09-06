@@ -502,11 +502,15 @@ function DashboardPage() {
             </StaggerItem>
           </Stagger>
 
-
           <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
             {/* Main column */}
             <div className="min-w-0 space-y-6">
+              <FadeIn delay={0.02}>
+                <QuickActions />
+              </FadeIn>
+
               <FadeIn delay={0.04}>
+
                 <Card className="p-6">
                   <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 sm:flex sm:flex-wrap sm:justify-between">
                     <div className="min-w-0">
