@@ -422,7 +422,7 @@ function DashboardPage() {
     );
   }
 
-  const empty = !isLoading && stats.total === 0 && (reminderRows ?? []).length === 0;
+  const noScans = stats.total === 0;
 
   return (
     <AppShell>
@@ -434,7 +434,7 @@ function DashboardPage() {
         actions={
           <Link to="/app">
             <Button className="gap-2 rounded-full">
-              <ScanLine className="h-4 w-4" /> New scan
+              <ScanLine className="h-4 w-4" /> {noScans ? "Start first scan" : "New scan"}
             </Button>
           </Link>
         }
@@ -449,21 +449,17 @@ function DashboardPage() {
           <Skeleton className="h-[320px] rounded-2xl sm:col-span-2 lg:col-span-1" />
           <span className="sr-only">Loading scan statistics…</span>
         </div>
-      ) : empty ? (
-        <EmptyOnboarding />
       ) : (
         <>
+          {noScans && <WelcomeCard />}
           <Stagger className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StaggerItem>
               <StatCard
                 icon={ScanLine}
                 label="Total scans"
                 value={stats.total}
-                hint={
-                  stats.total
-                    ? `${stats.lastWeek} in the last 7 days`
-                    : "Start by scanning your first crop."
-                }
+                hint={noScans ? "No scans yet" : `${stats.lastWeek} in the last 7 days`}
+                cta={noScans ? { to: "/app", label: "Start scanning" } : undefined}
               />
             </StaggerItem>
             <StaggerItem>
@@ -471,11 +467,11 @@ function DashboardPage() {
                 icon={CheckCircle2}
                 tone="success"
                 label="Healthy scans"
-                value={stats.healthy}
+                value={noScans ? "—" : stats.healthy}
                 hint={
-                  stats.total
-                    ? `${Math.round((stats.healthy / stats.total) * 100)}% of scans`
-                    : "No healthy scan data yet."
+                  noScans
+                    ? "Available after your first scan"
+                    : `${Math.round((stats.healthy / stats.total) * 100)}% of scans`
                 }
               />
             </StaggerItem>
@@ -484,11 +480,11 @@ function DashboardPage() {
                 icon={AlertTriangle}
                 tone="danger"
                 label="Diseased scans"
-                value={stats.diseased}
+                value={noScans ? "—" : stats.diseased}
                 hint={
-                  stats.total
-                    ? `${Math.round((stats.diseased / stats.total) * 100)}% of scans`
-                    : "No diagnosis data yet."
+                  noScans
+                    ? "Available after disease detection"
+                    : `${Math.round((stats.diseased / stats.total) * 100)}% of scans`
                 }
               />
             </StaggerItem>
@@ -499,12 +495,13 @@ function DashboardPage() {
                 value={stats.healthyRate === null ? "—" : `${stats.healthyRate}%`}
                 hint={
                   stats.healthyRate === null
-                    ? "Complete a few crop scans."
+                    ? "Builds up as you scan crops"
                     : `${stats.healthy} healthy of ${stats.total} scans`
                 }
               />
             </StaggerItem>
           </Stagger>
+
 
           <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
             {/* Main column */}
