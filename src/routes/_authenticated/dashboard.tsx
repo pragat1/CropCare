@@ -686,18 +686,22 @@ function DashboardPage() {
                     )}
                   </div>
                 </Card>
-              </FadeIn>
-
-              <FadeIn delay={0.1}>
-                <QuickActions />
-              </FadeIn>
             </div>
 
             {/* Right rail */}
             <div className="min-w-0 space-y-6">
+              <FadeIn delay={0.02}>
+                <FarmSetupCard
+                  hasLocation={Boolean(profile?.farm_place)}
+                  scans={stats.total}
+                  soil={soilCount ?? 0}
+                />
+              </FadeIn>
+
               <FadeIn delay={0.04}>
                 <FarmWeatherCard crop={stats.last?.crop ?? profile?.primary_crop ?? null} />
               </FadeIn>
+
 
               <FadeIn delay={0.06}>
                 <Card className="p-6">
