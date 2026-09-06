@@ -686,7 +686,9 @@ function DashboardPage() {
                     )}
                   </div>
                 </Card>
+              </FadeIn>
             </div>
+
 
             {/* Right rail */}
             <div className="min-w-0 space-y-6">
