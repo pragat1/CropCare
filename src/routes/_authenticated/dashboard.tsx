@@ -301,8 +301,10 @@ function DashboardPage() {
   const { data: detections, isLoading, isError, error, refetch, isFetching } = useDetections();
   const { data: profile } = useProfile();
   const { data: reminderRows } = useReminders();
+  const { data: soilCount } = useSoilCount();
   const toggleReminder = useToggleReminder();
   const [range, setRange] = useState<7 | 30 | 90>(7);
+
 
   const stats = useMemo(() => {
     const rows = detections ?? [];
