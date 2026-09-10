@@ -243,7 +243,10 @@ function DetectPage() {
                 />
                 {analyzing && (
                   <>
-                    <div className="pointer-events-none absolute inset-0 bg-primary/5" aria-hidden />
+                    <div
+                      className="pointer-events-none absolute inset-0 bg-primary/5"
+                      aria-hidden
+                    />
                     <motion.div
                       aria-hidden
                       className="pointer-events-none absolute inset-x-0 h-16 bg-gradient-to-b from-transparent via-primary/20 to-transparent"
