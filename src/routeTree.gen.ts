@@ -33,6 +33,7 @@ import { Route as AuthenticatedDiseasesIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedSoilTypesTypeRouteImport } from './routes/_authenticated/soil-types.$type'
+import { Route as AuthenticatedDiseasesSlugRouteImport } from './routes/_authenticated/diseases.$slug'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminCategoryRouteImport } from './routes/_authenticated/admin.$category'
@@ -158,6 +159,12 @@ const AuthenticatedSoilTypesTypeRoute =
     path: '/soil-types/$type',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDiseasesSlugRoute =
+  AuthenticatedDiseasesSlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => AuthenticatedDiseasesRoute,
+  } as any)
 const AuthenticatedDetectionIdRoute =
   AuthenticatedDetectionIdRouteImport.update({
     id: '/detection/$id',
@@ -198,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -223,6 +231,7 @@ export interface FileRoutesByTo {
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -253,6 +262,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
+  '/_authenticated/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/_authenticated/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/admin/$category'
     | '/admin/users'
     | '/detection/$id'
+    | '/diseases/$slug'
     | '/soil-types/$type'
     | '/soil/$id'
     | '/admin/'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/admin/$category'
     | '/admin/users'
     | '/detection/$id'
+    | '/diseases/$slug'
     | '/soil-types/$type'
     | '/soil/$id'
     | '/admin'
@@ -337,6 +349,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/$category'
     | '/_authenticated/admin/users'
     | '/_authenticated/detection/$id'
+    | '/_authenticated/diseases/$slug'
     | '/_authenticated/soil-types/$type'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
@@ -520,6 +533,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSoilTypesTypeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/diseases/$slug': {
+      id: '/_authenticated/diseases/$slug'
+      path: '/$slug'
+      fullPath: '/diseases/$slug'
+      preLoaderRoute: typeof AuthenticatedDiseasesSlugRouteImport
+      parentRoute: typeof AuthenticatedDiseasesRoute
+    }
     '/_authenticated/detection/$id': {
       id: '/_authenticated/detection/$id'
       path: '/detection/$id'
@@ -560,10 +580,12 @@ const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedDiseasesRouteChildren {
+  AuthenticatedDiseasesSlugRoute: typeof AuthenticatedDiseasesSlugRoute
   AuthenticatedDiseasesIndexRoute: typeof AuthenticatedDiseasesIndexRoute
 }
 
 const AuthenticatedDiseasesRouteChildren: AuthenticatedDiseasesRouteChildren = {
+  AuthenticatedDiseasesSlugRoute: AuthenticatedDiseasesSlugRoute,
   AuthenticatedDiseasesIndexRoute: AuthenticatedDiseasesIndexRoute,
 }
 
