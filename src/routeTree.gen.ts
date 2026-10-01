@@ -21,6 +21,7 @@ import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
@@ -95,6 +96,11 @@ const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDiseasesRoute = AuthenticatedDiseasesRouteImport.update({
+  id: '/diseases',
+  path: '/diseases',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -132,9 +138,9 @@ const AuthenticatedSoilIndexRoute = AuthenticatedSoilIndexRouteImport.update({
 } as any)
 const AuthenticatedDiseasesIndexRoute =
   AuthenticatedDiseasesIndexRouteImport.update({
-    id: '/diseases/',
-    path: '/diseases/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDiseasesRoute,
   } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diseases': typeof AuthenticatedDiseasesRouteWithChildren
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/reminders': typeof AuthenticatedRemindersRoute
@@ -233,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/diseases': typeof AuthenticatedDiseasesRouteWithChildren
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
@@ -262,6 +270,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/assistant'
     | '/dashboard'
+    | '/diseases'
     | '/history'
     | '/quiz'
     | '/reminders'
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/assistant'
     | '/_authenticated/dashboard'
+    | '/_authenticated/diseases'
     | '/_authenticated/history'
     | '/_authenticated/quiz'
     | '/_authenticated/reminders'
@@ -426,6 +436,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/diseases': {
+      id: '/_authenticated/diseases'
+      path: '/diseases'
+      fullPath: '/diseases'
+      preLoaderRoute: typeof AuthenticatedDiseasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -477,10 +494,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/diseases/': {
       id: '/_authenticated/diseases/'
-      path: '/diseases'
+      path: '/'
       fullPath: '/diseases/'
       preLoaderRoute: typeof AuthenticatedDiseasesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedDiseasesRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -542,6 +559,19 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedDiseasesRouteChildren {
+  AuthenticatedDiseasesIndexRoute: typeof AuthenticatedDiseasesIndexRoute
+}
+
+const AuthenticatedDiseasesRouteChildren: AuthenticatedDiseasesRouteChildren = {
+  AuthenticatedDiseasesIndexRoute: AuthenticatedDiseasesIndexRoute,
+}
+
+const AuthenticatedDiseasesRouteWithChildren =
+  AuthenticatedDiseasesRoute._addFileChildren(
+    AuthenticatedDiseasesRouteChildren,
+  )
+
 interface AuthenticatedSoilRouteChildren {
   AuthenticatedSoilIdRoute: typeof AuthenticatedSoilIdRoute
   AuthenticatedSoilIndexRoute: typeof AuthenticatedSoilIndexRoute
@@ -562,6 +592,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRouteWithChildren
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
@@ -573,7 +604,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWeatherRoute: typeof AuthenticatedWeatherRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
   AuthenticatedSoilTypesTypeRoute: typeof AuthenticatedSoilTypesTypeRoute
-  AuthenticatedDiseasesIndexRoute: typeof AuthenticatedDiseasesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -583,6 +613,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiseasesRoute: AuthenticatedDiseasesRouteWithChildren,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
@@ -594,7 +625,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWeatherRoute: AuthenticatedWeatherRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
   AuthenticatedSoilTypesTypeRoute: AuthenticatedSoilTypesTypeRoute,
-  AuthenticatedDiseasesIndexRoute: AuthenticatedDiseasesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
