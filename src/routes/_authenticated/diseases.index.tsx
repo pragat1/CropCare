@@ -19,7 +19,7 @@ import { Stagger, StaggerItem } from "@/components/motion";
 import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapDiseases } from "@/lib/admin/library";
 
-export const Route = createFileRoute("/_authenticated/diseases")({
+export const Route = createFileRoute("/_authenticated/diseases/")({
   head: () =>
     pageHead(
       "Crop Disease Database | LeafScan",

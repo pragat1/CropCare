@@ -21,7 +21,6 @@ import { Route as AuthenticatedSeasonsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
-import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
@@ -29,6 +28,7 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedSoilIndexRouteImport } from './routes/_authenticated/soil.index'
+import { Route as AuthenticatedDiseasesIndexRouteImport } from './routes/_authenticated/diseases.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedSoilTypesTypeRouteImport } from './routes/_authenticated/soil-types.$type'
@@ -95,11 +95,6 @@ const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDiseasesRoute = AuthenticatedDiseasesRouteImport.update({
-  id: '/diseases',
-  path: '/diseases',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -135,6 +130,12 @@ const AuthenticatedSoilIndexRoute = AuthenticatedSoilIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedSoilRoute,
 } as any)
+const AuthenticatedDiseasesIndexRoute =
+  AuthenticatedDiseasesIndexRouteImport.update({
+    id: '/diseases/',
+    path: '/diseases/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -178,7 +179,6 @@ export interface FileRoutesByFullPath {
   '/app': typeof AuthenticatedAppRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/reminders': typeof AuthenticatedRemindersRoute
@@ -194,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/diseases/': typeof AuthenticatedDiseasesIndexRoute
   '/soil/': typeof AuthenticatedSoilIndexRoute
 }
 export interface FileRoutesByTo {
@@ -204,7 +205,6 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
-  '/diseases': typeof AuthenticatedDiseasesRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/reminders': typeof AuthenticatedRemindersRoute
@@ -219,6 +219,7 @@ export interface FileRoutesByTo {
   '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/diseases': typeof AuthenticatedDiseasesIndexRoute
   '/soil': typeof AuthenticatedSoilIndexRoute
 }
 export interface FileRoutesById {
@@ -232,7 +233,6 @@ export interface FileRoutesById {
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/diseases': typeof AuthenticatedDiseasesRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
@@ -248,6 +248,7 @@ export interface FileRoutesById {
   '/_authenticated/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/diseases/': typeof AuthenticatedDiseasesIndexRoute
   '/_authenticated/soil/': typeof AuthenticatedSoilIndexRoute
 }
 export interface FileRouteTypes {
@@ -261,7 +262,6 @@ export interface FileRouteTypes {
     | '/app'
     | '/assistant'
     | '/dashboard'
-    | '/diseases'
     | '/history'
     | '/quiz'
     | '/reminders'
@@ -277,6 +277,7 @@ export interface FileRouteTypes {
     | '/soil-types/$type'
     | '/soil/$id'
     | '/admin/'
+    | '/diseases/'
     | '/soil/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -287,7 +288,6 @@ export interface FileRouteTypes {
     | '/app'
     | '/assistant'
     | '/dashboard'
-    | '/diseases'
     | '/history'
     | '/quiz'
     | '/reminders'
@@ -302,6 +302,7 @@ export interface FileRouteTypes {
     | '/soil-types/$type'
     | '/soil/$id'
     | '/admin'
+    | '/diseases'
     | '/soil'
   id:
     | '__root__'
@@ -314,7 +315,6 @@ export interface FileRouteTypes {
     | '/_authenticated/app'
     | '/_authenticated/assistant'
     | '/_authenticated/dashboard'
-    | '/_authenticated/diseases'
     | '/_authenticated/history'
     | '/_authenticated/quiz'
     | '/_authenticated/reminders'
@@ -330,6 +330,7 @@ export interface FileRouteTypes {
     | '/_authenticated/soil-types/$type'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
+    | '/_authenticated/diseases/'
     | '/_authenticated/soil/'
   fileRoutesById: FileRoutesById
 }
@@ -425,13 +426,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/diseases': {
-      id: '/_authenticated/diseases'
-      path: '/diseases'
-      fullPath: '/diseases'
-      preLoaderRoute: typeof AuthenticatedDiseasesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -480,6 +474,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/soil/'
       preLoaderRoute: typeof AuthenticatedSoilIndexRouteImport
       parentRoute: typeof AuthenticatedSoilRoute
+    }
+    '/_authenticated/diseases/': {
+      id: '/_authenticated/diseases/'
+      path: '/diseases'
+      fullPath: '/diseases/'
+      preLoaderRoute: typeof AuthenticatedDiseasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -561,7 +562,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
@@ -573,6 +573,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWeatherRoute: typeof AuthenticatedWeatherRoute
   AuthenticatedDetectionIdRoute: typeof AuthenticatedDetectionIdRoute
   AuthenticatedSoilTypesTypeRoute: typeof AuthenticatedSoilTypesTypeRoute
+  AuthenticatedDiseasesIndexRoute: typeof AuthenticatedDiseasesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -582,7 +583,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedDiseasesRoute: AuthenticatedDiseasesRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
@@ -594,6 +594,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWeatherRoute: AuthenticatedWeatherRoute,
   AuthenticatedDetectionIdRoute: AuthenticatedDetectionIdRoute,
   AuthenticatedSoilTypesTypeRoute: AuthenticatedSoilTypesTypeRoute,
+  AuthenticatedDiseasesIndexRoute: AuthenticatedDiseasesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
