@@ -10,3 +10,5 @@
 > the editor, so keep the branch in a working state.
 
 <!-- LOVABLE:END -->
+
+- Disease reference pages read published `content_items` directly, never bundled demo fallbacks, because the reference library must show only verified database records.
