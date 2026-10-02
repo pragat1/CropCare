@@ -1,18 +1,6 @@
 import { useState } from "react";
 import { ImageOff } from "lucide-react";
 
-/** Only an image explicitly attached to a disease record is eligible here. */
-export function diseaseImageUrl(data: Record<string, unknown>): string | null {
-  const value = data.image_url;
-  if (typeof value !== "string") return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" ? url.href : null;
-  } catch {
-    return null;
-  }
-}
-
 export function DiseaseReferenceImage({
   src,
   name,

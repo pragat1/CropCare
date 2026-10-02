@@ -1,6 +1,17 @@
-import { diseaseImageUrl } from "@/components/disease-reference-image";
 import { list, str } from "@/lib/admin/library";
 import type { ContentItem } from "@/lib/admin/schema";
+
+/** Only an image explicitly attached to a disease record is eligible here. */
+export function diseaseImageUrl(data: Record<string, unknown>): string | null {
+  const value = data.image_url;
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 
 export type DiseaseReference = {
   id: string;
