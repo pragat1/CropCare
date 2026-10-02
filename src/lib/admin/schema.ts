@@ -79,9 +79,19 @@ export const CATEGORY_DEFS: Record<Category, CategoryDef> = {
     fields: [
       { key: "crop", label: "Crop", type: "text", required: true },
       { key: "emoji", label: "Emoji", type: "text" },
-      { key: "type", label: "Disease type", type: "text", help: "Only enter a verified classification." },
+      {
+        key: "type",
+        label: "Disease type",
+        type: "text",
+        help: "Only enter a verified classification.",
+      },
       { key: "scientific_name", label: "Scientific name", type: "text" },
-      { key: "image_url", label: "Reference image URL", type: "text", help: "Verified HTTPS photo of this disease; leave blank if unavailable." },
+      {
+        key: "image_url",
+        label: "Reference image URL",
+        type: "text",
+        help: "Verified HTTPS photo of this disease; leave blank if unavailable.",
+      },
       { key: "severity", label: "Severity", type: "select", options: ["low", "medium", "high"] },
       { key: "confidence", label: "Typical confidence (%)", type: "number" },
       { key: "summary", label: "Summary", type: "textarea", required: true },
