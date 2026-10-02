@@ -51,6 +51,11 @@
   --color-warning: var(--warning);
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Fraunces", ui-serif, Georgia, serif;
+  --font-field-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-field-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-field-canvas: var(--field-canvas);
+  --color-field-soft: var(--field-soft);
+  --color-field-muted: var(--field-muted);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -68,6 +73,9 @@
 
 :root {
   --radius: 0.75rem;
+  --field-canvas: #f4f8f3;
+  --field-soft: #e6f1e7;
+  --field-muted: #425e50;
   --background: oklch(0.985 0.006 120);
   --foreground: oklch(0.22 0.03 155);
   --card: oklch(1 0 0);
@@ -111,6 +119,9 @@
 }
 
 .dark {
+  --field-canvas: oklch(0.17 0.025 155);
+  --field-soft: oklch(0.27 0.03 155);
+  --field-muted: oklch(0.72 0.02 145);
   --background: oklch(0.17 0.025 155);
   --foreground: oklch(0.96 0.01 140);
   --card: oklch(0.23 0.03 155);

@@ -40,7 +40,6 @@ function DiseasesPage() {
         .some((value) => value.toLocaleLowerCase().includes(query))),
     );
   }, [diseases, search, crop, type]);
-  const hasFilters = search !== "" || crop !== "all" || type !== "all";
   const clearFilters = () => { setSearch(""); setCrop("all"); setType("all"); };
 
   return (
