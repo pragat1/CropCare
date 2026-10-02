@@ -44,14 +44,14 @@ function DiseasesPage() {
 
   return (
     <AppShell>
-      <div className="-mx-4 -mt-8 min-h-screen bg-field-canvas px-4 pb-14 pt-9 md:-mx-6 md:-mt-10 md:px-6 md:pt-12">
+      <div className="-mx-4 -mt-8 min-h-screen bg-background px-4 pb-14 pt-9 md:-mx-6 md:-mt-10 md:px-6 md:pt-12">
         <div className="mx-auto max-w-6xl">
           <header className="flex flex-col gap-5 border-b border-border/70 pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
               <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase text-primary">
                 <BookOpen className="h-4 w-4" aria-hidden /> Disease reference
               </div>
-              <h1 className="mt-3 font-field-serif text-4xl leading-tight text-foreground sm:text-5xl">Disease database</h1>
+              <h1 className="mt-3 font-serif text-4xl leading-tight text-foreground sm:text-5xl">Disease database</h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
                 Explore crop diseases, compare visible symptoms, and learn how to identify them.
               </p>
@@ -78,7 +78,7 @@ function DiseasesPage() {
               <div className="mt-5 space-y-3">
                 {crops.length > 0 && (
                   <div className="flex items-start gap-3">
-                    <span className="w-12 shrink-0 pt-2 text-xs font-semibold text-field-muted">Crop</span>
+                    <span className="w-12 shrink-0 pt-2 text-xs font-semibold text-muted-foreground">Crop</span>
                     <div className="flex min-w-0 gap-2 overflow-x-auto pb-1" aria-label="Filter by crop">
                       {["all", ...crops].map((value) => (
                         <Button key={value} variant={crop === value ? "default" : "outline"} size="sm" aria-pressed={crop === value} onClick={() => setCrop(value)} className="shrink-0 rounded-full px-4 shadow-none">
@@ -90,7 +90,7 @@ function DiseasesPage() {
                 )}
                 {types.length > 0 && (
                   <div className="flex items-start gap-3">
-                    <span className="w-12 shrink-0 pt-2 text-xs font-semibold text-field-muted">Type</span>
+                    <span className="w-12 shrink-0 pt-2 text-xs font-semibold text-muted-foreground">Type</span>
                     <div className="flex min-w-0 gap-2 overflow-x-auto pb-1" aria-label="Filter by disease type">
                       {["all", ...types].map((value) => (
                         <Button key={value} variant={type === value ? "default" : "outline"} size="sm" aria-pressed={type === value} onClick={() => setType(value)} className="shrink-0 rounded-full px-4 shadow-none">
@@ -106,19 +106,19 @@ function DiseasesPage() {
 
           <section aria-labelledby="library-heading">
             <div className="mb-5 flex items-center justify-between gap-3 border-t border-border/70 pt-6">
-              <h2 id="library-heading" className="font-field-serif text-2xl text-foreground sm:text-3xl">Disease library</h2>
-              {!isPending && !isError && <span className="text-sm text-field-muted">{filtered.length} {filtered.length === 1 ? "reference" : "references"}</span>}
+              <h2 id="library-heading" className="font-serif text-2xl text-foreground sm:text-3xl">Disease library</h2>
+              {!isPending && !isError && <span className="text-sm text-muted-foreground">{filtered.length} {filtered.length === 1 ? "reference" : "references"}</span>}
             </div>
             {isPending ? (
               <div className="grid gap-5 md:grid-cols-2" role="status" aria-label="Loading disease references">
                 {[0, 1, 2, 3].map((item) => <div key={item} className="overflow-hidden rounded-lg border border-border bg-card"><Skeleton className="aspect-[16/10] w-full rounded-none" /><div className="space-y-3 p-5"><Skeleton className="h-6 w-1/2" /><Skeleton className="h-4 w-1/4" /><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-3/4" /></div></div>)}
               </div>
             ) : isError ? (
-              <div role="alert" className="border-y border-border py-14 text-center"><h3 className="font-field-serif text-2xl">Unable to load disease references</h3><p className="mt-2 text-sm text-muted-foreground">Please try again.</p><Button onClick={() => void refetch()} className="mt-5">Retry</Button></div>
+                <div role="alert" className="border-y border-border py-14 text-center"><h3 className="font-serif text-2xl">Unable to load disease references</h3><p className="mt-2 text-sm text-muted-foreground">Please try again.</p><Button onClick={() => void refetch()} className="mt-5">Retry</Button></div>
             ) : diseases.length === 0 ? (
-              <div className="border-y border-border py-14 text-center"><BookOpen className="mx-auto h-8 w-8 text-primary" aria-hidden /><h3 className="mt-4 font-field-serif text-2xl">No disease references yet</h3><p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">Your disease library will appear here once disease information is available.</p></div>
+                <div className="border-y border-border py-14 text-center"><BookOpen className="mx-auto h-8 w-8 text-primary" aria-hidden /><h3 className="mt-4 font-serif text-2xl">No disease references yet</h3><p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">Your disease library will appear here once disease information is available.</p></div>
             ) : filtered.length === 0 ? (
-              <div className="border-y border-border py-14 text-center"><Search className="mx-auto h-8 w-8 text-primary" aria-hidden /><h3 className="mt-4 font-field-serif text-2xl">No diseases found</h3><p className="mt-2 text-sm text-muted-foreground">Try another spelling, search by crop, or remove a filter.</p><Button variant="outline" onClick={clearFilters} className="mt-5">Clear filters</Button></div>
+                <div className="border-y border-border py-14 text-center"><Search className="mx-auto h-8 w-8 text-primary" aria-hidden /><h3 className="mt-4 font-serif text-2xl">No diseases found</h3><p className="mt-2 text-sm text-muted-foreground">Try another spelling, search by crop, or remove a filter.</p><Button variant="outline" onClick={clearFilters} className="mt-5">Clear filters</Button></div>
             ) : (
               <div className="grid gap-5 md:grid-cols-2">
                 {filtered.map((disease, index) => (
@@ -137,7 +137,7 @@ function DiseasesPage() {
           </section>
 
           <aside className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-border py-8 sm:flex-row sm:items-center">
-            <div><h2 className="font-field-serif text-2xl">Have a leaf photo?</h2><p className="mt-1 text-sm text-muted-foreground">Let LeafScan analyze it for possible disease symptoms.</p></div>
+             <div><h2 className="font-serif text-2xl">Have a leaf photo?</h2><p className="mt-1 text-sm text-muted-foreground">Let LeafScan analyze it for possible disease symptoms.</p></div>
             <Button asChild className="shrink-0 gap-2"><Link to="/app"><Camera className="h-4 w-4" aria-hidden /> Detect disease <ArrowRight className="h-4 w-4" aria-hidden /></Link></Button>
           </aside>
         </div>
