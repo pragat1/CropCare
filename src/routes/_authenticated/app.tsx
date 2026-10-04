@@ -222,11 +222,11 @@ function DetectPage() {
         description="Review your uploaded leaf image before starting the disease analysis."
       />
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         {/* LEFT — image */}
-        <FadeIn>
+        <FadeIn className="flex">
           {preview ? (
-            <Card className="overflow-hidden p-0">
+            <Card className="h-full w-full overflow-hidden p-0">
               <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3">
                 <h2 className="font-serif text-lg font-semibold">Uploaded leaf</h2>
                 {analyzing && (
@@ -291,7 +291,7 @@ function DetectPage() {
               role="button"
               tabIndex={0}
               aria-label="Upload a leaf photo"
-              className="grid min-h-[340px] cursor-pointer place-items-center border-2 border-dashed border-border p-8 transition-colors hover:border-primary/50"
+              className="grid h-full w-full min-h-[340px] cursor-pointer place-items-center border-2 border-dashed border-border p-8 transition-colors hover:border-primary/50"
               onClick={() => inputRef.current?.click()}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -331,11 +331,11 @@ function DetectPage() {
         </FadeIn>
 
         {/* RIGHT — setup / processing / result */}
-        <FadeIn delay={0.08}>
+        <FadeIn delay={0.08} className="flex flex-col">
           {resultId ? (
             <ResultCard id={resultId} onNewScan={reset} />
           ) : analyzing ? (
-            <Card className="p-6">
+            <Card className="flex-1 p-6">
               <div className="flex items-center gap-3">
                 <motion.span
                   className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary"
@@ -369,7 +369,7 @@ function DetectPage() {
               </p>
             </Card>
           ) : mutation.isError ? (
-            <Card className="p-6">
+            <Card className="flex-1 p-6">
               <div className="flex items-start gap-3 text-destructive">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
                 <div>
@@ -397,7 +397,7 @@ function DetectPage() {
               </div>
             </Card>
           ) : (
-            <Card className="p-6">
+            <Card className="flex-1 p-6">
               <h2 className="font-serif text-lg font-semibold">Analysis details</h2>
 
               <label htmlFor="crop-select" className="mt-5 block text-sm font-medium">
@@ -632,10 +632,10 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
   });
 
   if (q.isLoading)
-    return <Card className="p-6 text-sm text-muted-foreground">Loading result…</Card>;
+    return <Card className="flex-1 p-6 text-sm text-muted-foreground">Loading result…</Card>;
   if (q.error || !q.data)
     return (
-      <Card className="p-6">
+      <Card className="flex-1 p-6">
         <p className="text-sm text-destructive">We couldn't load this result.</p>
         <Button variant="outline" size="sm" className="mt-4" onClick={onNewScan}>
           New scan
@@ -655,7 +655,7 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
   ) as { level?: RiskLevel; score?: number } | null;
 
   return (
-    <Card className="p-6">
+    <Card className="flex-1 p-6">
       <span className="inline-flex items-center gap-2 rounded-full border border-border/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
         Detection result
       </span>
