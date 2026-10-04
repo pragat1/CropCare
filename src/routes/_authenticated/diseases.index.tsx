@@ -13,7 +13,7 @@ import { pageHead } from "@/lib/seo";
 export const Route = createFileRoute("/_authenticated/diseases/")({
   head: () =>
     pageHead(
-      "Disease Database | LeafScan",
+      "Disease Database | CropCare",
       "Explore crop disease references, compare visible symptoms and learn how to identify them.",
     ),
   component: DiseasesPage,
@@ -274,7 +274,7 @@ function DiseasesPage() {
             <div>
               <h2 className="font-serif text-2xl">Have a leaf photo?</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Let LeafScan analyze it for possible disease symptoms.
+                Let CropCare analyze it for possible disease symptoms.
               </p>
             </div>
             <Button asChild className="shrink-0 gap-2">

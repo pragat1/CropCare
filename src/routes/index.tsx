@@ -8,7 +8,7 @@ import { FadeIn, Stagger, StaggerItem, GlassCard } from "@/components/motion";
 export const Route = createFileRoute("/")({
   head: () =>
     pageHead(
-      "LeafScan — AI Crop Disease Detection for Farmers",
+      "CropCare — AI Crop Disease Detection for Farmers",
       "Snap a leaf photo and get an instant AI diagnosis with organic and chemical treatment plans, weather risk and soil insights.",
     ),
   ssr: false,
@@ -30,7 +30,7 @@ function Landing() {
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-brand text-primary-foreground ring-glow">
               <Leaf className="h-4 w-4" />
             </span>
-            <span className="truncate">LeafScan</span>
+            <span className="truncate">CropCare</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <Link to="/auth">
@@ -113,7 +113,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border/50 py-8 text-center text-sm text-muted-foreground">
-        LeafScan · Sign in to save your detection history.
+        CropCare · Sign in to save your detection history.
       </footer>
     </div>
   );

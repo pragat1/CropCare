@@ -98,7 +98,7 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
           to="/dashboard"
           onClick={close}
           className="flex items-center gap-2.5 px-1.5 py-1.5"
-          aria-label="LeafScan dashboard"
+          aria-label="CropCare dashboard"
         >
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-brand text-primary-foreground">
             <Leaf className="h-4.5 w-4.5" aria-hidden />
@@ -106,7 +106,7 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
           {!collapsed && (
             <span className="min-w-0">
               <span className="block truncate font-serif text-base font-semibold tracking-tight">
-                LeafScan
+                CropCare
               </span>
               <span className="block truncate text-xs text-muted-foreground">
                 Smart Agriculture

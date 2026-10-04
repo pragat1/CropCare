@@ -26,7 +26,7 @@ import { PageHeader } from "@/components/page-header";
 export const Route = createFileRoute("/_authenticated/tracker")({
   head: () =>
     pageHead(
-      "Treatment Progress Tracker | LeafScan",
+      "Treatment Progress Tracker | CropCare",
       "Compare before and after leaf photos to measure recovery and confirm whether a treatment is working.",
     ),
   component: TrackerPage,

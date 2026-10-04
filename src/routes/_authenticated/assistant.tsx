@@ -49,13 +49,13 @@ export const Route = createFileRoute("/_authenticated/assistant")({
   component: AssistantPage,
   head: () => ({
     meta: [
-      { title: "Voice Assistant — LeafScan Crop Care" },
+      { title: "Voice Assistant — CropCare Crop Care" },
       {
         name: "description",
         content:
           "Ask about crop diseases by voice or photo in English, Hindi or Punjabi and review your saved answers.",
       },
-      { property: "og:title", content: "Voice Assistant — LeafScan Crop Care" },
+      { property: "og:title", content: "Voice Assistant — CropCare Crop Care" },
       {
         property: "og:description",
         content:
@@ -319,7 +319,7 @@ function AssistantPage() {
         icon={MessageCircle}
         eyebrow="Voice assistant"
         title="Ask about your crop"
-        description="Speak, type or snap a leaf photo in English, Hindi or Punjabi. Answers come from the LeafScan disease database, are read aloud, and are saved to your history."
+        description="Speak, type or snap a leaf photo in English, Hindi or Punjabi. Answers come from the CropCare disease database, are read aloud, and are saved to your history."
       />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_18rem]">

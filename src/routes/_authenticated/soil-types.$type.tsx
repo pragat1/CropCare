@@ -12,9 +12,9 @@ import { pageHead } from "@/lib/seo";
 export const Route = createFileRoute("/_authenticated/soil-types/$type")({
   head: ({ params }) => {
     const name = SOIL_SLUGS[params.type.toLowerCase()];
-    if (!name) return pageHead("Soil type | LeafScan", "Soil type reference guide from LeafScan.");
+    if (!name) return pageHead("Soil type | CropCare", "Soil type reference guide from CropCare.");
     const g = SOIL_GUIDE[name];
-    return pageHead(`${name} soil guide | LeafScan`, g?.summary ?? "Soil type reference guide.");
+    return pageHead(`${name} soil guide | CropCare`, g?.summary ?? "Soil type reference guide.");
   },
   component: SoilTypePage,
   notFoundComponent: () => (
@@ -102,7 +102,7 @@ function SoilTypePage() {
 
       <Card className="mt-6 flex flex-wrap items-center justify-between gap-3 p-5">
         <p className="text-sm text-muted-foreground">
-          Not sure which soil you have? Upload a photo and let LeafScan analyze it.
+          Not sure which soil you have? Upload a photo and let CropCare analyze it.
         </p>
         <Button asChild>
           <Link to="/soil">Analyze my soil</Link>

@@ -47,13 +47,13 @@ export const Route = createFileRoute("/_authenticated/analytics")({
   component: AnalyticsPage,
   head: () => ({
     meta: [
-      { title: "Analytics · LeafScan Crop Insights" },
+      { title: "Analytics · CropCare Crop Insights" },
       {
         name: "description",
         content:
           "Interactive crop analytics: diseases this month, crop distribution, treatment success, recovery trends, scan frequency and seasonal disease patterns.",
       },
-      { property: "og:title", content: "Analytics · LeafScan Crop Insights" },
+      { property: "og:title", content: "Analytics · CropCare Crop Insights" },
       {
         property: "og:description",
         content:
@@ -269,7 +269,7 @@ function AnalyticsPage() {
     }));
     if (rows.length === 0) return toast.error("No scans in this range to export.");
     download(
-      `leafscan-scans-${new Date().toISOString().slice(0, 10)}.csv`,
+      `cropcare-scans-${new Date().toISOString().slice(0, 10)}.csv`,
       "text/csv;charset=utf-8",
       toCsv(rows),
     );
@@ -290,7 +290,7 @@ function AnalyticsPage() {
       seasonal_patterns: stats.seasonal,
     };
     download(
-      `leafscan-report-${new Date().toISOString().slice(0, 10)}.json`,
+      `cropcare-report-${new Date().toISOString().slice(0, 10)}.json`,
       "application/json",
       JSON.stringify(report, null, 2),
     );

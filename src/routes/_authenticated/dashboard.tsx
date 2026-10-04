@@ -46,13 +46,13 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
   head: () => ({
     meta: [
-      { title: "Dashboard · LeafScan Crop Health" },
+      { title: "Dashboard · CropCare Crop Health" },
       {
         name: "description",
         content:
           "Track scans, healthy scan rate, disease trends, farm weather and treatment reminders in one AI-powered farming dashboard.",
       },
-      { property: "og:title", content: "Dashboard · LeafScan Crop Health" },
+      { property: "og:title", content: "Dashboard · CropCare Crop Health" },
       {
         property: "og:description",
         content:
@@ -216,10 +216,10 @@ function WelcomeCard() {
           <Leaf className="h-7 w-7" aria-hidden />
         </span>
         <div className="min-w-0">
-          <h2 className="font-serif text-2xl font-semibold tracking-tight">Welcome to LeafScan</h2>
+          <h2 className="font-serif text-2xl font-semibold tracking-tight">Welcome to CropCare</h2>
           <p className="mt-2 max-w-xl text-sm text-muted-foreground">
             Start monitoring your crops with your first disease scan. Your dashboard will build
-            itself automatically as you use LeafScan.
+            itself automatically as you use CropCare.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link to="/app">

@@ -21,7 +21,7 @@ import { RISK_STYLES, type WeatherIntel } from "@/lib/weather-types";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { farmCoords, useProfile } from "@/lib/profile";
 
-const LS_KEY = "leafscan.geo";
+const LS_KEY = "cropcare.geo";
 
 type Coords = { lat: number; lon: number };
 
