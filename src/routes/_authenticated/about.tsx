@@ -17,8 +17,8 @@ import { Stagger, StaggerItem, FadeIn } from "@/components/motion";
 export const Route = createFileRoute("/_authenticated/about")({
   head: () =>
     pageHead(
-      "About LeafScan | AI Crop Health Platform",
-      "How LeafScan combines AI vision, agronomy data and weather intelligence to help farmers catch crop disease early.",
+      "About CropCare | AI Crop Health Platform",
+      "How CropCare combines AI vision, agronomy data and weather intelligence to help farmers catch crop disease early.",
     ),
   component: AboutPage,
 });
@@ -71,7 +71,7 @@ function AboutPage() {
               <Leaf className="h-5 w-5" />
             </span>
             <h1 className="font-serif text-3xl font-semibold tracking-tight">
-              About <span className="text-gradient">LeafScan</span>
+              About <span className="text-gradient">CropCare</span>
             </h1>
           </div>
           <p className="text-muted-foreground mt-4">

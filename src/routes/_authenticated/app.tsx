@@ -62,7 +62,7 @@ const CROPS = [
 export const Route = createFileRoute("/_authenticated/app")({
   head: () =>
     pageHead(
-      "Detect Disease — Analyze Your Crop | LeafScan",
+      "Detect Disease — Analyze Your Crop | CropCare",
       "Upload a leaf photo and review it before running an AI disease analysis with severity, affected plant part and treatment guidance.",
     ),
   component: DetectPage,

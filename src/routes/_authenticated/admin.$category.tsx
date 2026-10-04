@@ -59,18 +59,18 @@ export const Route = createFileRoute("/_authenticated/admin/$category")({
   component: AdminCategoryPage,
   head: ({ params }) => {
     const def = isCategory(params.category) ? CATEGORY_DEFS[params.category] : null;
-    const title = `Manage ${def?.plural ?? "content"} · LeafScan Admin`;
+    const title = `Manage ${def?.plural ?? "content"} · CropCare Admin`;
     return {
       meta: [
         { title },
         {
           name: "description",
-          content: def?.description ?? "Administrator content management for LeafScan.",
+          content: def?.description ?? "Administrator content management for CropCare.",
         },
         { property: "og:title", content: title },
         {
           property: "og:description",
-          content: def?.description ?? "Administrator content management for LeafScan.",
+          content: def?.description ?? "Administrator content management for CropCare.",
         },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },

@@ -11,7 +11,7 @@ import { pageHead } from "@/lib/seo";
 export const Route = createFileRoute("/_authenticated/diseases/$slug")({
   head: () =>
     pageHead(
-      "Disease Reference | LeafScan",
+      "Disease Reference | CropCare",
       "Crop disease symptoms, causes, treatment and prevention reference.",
     ),
   component: DiseaseDetailsPage,

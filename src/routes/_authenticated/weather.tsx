@@ -17,13 +17,13 @@ export const Route = createFileRoute("/_authenticated/weather")({
   component: WeatherPage,
   head: () => ({
     meta: [
-      { title: "Weather Intelligence & Crop Disease Risk | LeafScan" },
+      { title: "Weather Intelligence & Crop Disease Risk | CropCare" },
       {
         name: "description",
         content:
           "Live temperature, humidity, rainfall, wind and UV for your farm, with weather-driven disease risk and preventive actions for your crop.",
       },
-      { property: "og:title", content: "Weather Intelligence & Crop Disease Risk | LeafScan" },
+      { property: "og:title", content: "Weather Intelligence & Crop Disease Risk | CropCare" },
       {
         property: "og:description",
         content:

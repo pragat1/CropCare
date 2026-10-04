@@ -85,14 +85,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "LeafScan — AI Crop Disease Detection" },
+      { title: "CropCare — AI Crop Disease Detection" },
       {
         name: "description",
         content:
           "Upload a leaf photo and get instant AI-powered crop disease diagnosis, treatment plans, and prevention advice.",
       },
-      { name: "author", content: "LeafScan" },
-      { property: "og:title", content: "LeafScan — AI Crop Disease Detection" },
+      { name: "author", content: "CropCare" },
+      { property: "og:title", content: "CropCare — AI Crop Disease Detection" },
       {
         property: "og:description",
         content:
@@ -102,7 +102,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#143a26" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-title", content: "LeafScan" },
+      { name: "apple-mobile-web-app-title", content: "CropCare" },
     ],
     links: [
       {

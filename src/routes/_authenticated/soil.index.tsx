@@ -31,7 +31,7 @@ import { FadeIn } from "@/components/motion";
 export const Route = createFileRoute("/_authenticated/soil/")({
   head: () =>
     pageHead(
-      "Soil Analysis | LeafScan",
+      "Soil Analysis | CropCare",
       "Upload a soil photo for AI analysis of soil type, fertility, water retention, pH range and recommended crops.",
     ),
   component: SoilPage,
@@ -138,7 +138,7 @@ function SoilPage() {
         icon={Sprout}
         eyebrow="Soil analysis"
         title="Soil analysis"
-        description="Understand your soil before you plant. Upload a photo to analyze its visible characteristics and get insights from LeafScan."
+        description="Understand your soil before you plant. Upload a photo to analyze its visible characteristics and get insights from CropCare."
       />
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-2">

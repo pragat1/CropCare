@@ -12,7 +12,7 @@ import { useLibrary, mapTips } from "@/lib/admin/library";
 export const Route = createFileRoute("/_authenticated/tips")({
   head: () =>
     pageHead(
-      "Farming Tips & Best Practices | LeafScan",
+      "Farming Tips & Best Practices | CropCare",
       "Practical crop care tips covering irrigation, nutrition, pest pressure and disease prevention for every crop.",
     ),
   component: TipsPage,

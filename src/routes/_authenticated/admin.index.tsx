@@ -14,17 +14,17 @@ export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminHome,
   head: () => ({
     meta: [
-      { title: "Admin · LeafScan Content Library" },
+      { title: "Admin · CropCare Content Library" },
       {
         name: "description",
         content:
           "Administrator dashboard to manage diseases, treatments, quizzes, growth tips, seasonal guides, crops and the soil database.",
       },
-      { property: "og:title", content: "Admin · LeafScan Content Library" },
+      { property: "og:title", content: "Admin · CropCare Content Library" },
       {
         property: "og:description",
         content:
-          "Manage the LeafScan content library: diseases, treatments, quizzes, tips, seasons, crops and soil.",
+          "Manage the CropCare content library: diseases, treatments, quizzes, tips, seasons, crops and soil.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

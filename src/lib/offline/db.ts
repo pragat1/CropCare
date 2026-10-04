@@ -1,6 +1,6 @@
 // Minimal promise wrapper around IndexedDB (no dependency) used for offline support.
 
-export const DB_NAME = "leafscan-offline";
+export const DB_NAME = "cropcare-offline";
 export const DB_VERSION = 1;
 
 export const STORE_CONTENT = "content"; // cached reference data (diseases, tips, seasons, quiz)

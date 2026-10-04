@@ -14,8 +14,8 @@ import { lovable } from "@/integrations/lovable";
 export const Route = createFileRoute("/auth")({
   head: () =>
     pageHead(
-      "Sign in to LeafScan | Crop Disease Detection",
-      "Sign in or create a free LeafScan account to scan crops, track treatments and review your diagnosis history.",
+      "Sign in to CropCare | Crop Disease Detection",
+      "Sign in or create a free CropCare account to scan crops, track treatments and review your diagnosis history.",
     ),
   ssr: false,
   beforeLoad: async () => {
@@ -93,7 +93,7 @@ function AuthPage() {
           <span className="grid place-items-center w-9 h-9 rounded-lg bg-white/15">
             <Leaf className="h-4 w-4" />
           </span>
-          LeafScan
+          CropCare
         </Link>
         <div>
           <h2 className="font-serif text-4xl leading-tight">
@@ -103,7 +103,7 @@ function AuthPage() {
             Instant AI diagnosis, treatment plans, and a full detection history — all in one place.
           </p>
         </div>
-        <p className="text-sm opacity-70">© LeafScan</p>
+        <p className="text-sm opacity-70">© CropCare</p>
       </div>
 
       <div className="flex items-center justify-center p-6 md:p-10">
@@ -115,7 +115,7 @@ function AuthPage() {
             <span className="grid place-items-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
               <Leaf className="h-4 w-4" />
             </span>
-            LeafScan
+            CropCare
           </Link>
           <h1 className="font-serif text-3xl font-semibold">Welcome</h1>
           <p className="text-sm text-muted-foreground mt-1">

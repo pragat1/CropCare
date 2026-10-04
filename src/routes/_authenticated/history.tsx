@@ -16,7 +16,7 @@ import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
 export const Route = createFileRoute("/_authenticated/history")({
   head: () =>
     pageHead(
-      "Scan History | LeafScan",
+      "Scan History | CropCare",
       "Review every past leaf scan, its diagnosis, severity and treatment plan, including scans queued while offline.",
     ),
   component: HistoryPage,

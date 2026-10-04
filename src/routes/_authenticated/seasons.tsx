@@ -12,7 +12,7 @@ import { useLibrary, mapSeasons, mapSeasonList } from "@/lib/admin/library";
 export const Route = createFileRoute("/_authenticated/seasons")({
   head: () =>
     pageHead(
-      "Seasonal Crop Calendar | LeafScan",
+      "Seasonal Crop Calendar | CropCare",
       "Season-by-season sowing, care and harvest guidance with the disease risks to watch for in each period.",
     ),
   component: SeasonsPage,
