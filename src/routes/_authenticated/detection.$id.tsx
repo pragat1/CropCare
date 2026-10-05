@@ -29,6 +29,7 @@ import type { DiseaseCandidate, Differential, TreatmentPlan } from "@/lib/ai.ser
 import { RISK_STYLES, type RiskLevel, type WeatherSnapshot } from "@/lib/weather-types";
 import { generateDetectionPdf } from "@/lib/report-pdf";
 import { useProfile } from "@/lib/profile";
+import { MatchingDiseases } from "@/components/matching-diseases";
 
 function WeatherAtScan({
   weather,
@@ -299,6 +300,10 @@ function DetectionPage() {
                   </div>
                 </Card>
               )}
+              <MatchingDiseases
+                crop={d.crop}
+                names={[d.disease ?? "", ...alternatives.map((a) => a.disease)]}
+              />
               {immediate.length > 0 && (
                 <Section
                   title="Do this now"
