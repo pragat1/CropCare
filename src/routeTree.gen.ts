@@ -23,6 +23,7 @@ import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/q
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDiseasesRouteImport } from './routes/_authenticated/diseases'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCropsRouteImport } from './routes/_authenticated/crops'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
@@ -30,11 +31,13 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedSoilIndexRouteImport } from './routes/_authenticated/soil.index'
 import { Route as AuthenticatedDiseasesIndexRouteImport } from './routes/_authenticated/diseases.index'
+import { Route as AuthenticatedCropsIndexRouteImport } from './routes/_authenticated/crops.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedSoilIdRouteImport } from './routes/_authenticated/soil.$id'
 import { Route as AuthenticatedSoilTypesTypeRouteImport } from './routes/_authenticated/soil-types.$type'
 import { Route as AuthenticatedDiseasesSlugRouteImport } from './routes/_authenticated/diseases.$slug'
 import { Route as AuthenticatedDetectionIdRouteImport } from './routes/_authenticated/detection.$id'
+import { Route as AuthenticatedCropsCropRouteImport } from './routes/_authenticated/crops.$crop'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminCategoryRouteImport } from './routes/_authenticated/admin.$category'
 
@@ -107,6 +110,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCropsRoute = AuthenticatedCropsRouteImport.update({
+  id: '/crops',
+  path: '/crops',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
   id: '/assistant',
   path: '/assistant',
@@ -143,6 +151,11 @@ const AuthenticatedDiseasesIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedDiseasesRoute,
   } as any)
+const AuthenticatedCropsIndexRoute = AuthenticatedCropsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedCropsRoute,
+} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -171,6 +184,11 @@ const AuthenticatedDetectionIdRoute =
     path: '/detection/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCropsCropRoute = AuthenticatedCropsCropRouteImport.update({
+  id: '/$crop',
+  path: '/$crop',
+  getParentRoute: () => AuthenticatedCropsRoute,
+} as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -191,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/app': typeof AuthenticatedAppRoute
   '/assistant': typeof AuthenticatedAssistantRoute
+  '/crops': typeof AuthenticatedCropsRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/diseases': typeof AuthenticatedDiseasesRouteWithChildren
   '/history': typeof AuthenticatedHistoryRoute
@@ -204,11 +223,13 @@ export interface FileRoutesByFullPath {
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/crops/$crop': typeof AuthenticatedCropsCropRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/crops/': typeof AuthenticatedCropsIndexRoute
   '/diseases/': typeof AuthenticatedDiseasesIndexRoute
   '/soil/': typeof AuthenticatedSoilIndexRoute
 }
@@ -230,11 +251,13 @@ export interface FileRoutesByTo {
   '/weather': typeof AuthenticatedWeatherRoute
   '/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/crops/$crop': typeof AuthenticatedCropsCropRoute
   '/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/soil/$id': typeof AuthenticatedSoilIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/crops': typeof AuthenticatedCropsIndexRoute
   '/diseases': typeof AuthenticatedDiseasesIndexRoute
   '/soil': typeof AuthenticatedSoilIndexRoute
 }
@@ -248,6 +271,7 @@ export interface FileRoutesById {
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/app': typeof AuthenticatedAppRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
+  '/_authenticated/crops': typeof AuthenticatedCropsRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/diseases': typeof AuthenticatedDiseasesRouteWithChildren
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
@@ -261,11 +285,13 @@ export interface FileRoutesById {
   '/_authenticated/weather': typeof AuthenticatedWeatherRoute
   '/_authenticated/admin/$category': typeof AuthenticatedAdminCategoryRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/crops/$crop': typeof AuthenticatedCropsCropRoute
   '/_authenticated/detection/$id': typeof AuthenticatedDetectionIdRoute
   '/_authenticated/diseases/$slug': typeof AuthenticatedDiseasesSlugRoute
   '/_authenticated/soil-types/$type': typeof AuthenticatedSoilTypesTypeRoute
   '/_authenticated/soil/$id': typeof AuthenticatedSoilIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/crops/': typeof AuthenticatedCropsIndexRoute
   '/_authenticated/diseases/': typeof AuthenticatedDiseasesIndexRoute
   '/_authenticated/soil/': typeof AuthenticatedSoilIndexRoute
 }
@@ -279,6 +305,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/app'
     | '/assistant'
+    | '/crops'
     | '/dashboard'
     | '/diseases'
     | '/history'
@@ -292,11 +319,13 @@ export interface FileRouteTypes {
     | '/weather'
     | '/admin/$category'
     | '/admin/users'
+    | '/crops/$crop'
     | '/detection/$id'
     | '/diseases/$slug'
     | '/soil-types/$type'
     | '/soil/$id'
     | '/admin/'
+    | '/crops/'
     | '/diseases/'
     | '/soil/'
   fileRoutesByTo: FileRoutesByTo
@@ -318,11 +347,13 @@ export interface FileRouteTypes {
     | '/weather'
     | '/admin/$category'
     | '/admin/users'
+    | '/crops/$crop'
     | '/detection/$id'
     | '/diseases/$slug'
     | '/soil-types/$type'
     | '/soil/$id'
     | '/admin'
+    | '/crops'
     | '/diseases'
     | '/soil'
   id:
@@ -335,6 +366,7 @@ export interface FileRouteTypes {
     | '/_authenticated/analytics'
     | '/_authenticated/app'
     | '/_authenticated/assistant'
+    | '/_authenticated/crops'
     | '/_authenticated/dashboard'
     | '/_authenticated/diseases'
     | '/_authenticated/history'
@@ -348,11 +380,13 @@ export interface FileRouteTypes {
     | '/_authenticated/weather'
     | '/_authenticated/admin/$category'
     | '/_authenticated/admin/users'
+    | '/_authenticated/crops/$crop'
     | '/_authenticated/detection/$id'
     | '/_authenticated/diseases/$slug'
     | '/_authenticated/soil-types/$type'
     | '/_authenticated/soil/$id'
     | '/_authenticated/admin/'
+    | '/_authenticated/crops/'
     | '/_authenticated/diseases/'
     | '/_authenticated/soil/'
   fileRoutesById: FileRoutesById
@@ -463,6 +497,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/crops': {
+      id: '/_authenticated/crops'
+      path: '/crops'
+      fullPath: '/crops'
+      preLoaderRoute: typeof AuthenticatedCropsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/assistant': {
       id: '/_authenticated/assistant'
       path: '/assistant'
@@ -512,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDiseasesIndexRouteImport
       parentRoute: typeof AuthenticatedDiseasesRoute
     }
+    '/_authenticated/crops/': {
+      id: '/_authenticated/crops/'
+      path: '/'
+      fullPath: '/crops/'
+      preLoaderRoute: typeof AuthenticatedCropsIndexRouteImport
+      parentRoute: typeof AuthenticatedCropsRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -547,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDetectionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/crops/$crop': {
+      id: '/_authenticated/crops/$crop'
+      path: '/$crop'
+      fullPath: '/crops/$crop'
+      preLoaderRoute: typeof AuthenticatedCropsCropRouteImport
+      parentRoute: typeof AuthenticatedCropsRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -578,6 +633,19 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedCropsRouteChildren {
+  AuthenticatedCropsCropRoute: typeof AuthenticatedCropsCropRoute
+  AuthenticatedCropsIndexRoute: typeof AuthenticatedCropsIndexRoute
+}
+
+const AuthenticatedCropsRouteChildren: AuthenticatedCropsRouteChildren = {
+  AuthenticatedCropsCropRoute: AuthenticatedCropsCropRoute,
+  AuthenticatedCropsIndexRoute: AuthenticatedCropsIndexRoute,
+}
+
+const AuthenticatedCropsRouteWithChildren =
+  AuthenticatedCropsRoute._addFileChildren(AuthenticatedCropsRouteChildren)
 
 interface AuthenticatedDiseasesRouteChildren {
   AuthenticatedDiseasesSlugRoute: typeof AuthenticatedDiseasesSlugRoute
@@ -613,6 +681,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAppRoute: typeof AuthenticatedAppRoute
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
+  AuthenticatedCropsRoute: typeof AuthenticatedCropsRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiseasesRoute: typeof AuthenticatedDiseasesRouteWithChildren
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
@@ -634,6 +703,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAppRoute: AuthenticatedAppRoute,
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
+  AuthenticatedCropsRoute: AuthenticatedCropsRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiseasesRoute: AuthenticatedDiseasesRouteWithChildren,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
