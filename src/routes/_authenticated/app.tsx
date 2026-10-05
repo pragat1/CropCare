@@ -726,6 +726,19 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
         </div>
       )}
 
+      {!healthy && d.disease && (
+        <MatchingDiseases
+          compact
+          crop={d.crop}
+          names={[
+            d.disease,
+            ...(Array.isArray(d.alternatives)
+              ? (d.alternatives as Array<{ disease?: string }>).map((a) => a.disease ?? "")
+              : []),
+          ]}
+        />
+      )}
+
       <div className="mt-6 flex flex-wrap gap-2">
         <Link to="/detection/$id" params={{ id }}>
           <Button className="gap-2">
