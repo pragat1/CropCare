@@ -613,7 +613,10 @@ function DashboardPage() {
                   <Card className="min-w-0 p-6">
                     <h2 className="font-serif text-lg font-semibold">Crops you scan most</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Healthy scan rate per crop.
+                      Healthy scan rate per crop.{" "}
+                      <Link to="/crops" className="font-medium text-primary hover:underline">
+                        Crop profiles →
+                      </Link>
                     </p>
                     {stats.topCrops.length === 0 ? (
                       <div className="mt-6 rounded-xl border border-dashed border-border/70 p-8 text-center text-sm text-muted-foreground">
@@ -624,7 +627,13 @@ function DashboardPage() {
                         {stats.topCrops.map((c) => (
                           <li key={c.name}>
                             <div className="flex items-center justify-between gap-3 text-sm">
-                              <span className="min-w-0 truncate font-medium">{c.name}</span>
+                              <Link
+                                to="/crops/$crop"
+                                params={{ crop: c.name.toLowerCase() }}
+                                className="min-w-0 truncate font-medium hover:text-primary hover:underline"
+                              >
+                                {c.name}
+                              </Link>
                               <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
                                 {c.scans} scan{c.scans === 1 ? "" : "s"} · {c.health}% healthy
                               </span>
