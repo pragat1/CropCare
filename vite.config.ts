@@ -23,14 +23,24 @@ export default defineConfig({
         outDir: "dist/client",
         devOptions: { enabled: false },
         manifest: {
-          name: "LeafScan — AI Crop Disease Detection",
-          short_name: "LeafScan",
+          id: "/",
+          name: "CropCare — AI Crop Disease Detection",
+          short_name: "CropCare",
+          lang: "en",
+          scope: "/",
+          orientation: "portrait",
+          categories: ["agriculture", "productivity", "utilities"],
           description:
             "Diagnose crop diseases from a leaf photo, with offline access to the disease database, tips, seasons and quizzes.",
           theme_color: "#143a26",
           background_color: "#143a26",
           display: "standalone",
-          start_url: "/",
+          start_url: "/dashboard",
+          shortcuts: [
+            { name: "Scan a leaf", short_name: "Scan", url: "/app", icons: [{ src: "/pwa-192.png", sizes: "192x192" }] },
+            { name: "Disease database", short_name: "Diseases", url: "/diseases", icons: [{ src: "/pwa-192.png", sizes: "192x192" }] },
+            { name: "Weather risk", short_name: "Weather", url: "/weather", icons: [{ src: "/pwa-192.png", sizes: "192x192" }] },
+          ],
           icons: [
             { src: "/pwa-192.png", sizes: "192x192", type: "image/png" },
             { src: "/pwa-512.png", sizes: "512x512", type: "image/png" },

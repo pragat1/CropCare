@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { registerOfflineWorker } from "@/lib/offline/sw-register";
 import { startSyncEngine } from "@/lib/offline/sync";
 import { seedOfflineContent } from "@/lib/offline/content-cache";
+import { InstallPrompt } from "@/components/install-prompt";
 
 function NotFoundComponent() {
   return (
@@ -169,6 +170,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <Toaster position="top-right" richColors />
+      <InstallPrompt />
     </QueryClientProvider>
   );
 }

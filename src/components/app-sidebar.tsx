@@ -50,7 +50,7 @@ const MONITOR: NavItem[] = [
 
 const LEARN: NavItem[] = [
   { to: "/diseases", label: "Diseases", icon: BookOpen },
-  { to: "/crops", label: "Crop profiles", icon: Sprout },
+  { to: "/crops", label: "Crop profiles", icon: Leaf },
   { to: "/tips", label: "Tips", icon: Lightbulb },
   { to: "/seasons", label: "Seasons", icon: CalendarDays },
   { to: "/quiz", label: "Quiz", icon: Brain },
