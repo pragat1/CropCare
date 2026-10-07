@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://code-companion-hub-23.lovable.app/sitemap.xml
