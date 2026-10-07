@@ -11,6 +11,16 @@ import { useContentItems } from "@/lib/admin/library";
 import { toDiseaseReference } from "@/lib/disease-references";
 import { findCropProfile } from "@/lib/data/crop-profiles";
 import { pageHead } from "@/lib/seo";
+import { useSignedUrl } from "@/hooks/use-signed-url";
+
+function ScanThumb({ path }: { path: string | null }) {
+  const url = useSignedUrl("leaf-images", path ?? undefined);
+  return (
+    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
+      {url && <img src={url} alt="Your scanned leaf" className="h-full w-full object-cover" loading="lazy" />}
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/crops/$crop")({
   head: () =>
@@ -31,7 +41,7 @@ function CropProfilePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("detections")
-        .select("id, crop, disease, is_healthy, severity, symptoms, created_at")
+        .select("id, crop, disease, is_healthy, severity, symptoms, created_at, image_path")
         .ilike("crop", `%${key}%`)
         .order("created_at", { ascending: false })
         .limit(30);
@@ -165,9 +175,12 @@ function CropProfilePage() {
                           </span>
                         )}
                       </Link>
-                      {sym.length > 0 && (
-                        <p className="mt-1 text-sm text-muted-foreground">{sym.slice(0, 2).join(" · ")}</p>
-                      )}
+                      <div className="mt-2 flex gap-3">
+                        <ScanThumb path={s.image_path} />
+                        {sym.length > 0 && (
+                          <p className="text-sm text-muted-foreground">{sym.slice(0, 2).join(" · ")}</p>
+                        )}
+                      </div>
                     </li>
                   );
                 })}
