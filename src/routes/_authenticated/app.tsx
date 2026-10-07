@@ -42,6 +42,7 @@ import { saveScans } from "@/lib/offline/scan-cache";
 import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
 import { useSignedUrl } from "@/hooks/use-signed-url";
 import { RISK_STYLES, type RiskLevel } from "@/lib/weather-types";
+import { MatchingDiseases } from "@/components/matching-diseases";
 
 const CROPS = [
   "Tomato",
