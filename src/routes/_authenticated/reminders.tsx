@@ -35,6 +35,7 @@ import {
 } from "@/lib/reminders";
 
 export const Route = createFileRoute("/_authenticated/reminders")({
+  staticData: { sitemap: false },
   component: RemindersPage,
   head: () =>
     pageHead(

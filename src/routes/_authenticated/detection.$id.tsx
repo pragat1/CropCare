@@ -81,6 +81,7 @@ function WeatherAtScan({
 }
 
 export const Route = createFileRoute("/_authenticated/detection/$id")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Detection Report | CropCare",

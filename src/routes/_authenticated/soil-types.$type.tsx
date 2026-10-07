@@ -10,6 +10,7 @@ import { SOIL_IMAGES, SOIL_SLUGS } from "@/lib/data/soil-images";
 import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/soil-types/$type")({
+  staticData: { sitemap: false },
   head: ({ params }) => {
     const name = SOIL_SLUGS[params.type.toLowerCase()];
     if (!name) return pageHead("Soil type | CropCare", "Soil type reference guide from CropCare.");

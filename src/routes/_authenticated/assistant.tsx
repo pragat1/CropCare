@@ -46,6 +46,7 @@ import type { AssistantRisk } from "@/lib/assistant.server";
 import { startRecording, blobToBase64, type Recorder } from "@/lib/audio-client";
 
 export const Route = createFileRoute("/_authenticated/assistant")({
+  staticData: { sitemap: false },
   component: AssistantPage,
   head: () => ({
     meta: [

@@ -14,6 +14,7 @@ import { readScans, saveScans, type CachedScan } from "@/lib/offline/scan-cache"
 import { usePendingQueue, useSyncStatus } from "@/hooks/use-offline";
 
 export const Route = createFileRoute("/_authenticated/history")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Scan History | CropCare",

@@ -30,6 +30,7 @@ import {
 } from "@/lib/profile";
 
 export const Route = createFileRoute("/_authenticated/settings")({
+  staticData: { sitemap: false },
   component: SettingsPage,
   head: () =>
     pageHead(

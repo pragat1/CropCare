@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
+  staticData: { sitemap: false },
   component: AdminUsersPage,
   head: () =>
     pageHead("User Management | CropCare Admin", "Administer CropCare accounts and roles."),

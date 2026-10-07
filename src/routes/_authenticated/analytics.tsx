@@ -44,6 +44,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
+  staticData: { sitemap: false },
   component: AnalyticsPage,
   head: () => ({
     meta: [

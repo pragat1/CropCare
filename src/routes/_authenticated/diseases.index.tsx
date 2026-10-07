@@ -11,6 +11,7 @@ import { toDiseaseReference } from "@/lib/disease-references";
 import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/diseases/")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Disease Database | CropCare",

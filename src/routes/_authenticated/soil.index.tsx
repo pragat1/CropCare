@@ -29,6 +29,7 @@ import { PageHeader } from "@/components/page-header";
 import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/soil/")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Soil Analysis | CropCare",

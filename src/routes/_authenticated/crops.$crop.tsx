@@ -23,6 +23,7 @@ function ScanThumb({ path }: { path: string | null }) {
 }
 
 export const Route = createFileRoute("/_authenticated/crops/$crop")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Crop Profile | CropCare",

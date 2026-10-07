@@ -53,6 +53,7 @@ import {
 } from "@/lib/admin/schema";
 
 export const Route = createFileRoute("/_authenticated/admin/$category")({
+  staticData: { sitemap: false },
   beforeLoad: ({ params }) => {
     if (!isCategory(params.category)) throw notFound();
   },

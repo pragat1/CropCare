@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FadeIn, Stagger, StaggerItem, GlassCard } from "@/components/motion";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () =>
     pageHead(
       "CropCare — AI Crop Disease Detection for Farmers",

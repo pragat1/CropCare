@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: true },
   head: () =>
     pageHead(
       "Sign in to CropCare | Crop Disease Detection",

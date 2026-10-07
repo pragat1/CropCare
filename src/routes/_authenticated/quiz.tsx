@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/quiz")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Farming Knowledge Quiz | CropCare",
