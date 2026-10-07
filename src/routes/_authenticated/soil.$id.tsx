@@ -12,6 +12,7 @@ import { AppShell } from "@/components/app-shell";
 import { SOIL_GUIDE } from "@/lib/data/soil-guide";
 
 export const Route = createFileRoute("/_authenticated/soil/$id")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Soil Report | CropCare",

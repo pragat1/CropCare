@@ -10,6 +10,7 @@ import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapTips } from "@/lib/admin/library";
 
 export const Route = createFileRoute("/_authenticated/tips")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Farming Tips & Best Practices | CropCare",

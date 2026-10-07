@@ -43,6 +43,7 @@ const DistributionChart = lazy(() =>
 );
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  staticData: { sitemap: false },
   component: DashboardPage,
   head: () => ({
     meta: [

@@ -61,6 +61,7 @@ const CROPS = [
 ];
 
 export const Route = createFileRoute("/_authenticated/app")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Detect Disease — Analyze Your Crop | CropCare",

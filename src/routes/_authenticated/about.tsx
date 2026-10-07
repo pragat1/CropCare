@@ -15,6 +15,7 @@ import {
 import { Stagger, StaggerItem, FadeIn } from "@/components/motion";
 
 export const Route = createFileRoute("/_authenticated/about")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "About CropCare | AI Crop Health Platform",

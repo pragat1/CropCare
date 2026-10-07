@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useIsAdmin } from "@/hooks/use-admin";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  staticData: { sitemap: false },
   component: AdminLayout,
 });
 

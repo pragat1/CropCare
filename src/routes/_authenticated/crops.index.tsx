@@ -5,6 +5,7 @@ import { CROP_PROFILES } from "@/lib/data/crop-profiles";
 import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/_authenticated/crops/")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Crop Profiles | CropCare",

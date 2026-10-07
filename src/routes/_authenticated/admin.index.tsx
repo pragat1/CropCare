@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, CATEGORY_DEFS } from "@/lib/admin/schema";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
+  staticData: { sitemap: false },
   component: AdminHome,
   head: () => ({
     meta: [

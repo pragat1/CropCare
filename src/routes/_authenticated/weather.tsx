@@ -14,6 +14,7 @@ import { WeatherPanel, useWeatherIntel } from "@/components/weather-panel";
 import { CROP_LIST } from "@/lib/data/crops";
 
 export const Route = createFileRoute("/_authenticated/weather")({
+  staticData: { sitemap: false },
   component: WeatherPage,
   head: () => ({
     meta: [

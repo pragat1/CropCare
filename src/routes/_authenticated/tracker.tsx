@@ -24,6 +24,7 @@ import { CROP_LIST } from "@/lib/data/crops";
 import { PageHeader } from "@/components/page-header";
 
 export const Route = createFileRoute("/_authenticated/tracker")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Treatment Progress Tracker | CropCare",

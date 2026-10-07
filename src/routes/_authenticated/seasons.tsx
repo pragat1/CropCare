@@ -10,6 +10,7 @@ import { useOfflineData } from "@/hooks/use-offline";
 import { useLibrary, mapSeasons, mapSeasonList } from "@/lib/admin/library";
 
 export const Route = createFileRoute("/_authenticated/seasons")({
+  staticData: { sitemap: false },
   head: () =>
     pageHead(
       "Seasonal Crop Calendar | CropCare",
