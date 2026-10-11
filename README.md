@@ -79,3 +79,167 @@ Designed with an **offline-first philosophy**, CropCare automatically caches cri
 │  • Speech Transcription/TTS  │ │  • Private AES-256 Storage Buckets         │
 │  • Microclimate Analysis     │ │  • Role-Based Access Control (RBAC)        │
 └──────────────────────────────┘ └────────────────────────────────────────────┘
+```
+
+### Component Hierarchy
+
+| Module | Route / File Path | Description |
+| :--- | :--- | :--- |
+| **Detect Disease** | `/app` | Live leaf upload, camera capture, crop selector, and AI differential cards |
+| **Dashboard** | `/dashboard` | KPI summaries, scan trends, disease distribution chart, and weather widget |
+| **Disease Library** | `/diseases` | 28 verified disease reference dossiers across 12 global crops |
+| **Crop Profiles** | `/crops/$crop` | Growth stages, climate requirements, and user symptom timeline |
+| **Soil Analysis** | `/soil` | Soil texture diagnostics, fertility assessment, and amendment guidance |
+| **Weather Risk** | `/weather` | Atmospheric condition tracking, disease risk score, and spraying windows |
+| **Voice Assistant** | `/assistant` | Multimodal conversational advisor in English, Hindi, and Punjabi |
+| **Treatment Tracker** | `/tracker` | 7/14/21-day treatment follow-up scheduler and recovery tracking |
+
+---
+
+## 💻 Tech Stack
+
+### Frontend & Application Layer
+* **Framework:** [TanStack Start v1](https://tanstack.com/start) with React 19
+* **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) with native semantic design tokens
+* **UI Components:** [Radix UI Primitives](https://www.radix-ui.com/) + [Lucide React](https://lucide.dev/)
+* **State & Data Fetching:** [TanStack Query v5](https://tanstack.com/query) & [TanStack Router](https://tanstack.com/router)
+* **Form & Data Validation:** [Zod](https://zod.dev/) + React Hook Form
+* **Visualizations & Charts:** [Recharts](https://recharts.org/)
+* **PDF Engine:** [jsPDF](https://github.com/parallax/jsPDF)
+
+### Backend & Cloud Infrastructure
+* **Runtime:** Cloudflare Workers (`workerd` Edge runtime)
+* **API Paradigm:** Typed Server Functions (`createServerFn`)
+* **Database:** Managed PostgreSQL with Row-Level Security (RLS)
+* **Authentication:** Supabase Auth (Secure Email/Password & Google OAuth)
+* **Object Storage:** Private encrypted buckets with time-limited signed URLs
+* **Weather API:** Open-Meteo REST API (zero-key atmospheric modeling)
+
+---
+
+## 🔒 Security & Data Governance
+
+1. **Strict Row-Level Security (RLS):**
+   * Every database table enforces RLS. Farmers can only query, modify, or view their own scan records, reminders, and profile details.
+2. **Private Storage with Signed URLs:**
+   * Leaf and soil photos are stored in private, unlisted buckets (`leaf-images`, `soil-images`). Images are rendered using short-lived cryptographically signed tokens.
+3. **Role-Based Content Administration (RBAC):**
+   * Reference content modification is gated behind a database-level `has_role(auth.uid(), 'admin')` security-definer function, preventing unauthorized catalog edits.
+4. **Client-Side Compression:**
+   * High-resolution camera photos are resized and compressed client-side prior to transfer, minimizing edge bandwidth and upload latency in low-bandwidth regions.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+* **Node.js:** `>= 20.x` (or **Bun:** `>= 1.1.x`)
+* **Package Manager:** `npm` or `bun`
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/<your-username>/cropcare.git
+cd cropcare
+```
+
+### 2. Install Dependencies
+```bash
+Using Bun (Recommended)
+bun install
+
+Or using npm
+npm install
+```
+
+### 3. Configure Environment Variables
+Create a `.env` file in the project root:
+```env
+VITE_SUPABASE_URL=https://<your-project-ref>.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
+VITE_SUPABASE_PROJECT_ID=<your-project-id>
+```
+
+### 4. Start the Local Development Server
+```bash
+Using Bun
+bun run dev
+
+Or using npm
+npm run dev
+```
+Open [http://localhost:8080](http://localhost:8080) in your browser.
+
+### 5. Build for Production
+```bash
+bun run build
+Or
+npm run build
+```
+
+---
+
+## 📊 Database Schema Highlights
+
+```sql
+-- Detections: Stores in-depth multimodal AI diagnosis
+CREATE TABLE public.detections (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  crop TEXT NOT NULL,
+  disease TEXT NOT NULL,
+  is_healthy BOOLEAN DEFAULT false,
+  confidence NUMERIC(5,2) NOT NULL,
+  severity TEXT CHECK (severity IN ('Low', 'Moderate', 'High', 'Critical')),
+  symptoms TEXT[],
+  organic_treatment TEXT[],
+  chemical_treatment TEXT[],
+  preventive_measures TEXT[],
+  image_path TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Content Items: Curated reference catalog for diseases & treatments
+CREATE TABLE public.content_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  category TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  scientific_name TEXT,
+  crop TEXT,
+  data JSONB NOT NULL,
+  published BOOLEAN DEFAULT true,
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [x] Multimodal Leaf Disease Detection with Top-3 Differentials
+- [x] Curated Disease Reference Library with 28 dossiers across 12 crops
+- [x] Soil Texture and Chemical Fertility AI Diagnosis
+- [x] Open-Meteo Weather Integration & Disease Outbreak Risk Score
+- [x] PWA Offline Scanning Queue & Local IndexedDB Sync
+- [x] Multilingual Voice Assistant (English, Hindi, Punjabi)
+- [ ] Direct Agronomist Tele-consultation Escalation Flow
+- [ ] Drone & Multi-Spectrum NDVI Imagery Ingestion
+
+---
+
+## 📄 License
+
+This project is open-source and distributed under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ to protect global food security and empower agricultural communities.</sub>
+</div>
+
+---
+
+How to use this:
+1. Open or create `README.md` in the root of your repository.
+2. Replace `<your-username>` with your GitHub handle.
+3. Commit and push to GitHub — GitHub will immediately render the formatted badges, architecture diagram, and tables cleanly on your repo home page.
