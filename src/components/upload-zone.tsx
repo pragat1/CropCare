@@ -1,7 +1,9 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ALLOWED_MIMES } from "@/lib/image-client";
+import { useRasterPreview } from "@/hooks/use-raster-preview";
 
 type Props = {
   label?: string;
@@ -23,23 +25,26 @@ export function UploadZone({
   ariaLabel,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const { preview, showPreview, clearPreview } = useRasterPreview();
 
-  function pick(f: File | null) {
+  async function pick(f: File | null) {
     if (!f) return;
-    if (!f.type.startsWith("image/")) {
-      toast.error("Please choose an image file");
+    if (!ALLOWED_MIMES.includes(f.type)) {
+      toast.error("Only JPG, PNG or WebP images are supported");
       return;
     }
     if (f.size > maxMB * 1024 * 1024) {
       toast.error(`Image larger than ${maxMB}MB`);
       return;
     }
-    setPreview(URL.createObjectURL(f));
-    onFile(f);
+    try {
+      if (await showPreview(f)) onFile(f);
+    } catch {
+      toast.error("Could not prepare this image preview. Please choose another image.");
+    }
   }
   function clear() {
-    setPreview(null);
+    clearPreview();
     onFile(null);
     if (inputRef.current) inputRef.current.value = "";
   }

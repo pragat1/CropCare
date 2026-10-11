@@ -35,6 +35,7 @@ import { FadeIn } from "@/components/motion";
 import { DISEASES } from "@/lib/data/diseases";
 import { supabase } from "@/integrations/supabase/client";
 import { compressImage, validateImageFile } from "@/lib/image-client";
+import { useRasterPreview } from "@/hooks/use-raster-preview";
 import {
   askAssistant,
   speakText,
@@ -148,13 +149,19 @@ function AssistantPage() {
   const [followUps, setFollowUps] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const {
+    preview: photoPreview,
+    showPreview: showPhotoPreview,
+    clearPreview: clearPhotoPreview,
+    releasePreview: releasePhotoPreview,
+  } = useRasterPreview();
   const [showHistory, setShowHistory] = useState(false);
 
   const recorderRef = useRef<Recorder | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const retainedPreviewUrls = useRef(new Set<string>());
 
   const history = useQuery({
     queryKey: ["assistant-history"],
@@ -170,21 +177,35 @@ function AssistantPage() {
     },
     [],
   );
+  useEffect(
+    () => () => {
+      retainedPreviewUrls.current.forEach((url) => URL.revokeObjectURL(url));
+    },
+    [],
+  );
 
-  function pickPhoto(f: File | null) {
+  async function pickPhoto(f: File | null) {
     if (!f) return;
     const err = validateImageFile(f);
     if (err) {
       toast.error(err);
       return;
     }
-    setPhoto(f);
-    setPhotoPreview(URL.createObjectURL(f));
+    try {
+      if (await showPhotoPreview(f)) setPhoto(f);
+    } catch {
+      toast.error("Could not prepare this image preview. Please choose another image.");
+    }
   }
 
-  function clearPhoto() {
+  function clearPhoto(retainPreview = false) {
     setPhoto(null);
-    setPhotoPreview(null);
+    if (retainPreview) {
+      const url = releasePhotoPreview();
+      if (url) retainedPreviewUrls.current.add(url);
+    } else {
+      clearPhotoPreview();
+    }
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -226,7 +247,7 @@ function AssistantPage() {
     try {
       const imagePath = await uploadPhoto();
       setMessages((m) => [...m, { role: "user", content: asked, imageUrl: localPreview }]);
-      clearPhoto();
+      clearPhoto(true);
       const res = await ask({
         data: { question: asked, lang, history: history6, ...(imagePath ? { imagePath } : {}) },
       });

@@ -34,6 +34,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { analyzeDetection } from "@/lib/detect.functions";
 import { AppShell } from "@/components/app-shell";
 import { compressImage, validateImageFile } from "@/lib/image-client";
+import { useRasterPreview } from "@/hooks/use-raster-preview";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
 import { useWeatherIntel } from "@/components/weather-panel";
@@ -81,7 +82,7 @@ function DetectPage() {
   const analyze = useServerFn(analyzeDetection);
   const [crop, setCrop] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const { preview, showPreview, clearPreview } = useRasterPreview();
   const [resultId, setResultId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const weather = useWeatherIntel(crop || "Tomato");
@@ -194,23 +195,27 @@ function DetectPage() {
 
   function reset() {
     setFile(null);
-    setPreview(null);
+    clearPreview();
     setResultId(null);
     mutation.reset();
     if (inputRef.current) inputRef.current.value = "";
   }
 
-  function onPick(f: File | null) {
+  async function onPick(f: File | null) {
     if (!f) return;
     const err = validateImageFile(f);
     if (err) {
       toast.error(err);
       return;
     }
-    setResultId(null);
-    mutation.reset();
-    setFile(f);
-    setPreview(URL.createObjectURL(f));
+    try {
+      if (!(await showPreview(f))) return;
+      setResultId(null);
+      mutation.reset();
+      setFile(f);
+    } catch {
+      toast.error("Could not prepare this image preview. Please choose another image.");
+    }
   }
 
   const analyzing = mutation.isPending;

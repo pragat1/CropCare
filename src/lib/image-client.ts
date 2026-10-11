@@ -10,6 +10,37 @@ export function validateImageFile(f: File): string | null {
   return null;
 }
 
+export async function createRasterPreview(file: File): Promise<string> {
+  const bitmap = await createImageBitmap(file);
+  try {
+    const maxEdge = 1600;
+    const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas =
+      typeof OffscreenCanvas !== "undefined"
+        ? new OffscreenCanvas(width, height)
+        : Object.assign(document.createElement("canvas"), { width, height });
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Could not prepare the image preview");
+    context.drawImage(bitmap, 0, 0, width, height);
+
+    const blob =
+      "convertToBlob" in canvas
+        ? await canvas.convertToBlob({ type: "image/png" })
+        : await new Promise<Blob>((resolve, reject) => {
+            (canvas as HTMLCanvasElement).toBlob(
+              (result) =>
+                result ? resolve(result) : reject(new Error("Could not prepare the image preview")),
+              "image/png",
+            );
+          });
+    return URL.createObjectURL(blob);
+  } finally {
+    bitmap.close();
+  }
+}
+
 /**
  * Downscale to at most `maxEdge` px on the longest side and re-encode as JPEG.
  * Skips work when the file is already small enough.
