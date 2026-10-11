@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { ArrowLeft, ArrowRight, CloudSun, Droplets, Sun, Thermometer, Layers, FlaskConical } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CloudSun,
+  Droplets,
+  Sun,
+  Thermometer,
+  Layers,
+  FlaskConical,
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +26,14 @@ function ScanThumb({ path }: { path: string | null }) {
   const url = useSignedUrl("leaf-images", path ?? undefined);
   return (
     <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-      {url && <img src={url} alt="Your scanned leaf" className="h-full w-full object-cover" loading="lazy" />}
+      {url && (
+        <img
+          src={url}
+          alt="Your scanned leaf"
+          className="h-full w-full object-cover"
+          loading="lazy"
+        />
+      )}
     </div>
   );
 }
@@ -98,7 +114,9 @@ function CropProfilePage() {
         </header>
 
         <section className="mt-8" aria-labelledby="climate">
-          <h2 id="climate" className="font-serif text-2xl">Ideal climate</h2>
+          <h2 id="climate" className="font-serif text-2xl">
+            Ideal climate
+          </h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {climate.map(({ icon: Icon, label, value }) => (
               <Card key={label} className="flex items-start gap-3 p-4">
@@ -118,7 +136,9 @@ function CropProfilePage() {
         </section>
 
         <section className="mt-10" aria-labelledby="stages">
-          <h2 id="stages" className="font-serif text-2xl">Growth stages</h2>
+          <h2 id="stages" className="font-serif text-2xl">
+            Growth stages
+          </h2>
           <ol className="mt-4 grid gap-3 md:grid-cols-5">
             {profile.stages.map((s, i) => (
               <li key={s.name} className="rounded-lg border border-border bg-card p-4">
@@ -137,7 +157,9 @@ function CropProfilePage() {
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
           <section aria-labelledby="timeline">
-            <h2 id="timeline" className="font-serif text-2xl">Your symptoms timeline</h2>
+            <h2 id="timeline" className="font-serif text-2xl">
+              Your symptoms timeline
+            </h2>
             {scans.isPending ? (
               <Skeleton className="mt-4 h-40 w-full" />
             ) : scans.isError ? (
@@ -162,7 +184,9 @@ function CropProfilePage() {
                         aria-hidden
                       />
                       <time className="text-xs text-muted-foreground">
-                        {new Date(s.created_at).toLocaleDateString(undefined, { dateStyle: "medium" })}
+                        {new Date(s.created_at).toLocaleDateString(undefined, {
+                          dateStyle: "medium",
+                        })}
                       </time>
                       <Link
                         to="/detection/$id"
@@ -179,7 +203,9 @@ function CropProfilePage() {
                       <div className="mt-2 flex gap-3">
                         <ScanThumb path={s.image_path} />
                         {sym.length > 0 && (
-                          <p className="text-sm text-muted-foreground">{sym.slice(0, 2).join(" · ")}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {sym.slice(0, 2).join(" · ")}
+                          </p>
                         )}
                       </div>
                     </li>
@@ -190,7 +216,9 @@ function CropProfilePage() {
           </section>
 
           <section aria-labelledby="known">
-            <h2 id="known" className="font-serif text-2xl">Known diseases</h2>
+            <h2 id="known" className="font-serif text-2xl">
+              Known diseases
+            </h2>
             {diseases.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">
                 No Disease Database entries for this crop yet.
@@ -206,7 +234,12 @@ function CropProfilePage() {
                     >
                       <span className="h-12 w-16 shrink-0 overflow-hidden rounded-md bg-secondary">
                         {d.imageUrl && (
-                          <img src={d.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
+                          <img
+                            src={d.imageUrl}
+                            alt=""
+                            loading="lazy"
+                            className="h-full w-full object-cover"
+                          />
                         )}
                       </span>
                       <span className="min-w-0 flex-1">

@@ -37,9 +37,24 @@ export default defineConfig({
           display: "standalone",
           start_url: "/dashboard",
           shortcuts: [
-            { name: "Scan a leaf", short_name: "Scan", url: "/app", icons: [{ src: "/pwa-192.png", sizes: "192x192" }] },
-            { name: "Disease database", short_name: "Diseases", url: "/diseases", icons: [{ src: "/pwa-192.png", sizes: "192x192" }] },
-            { name: "Weather risk", short_name: "Weather", url: "/weather", icons: [{ src: "/pwa-192.png", sizes: "192x192" }] },
+            {
+              name: "Scan a leaf",
+              short_name: "Scan",
+              url: "/app",
+              icons: [{ src: "/pwa-192.png", sizes: "192x192" }],
+            },
+            {
+              name: "Disease database",
+              short_name: "Diseases",
+              url: "/diseases",
+              icons: [{ src: "/pwa-192.png", sizes: "192x192" }],
+            },
+            {
+              name: "Weather risk",
+              short_name: "Weather",
+              url: "/weather",
+              icons: [{ src: "/pwa-192.png", sizes: "192x192" }],
+            },
           ],
           icons: [
             { src: "/pwa-192.png", sizes: "192x192", type: "image/png" },
