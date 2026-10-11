@@ -159,6 +159,17 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<your-publishable-key>
 VITE_SUPABASE_PROJECT_ID=<your-project-id>
 ```
 
+### Supabase Password Recovery Setup
+In the Supabase dashboard, set **Authentication → URL Configuration → Site URL** to the deployed
+application origin. Add each deployed site's exact `https://<host>/reset-password` URL to the
+**Redirect URLs** allowlist; for local development, also allow `http://localhost:8080/reset-password`.
+
+Under **Authentication → Email → Templates → Reset Password**, keep the link pointed at
+`{{ .ConfirmationURL }}` so Supabase verifies the recovery token before redirecting to the app.
+The app relies on Supabase's `PASSWORD_RECOVERY` event and does not change email-confirmation
+settings. If the recovery email template or redirect allowlist is not configured, email links may
+not return to the reset page.
+
 ### 4. Start the Local Development Server
 ```bash
 Using Bun

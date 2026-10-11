@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
+import { clearPasswordRecoveryMarker, getPasswordRecoveryUserId } from "@/lib/password-recovery";
 
 export const Route = createFileRoute("/auth")({
   staticData: { sitemap: true },
@@ -23,7 +24,12 @@ export const Route = createFileRoute("/auth")({
     // Revalidate instead of trusting stored session, otherwise a stale token
     // ping-pongs between /auth and the protected gate.
     const { data, error } = await supabase.auth.getUser();
-    if (!error && data.user) throw redirect({ to: "/dashboard" });
+    if (!error && data.user) {
+      const recoveryUserId = getPasswordRecoveryUserId();
+      if (recoveryUserId === data.user.id) throw redirect({ to: "/reset-password" });
+      if (recoveryUserId) clearPasswordRecoveryMarker();
+      throw redirect({ to: "/dashboard" });
+    }
   },
   component: AuthPage,
 });
@@ -36,6 +42,7 @@ const credsSchema = z.object({
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -123,7 +130,13 @@ function AuthPage() {
             Sign in or create an account to start scanning.
           </p>
 
-          <Tabs defaultValue="signin" className="mt-6">
+          <Tabs
+            value={mode}
+            onValueChange={(value) => {
+              if (value === "signin" || value === "signup") setMode(value);
+            }}
+            className="mt-6"
+          >
             <TabsList className="grid grid-cols-2 w-full">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
               <TabsTrigger value="signup">Sign up</TabsTrigger>
@@ -151,6 +164,16 @@ function AuthPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+                {mode === "signin" && (
+                  <div className="flex justify-end">
+                    <Link
+                      to="/forgot-password"
+                      className="text-sm text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                )}
                 <Button className="w-full" disabled={loading} onClick={() => handleAuth(mode)}>
                   {mode === "signin" ? "Sign in" : "Create account"}
                 </Button>

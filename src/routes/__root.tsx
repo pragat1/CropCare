@@ -18,6 +18,7 @@ import { registerOfflineWorker } from "@/lib/offline/sw-register";
 import { startSyncEngine } from "@/lib/offline/sync";
 import { seedOfflineContent } from "@/lib/offline/content-cache";
 import { InstallPrompt } from "@/components/install-prompt";
+import { clearPasswordRecoveryMarker, markPasswordRecovery } from "@/lib/password-recovery";
 
 function NotFoundComponent() {
   return (
@@ -147,7 +148,12 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        if (session?.user.id) markPasswordRecovery(session.user.id);
+        return;
+      }
+      if (event === "SIGNED_OUT") clearPasswordRecoveryMarker();
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
