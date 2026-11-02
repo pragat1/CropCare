@@ -106,10 +106,34 @@ function SettingsPage() {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setLocating(false);
-        set("farm_lat", +pos.coords.latitude.toFixed(4));
-        set("farm_lng", +pos.coords.longitude.toFixed(4));
-        toast.success("Coordinates captured — remember to save.");
+        const lat = +pos.coords.latitude.toFixed(4);
+        const lng = +pos.coords.longitude.toFixed(4);
+        set("farm_lat", lat);
+        set("farm_lng", lng);
+        // Auto-name the farm place from coordinates when the field is blank,
+        // so location-aware features never show a placeholder.
+        const needsName = !form.farm_place?.trim();
+        const geocode = needsName
+          ? fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=en`,
+            )
+              .then((r) => (r.ok ? r.json() : null))
+              .then((d) => {
+                const name = [d?.locality || d?.city, d?.principalSubdivision]
+                  .filter(Boolean)
+                  .join(", ");
+                if (name) set("farm_place", name);
+              })
+              .catch(() => undefined)
+          : Promise.resolve();
+        geocode.finally(() => {
+          setLocating(false);
+          toast.success(
+            needsName
+              ? "Location captured and named — remember to save."
+              : "Coordinates captured — remember to save.",
+          );
+        });
       },
       () => {
         setLocating(false);

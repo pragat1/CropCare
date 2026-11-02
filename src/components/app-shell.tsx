@@ -27,6 +27,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     ).length;
   }, [reminders]);
 
+  // Show the place name, falling back to the saved coordinates — never a
+  // misleading "Add farm location" once the farmer has shared their location.
+  const locationLabel = profile?.farm_place
+    ? profile.farm_place
+    : profile?.farm_lat != null && profile?.farm_lng != null
+      ? `${Math.abs(profile.farm_lat).toFixed(2)}° ${profile.farm_lat >= 0 ? "N" : "S"}, ${Math.abs(profile.farm_lng).toFixed(2)}° ${profile.farm_lng >= 0 ? "E" : "W"}`
+      : "Add farm location";
+
   async function signOut() {
     await qc.cancelQueries();
     qc.clear();
@@ -47,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               className="flex min-w-0 items-center gap-1.5 rounded-full border border-border/50 bg-card/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
-              <span className="truncate">{profile?.farm_place ?? "Add farm location"}</span>
+              <span className="truncate">{locationLabel}</span>
             </Link>
             <div className="ml-auto flex items-center gap-2">
               <SyncStatus className="hidden sm:flex" />
