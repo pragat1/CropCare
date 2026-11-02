@@ -29,9 +29,10 @@ export function DiseaseReferenceImage({
           className="h-full w-full object-cover transition-transform duration-500 motion-safe:group-hover:scale-[1.025]"
         />
       ) : (
-        <div className="flex h-full flex-col items-center justify-center gap-3 px-5 text-center text-muted-foreground">
+        <div className="flex h-full flex-col items-center justify-center gap-2 px-5 text-center text-muted-foreground">
           <ImageOff aria-hidden className="h-9 w-9 opacity-60" strokeWidth={1.5} />
-          <span className="text-sm font-medium">Reference image unavailable</span>
+          <span className="text-sm font-medium">No reference photo yet</span>
+          <span className="text-xs">Symptoms are described in full on the detail page.</span>
         </div>
       )}
     </div>
