@@ -9,6 +9,7 @@ export type CachedScan = {
   confidence: number | null;
   severity: string | null;
   summary: string | null;
+  is_sample?: boolean;
   created_at: string;
 };
 

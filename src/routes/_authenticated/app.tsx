@@ -18,6 +18,8 @@ import {
   ArrowRight,
   CloudOff,
   Clock,
+  Sprout,
+  FlaskConical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,6 +32,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { TreatmentPlan } from "@/lib/ai.server";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeDetection } from "@/lib/detect.functions";
 import { AppShell } from "@/components/app-shell";
@@ -94,7 +98,7 @@ function DetectPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("detections")
-        .select("id, crop, disease, is_healthy, confidence, severity, created_at, image_path")
+        .select("id, crop, disease, is_healthy, confidence, severity, created_at, image_path, is_sample")
         .order("created_at", { ascending: false })
         .limit(4);
       if (error) throw error;
@@ -542,6 +546,7 @@ type RecentRow = {
   severity: string | null;
   created_at: string;
   image_path: string | null;
+  is_sample: boolean | null;
 };
 
 function RecentScans({
@@ -617,6 +622,7 @@ function ScanRow({ row }: { row: RecentRow }) {
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
+        {row.is_sample && <Badge variant="secondary">Sample</Badge>}
         {row.severity && !row.is_healthy && (
           <Badge variant="outline" className="capitalize">
             {row.severity}
@@ -625,6 +631,89 @@ function ScanRow({ row }: { row: RecentRow }) {
         {typeof row.confidence === "number" && <Badge variant="secondary">{row.confidence}%</Badge>}
       </div>
     </Card>
+  );
+}
+
+function PlanItem({ plan }: { plan: TreatmentPlan }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-muted/20 p-3 text-sm">
+      <p className="font-medium">
+        {plan.name}
+        {plan.active_ingredient ? (
+          <span className="font-normal text-muted-foreground"> · {plan.active_ingredient}</span>
+        ) : null}
+      </p>
+      {(plan.dosage || plan.frequency) && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          {[plan.dosage, plan.frequency].filter(Boolean).join(" · ")}
+        </p>
+      )}
+      {plan.precautions && (
+        <p className="mt-1.5 text-xs text-warning">Safety: {plan.precautions}</p>
+      )}
+    </div>
+  );
+}
+
+function TreatmentTabs({
+  organicPlans,
+  chemicalPlans,
+  organicList,
+  chemicalList,
+}: {
+  organicPlans: TreatmentPlan[];
+  chemicalPlans: TreatmentPlan[];
+  organicList: string[];
+  chemicalList: string[];
+}) {
+  const organicSimple = organicPlans.length === 0 ? organicList : [];
+  const chemicalSimple = chemicalPlans.length === 0 ? chemicalList : [];
+  return (
+    <Tabs defaultValue="organic">
+      <TabsList aria-label="Treatment type">
+        <TabsTrigger value="organic" className="gap-1.5">
+          <Sprout className="h-3.5 w-3.5" aria-hidden /> Organic
+        </TabsTrigger>
+        <TabsTrigger value="chemical" className="gap-1.5">
+          <FlaskConical className="h-3.5 w-3.5" aria-hidden /> Chemical
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="organic" className="mt-3 space-y-2">
+        {organicPlans.map((p, i) => (
+          <PlanItem key={i} plan={p} />
+        ))}
+        {organicSimple.map((t, i) => (
+          <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden />
+            {t}
+          </div>
+        ))}
+        {organicPlans.length === 0 && organicSimple.length === 0 && (
+          <p className="text-sm text-muted-foreground">No organic suggestions for this result.</p>
+        )}
+      </TabsContent>
+      <TabsContent value="chemical" className="mt-3 space-y-2">
+        {chemicalPlans.map((p, i) => (
+          <PlanItem key={i} plan={p} />
+        ))}
+        {chemicalSimple.map((t, i) => (
+          <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden />
+            {t}
+          </div>
+        ))}
+        {chemicalPlans.length === 0 && chemicalSimple.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            No chemical suggestions for this result — organic options may be sufficient.
+          </p>
+        )}
+        <p className="rounded-lg border border-border/60 bg-muted/30 p-3 text-xs text-muted-foreground">
+          Pesticide safety: always follow the product label and local regulations, wear protective
+          gear while spraying, never exceed the stated dose, and observe the waiting period before
+          harvest. Incorrect pesticide use can harm the crop, the user and the environment.
+        </p>
+      </TabsContent>
+    </Tabs>
   );
 }
 
@@ -655,6 +744,14 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
   const actions: string[] = Array.isArray(d.immediate_actions)
     ? (d.immediate_actions as string[])
     : [];
+  const asPlans = (v: unknown): TreatmentPlan[] => (Array.isArray(v) ? (v as TreatmentPlan[]) : []);
+  const asList = (v: unknown): string[] => (Array.isArray(v) ? (v as string[]) : []);
+  const organicPlans = asPlans(d.treatment_organic_detailed);
+  const chemicalPlans = asPlans(d.treatment_chemical_detailed);
+  const organicList = asList(d.treatment_organic);
+  const chemicalList = asList(d.treatment_chemical);
+  const hasTreatments =
+    organicPlans.length + chemicalPlans.length + organicList.length + chemicalList.length > 0;
   const weatherRisk = (
     d.weather_risk && typeof d.weather_risk === "object"
       ? (d.weather_risk as { level?: RiskLevel; score?: number })
@@ -685,7 +782,22 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
         <div className="mt-5">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Confidence</span>
-            <span className="font-semibold tabular-nums">{d.confidence}%</span>
+            <span className="flex items-center gap-2">
+              {d.confidence >= 80 ? (
+                <Badge variant="outline" className="border-success/40 text-success">
+                  High confidence
+                </Badge>
+              ) : d.confidence >= 60 ? (
+                <Badge variant="outline" className="border-warning/40 text-warning">
+                  Moderate confidence
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-warning/40 text-warning">
+                  Low confidence
+                </Badge>
+              )}
+              <span className="font-semibold tabular-nums">{d.confidence}%</span>
+            </span>
           </div>
           <Progress value={d.confidence} className="mt-2 h-2" />
         </div>
@@ -706,6 +818,20 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
           {d.summary ?? d.reasoning ?? "Detailed explanation is not available for this analysis."}
         </p>
       </div>
+
+      {hasTreatments && (
+        <div className="mt-5">
+          <h3 className="text-sm font-medium">Treatment options</h3>
+          <div className="mt-2">
+            <TreatmentTabs
+              organicPlans={organicPlans}
+              chemicalPlans={chemicalPlans}
+              organicList={organicList}
+              chemicalList={chemicalList}
+            />
+          </div>
+        </div>
+      )}
 
       {actions.length > 0 && (
         <div className="mt-5">

@@ -489,7 +489,7 @@ function AssistantPage() {
                   variant="ghost"
                   size="icon"
                   className="rounded-lg"
-                  onClick={clearPhoto}
+                  onClick={() => clearPhoto()}
                   aria-label="Remove photo"
                 >
                   <X className="h-4 w-4" />

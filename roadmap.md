@@ -5,5 +5,10 @@
 - [x] 3 real scans saved; PDF + matching diseases verified
 - [x] Published; Scan/Diseases/Weather shortcut pages respond
 - [x] Symptoms timeline shows each scan's own leaf photo
-- [ ] Disease photos: cotton leaf curl, cotton Alternaria, sugarcane red rot — no suitable Wikimedia photo found (blocked: need a licensed source/photo from user)
+- [x] Day 1 C1: reverse-geocoding fills farm place name; header falls back to coordinates
+- [x] Day 1 C3: "Load sample farm data" (2 sample scans, is_sample flag, Sample badges)
+- [x] Day 1 C4: confidence tier badges, Organic vs Chemical tabs, pesticide safety disclaimer
+- [x] Day 1 C5: tracker photo tips, equal-height frames, recovery score bars
+- [x] Day 1 C2 (partial): improved no-photo placeholder copy
+- [ ] Disease photos: cotton leaf curl, cotton Alternaria, sugarcane red rot — BLOCKED: no freely licensed photo exists (Wikimedia/Commons have none; Bugwood & government images aren't hotlinkable/redistributable). Needs a user-supplied or explicitly licensed photo.
 - [ ] Per-growth-stage crop photos — blocked: no reliable licensed stage-by-stage photo set; needs user-supplied or approved photos
