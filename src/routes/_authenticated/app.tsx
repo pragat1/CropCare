@@ -18,6 +18,8 @@ import {
   ArrowRight,
   CloudOff,
   Clock,
+  Sprout,
+  FlaskConical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,6 +32,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { TreatmentPlan } from "@/lib/ai.server";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeDetection } from "@/lib/detect.functions";
 import { AppShell } from "@/components/app-shell";
@@ -94,7 +98,7 @@ function DetectPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("detections")
-        .select("id, crop, disease, is_healthy, confidence, severity, created_at, image_path")
+        .select("id, crop, disease, is_healthy, confidence, severity, created_at, image_path, is_sample")
         .order("created_at", { ascending: false })
         .limit(4);
       if (error) throw error;
@@ -542,6 +546,7 @@ type RecentRow = {
   severity: string | null;
   created_at: string;
   image_path: string | null;
+  is_sample: boolean | null;
 };
 
 function RecentScans({
