@@ -744,6 +744,14 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
   const actions: string[] = Array.isArray(d.immediate_actions)
     ? (d.immediate_actions as string[])
     : [];
+  const asPlans = (v: unknown): TreatmentPlan[] => (Array.isArray(v) ? (v as TreatmentPlan[]) : []);
+  const asList = (v: unknown): string[] => (Array.isArray(v) ? (v as string[]) : []);
+  const organicPlans = asPlans(d.treatment_organic_detailed);
+  const chemicalPlans = asPlans(d.treatment_chemical_detailed);
+  const organicList = asList(d.treatment_organic);
+  const chemicalList = asList(d.treatment_chemical);
+  const hasTreatments =
+    organicPlans.length + chemicalPlans.length + organicList.length + chemicalList.length > 0;
   const weatherRisk = (
     d.weather_risk && typeof d.weather_risk === "object"
       ? (d.weather_risk as { level?: RiskLevel; score?: number })
@@ -810,6 +818,20 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
           {d.summary ?? d.reasoning ?? "Detailed explanation is not available for this analysis."}
         </p>
       </div>
+
+      {hasTreatments && (
+        <div className="mt-5">
+          <h3 className="text-sm font-medium">Treatment options</h3>
+          <div className="mt-2">
+            <TreatmentTabs
+              organicPlans={organicPlans}
+              chemicalPlans={chemicalPlans}
+              organicList={organicList}
+              chemicalList={chemicalList}
+            />
+          </div>
+        </div>
+      )}
 
       {actions.length > 0 && (
         <div className="mt-5">
