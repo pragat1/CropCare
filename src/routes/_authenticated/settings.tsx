@@ -106,10 +106,8 @@ function SettingsPage() {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const lat = +pos.coords.latitude.toFixed(4);
-        const lng = +pos.coords.longitude.toFixed(4);
-        set("farm_lat", lat);
-        set("farm_lng", lng);
+        set("farm_lat", +pos.coords.latitude.toFixed(4));
+        set("farm_lng", +pos.coords.longitude.toFixed(4));
         // Auto-name the farm place from coordinates when the field is blank,
         // so location-aware features never show a placeholder.
         const needsName = !form.farm_place?.trim();
