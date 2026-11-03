@@ -634,6 +634,89 @@ function ScanRow({ row }: { row: RecentRow }) {
   );
 }
 
+function PlanItem({ plan }: { plan: TreatmentPlan }) {
+  return (
+    <div className="rounded-xl border border-border/60 bg-muted/20 p-3 text-sm">
+      <p className="font-medium">
+        {plan.name}
+        {plan.active_ingredient ? (
+          <span className="font-normal text-muted-foreground"> · {plan.active_ingredient}</span>
+        ) : null}
+      </p>
+      {(plan.dosage || plan.frequency) && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          {[plan.dosage, plan.frequency].filter(Boolean).join(" · ")}
+        </p>
+      )}
+      {plan.precautions && (
+        <p className="mt-1.5 text-xs text-warning">Safety: {plan.precautions}</p>
+      )}
+    </div>
+  );
+}
+
+function TreatmentTabs({
+  organicPlans,
+  chemicalPlans,
+  organicList,
+  chemicalList,
+}: {
+  organicPlans: TreatmentPlan[];
+  chemicalPlans: TreatmentPlan[];
+  organicList: string[];
+  chemicalList: string[];
+}) {
+  const organicSimple = organicPlans.length === 0 ? organicList : [];
+  const chemicalSimple = chemicalPlans.length === 0 ? chemicalList : [];
+  return (
+    <Tabs defaultValue="organic">
+      <TabsList aria-label="Treatment type">
+        <TabsTrigger value="organic" className="gap-1.5">
+          <Sprout className="h-3.5 w-3.5" aria-hidden /> Organic
+        </TabsTrigger>
+        <TabsTrigger value="chemical" className="gap-1.5">
+          <FlaskConical className="h-3.5 w-3.5" aria-hidden /> Chemical
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="organic" className="mt-3 space-y-2">
+        {organicPlans.map((p, i) => (
+          <PlanItem key={i} plan={p} />
+        ))}
+        {organicSimple.map((t, i) => (
+          <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden />
+            {t}
+          </div>
+        ))}
+        {organicPlans.length === 0 && organicSimple.length === 0 && (
+          <p className="text-sm text-muted-foreground">No organic suggestions for this result.</p>
+        )}
+      </TabsContent>
+      <TabsContent value="chemical" className="mt-3 space-y-2">
+        {chemicalPlans.map((p, i) => (
+          <PlanItem key={i} plan={p} />
+        ))}
+        {chemicalSimple.map((t, i) => (
+          <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/70" aria-hidden />
+            {t}
+          </div>
+        ))}
+        {chemicalPlans.length === 0 && chemicalSimple.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            No chemical suggestions for this result — organic options may be sufficient.
+          </p>
+        )}
+        <p className="rounded-lg border border-border/60 bg-muted/30 p-3 text-xs text-muted-foreground">
+          Pesticide safety: always follow the product label and local regulations, wear protective
+          gear while spraying, never exceed the stated dose, and observe the waiting period before
+          harvest. Incorrect pesticide use can harm the crop, the user and the environment.
+        </p>
+      </TabsContent>
+    </Tabs>
+  );
+}
+
 function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
   const q = useQuery({
     queryKey: ["detection", id],
