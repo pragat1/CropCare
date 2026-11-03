@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { Suspense, lazy, useMemo, useState } from "react";
 import {
@@ -18,7 +19,10 @@ import {
   ScanLine,
   Sprout,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
+import sampleTomatoBlight from "@/assets/sample-tomato-blight.jpg";
+import sampleWheatRust from "@/assets/sample-wheat-rust.jpg";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { FadeIn, Stagger, StaggerItem } from "@/components/motion";
@@ -73,10 +77,123 @@ type Detection = {
   confidence: number | null;
   severity: string | null;
   image_path: string | null;
+  is_sample: boolean | null;
   created_at: string;
 };
 
 const DAY = 86_400_000;
+
+type SamplePlan = {
+  name: string;
+  active_ingredient?: string;
+  dosage: string;
+  frequency: string;
+  precautions: string;
+};
+
+/** Two example scans that populate an empty dashboard on request — clearly
+ *  labelled "Sample" in the UI and deletable from History like any scan. */
+const SAMPLE_SCANS = [
+  {
+    daysAgo: 3,
+    crop: "Tomato",
+    disease: "Late Blight",
+    confidence: 88,
+    severity: "high",
+    plantPart: "leaf",
+    imageName: "sample-tomato-late-blight.jpg",
+    image: sampleTomatoBlight,
+    summary:
+      "Sample scan — dark water-soaked lesions with pale green halos on tomato leaves, consistent with late blight.",
+    symptoms: [
+      "Dark water-soaked lesions with pale borders",
+      "White fungal growth on leaf undersides in humid weather",
+      "Rapid spread to younger leaves",
+    ],
+    causes: ["Cool, humid weather", "Extended leaf wetness", "Overhead irrigation"],
+    treatmentOrganic: [
+      "Remove and destroy infected leaves",
+      "Copper-based fungicide spray every 7 days",
+      "Improve air circulation between plants",
+    ],
+    treatmentChemical: [
+      "Metalaxyl + Mancozeb spray as per label dose",
+      "Alternate fungicide groups to avoid resistance",
+    ],
+    organicPlans: [
+      {
+        name: "Copper fungicide",
+        dosage: "2 g/L of water",
+        frequency: "Every 7 days",
+        precautions: "Wear gloves; avoid spraying in strong sun",
+      },
+    ] as SamplePlan[],
+    chemicalPlans: [
+      {
+        name: "Metalaxyl + Mancozeb",
+        active_ingredient: "Metalaxyl 8% + Mancozeb 64%",
+        dosage: "2.5 g/L of water",
+        frequency: "Every 7–10 days",
+        precautions: "Observe the pre-harvest interval; follow the label",
+      },
+    ] as SamplePlan[],
+    prevention: [
+      "Avoid overhead watering",
+      "Stake plants for airflow",
+      "Rotate tomato beds each season",
+    ],
+    immediateActions: ["Remove visibly infected leaves now", "Start protective fungicide sprays"],
+  },
+  {
+    daysAgo: 1,
+    crop: "Wheat",
+    disease: "Leaf Rust",
+    confidence: 91,
+    severity: "medium",
+    plantPart: "leaf",
+    imageName: "sample-wheat-leaf-rust.jpg",
+    image: sampleWheatRust,
+    summary:
+      "Sample scan — orange-brown rust pustules scattered across the wheat leaf blade, typical of leaf rust.",
+    symptoms: [
+      "Small orange-brown pustules on the leaf blade",
+      "Powdery rust spores that rub off on fingers",
+      "Yellowing around older pustules",
+    ],
+    causes: ["Warm days with humid nights", "Dense canopy and high nitrogen", "Carry-over from nearby fields"],
+    treatmentOrganic: [
+      "Sulphur dust or spray at label rate",
+      "Encourage beneficial insects and balanced nutrition",
+    ],
+    treatmentChemical: [
+      "Propiconazole 25% EC foliar spray as per label",
+      "Repeat once after 15 days if pustules persist",
+    ],
+    organicPlans: [
+      {
+        name: "Sulphur spray",
+        dosage: "2 g/L of water",
+        frequency: "Every 10 days",
+        precautions: "Do not mix with oil sprays; avoid heat of the day",
+      },
+    ] as SamplePlan[],
+    chemicalPlans: [
+      {
+        name: "Propiconazole 25% EC",
+        active_ingredient: "Propiconazole",
+        dosage: "1 mL/L of water",
+        frequency: "Repeat after 15 days if needed",
+        precautions: "Observe the pre-harvest interval; follow the label",
+      },
+    ] as SamplePlan[],
+    prevention: [
+      "Choose rust-tolerant varieties next season",
+      "Avoid excess nitrogen fertilizer",
+      "Monitor fields weekly during warm, humid spells",
+    ],
+    immediateActions: ["Scout the whole field for rust pustules", "Plan a protective spray this week"],
+  },
+];
 
 /** All dashboard numbers come from this single scan query — nothing is synthesised. */
 function useDetections() {
@@ -85,7 +202,7 @@ function useDetections() {
     queryFn: async (): Promise<Detection[]> => {
       const { data, error } = await supabase
         .from("detections")
-        .select("id, crop, disease, is_healthy, confidence, severity, image_path, created_at")
+        .select("id, crop, disease, is_healthy, confidence, severity, image_path, is_sample, created_at")
         .order("created_at", { ascending: false })
         .limit(1000);
       if (error) throw error;
