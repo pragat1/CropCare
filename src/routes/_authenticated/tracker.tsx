@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, LineChart, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Loader2, LineChart, TrendingUp, TrendingDown, Minus, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -101,23 +101,37 @@ function TrackerPage() {
       />
 
       <Card className="mt-8 p-6 space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
+        <div className="flex items-start gap-2.5 rounded-xl border border-border/60 bg-muted/30 p-4">
+          <Camera className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />
+          <div className="text-sm">
+            <p className="font-medium">Photo tips for an accurate comparison</p>
+            <ul className="mt-1.5 grid gap-1 text-xs text-muted-foreground sm:grid-cols-2">
+              <li>Shoot in natural daylight — avoid flash</li>
+              <li>Let the affected leaf fill the frame</li>
+              <li>Photograph the same plant before and after</li>
+              <li>Keep the leaf still and in focus</li>
+            </ul>
+          </div>
+        </div>
+        <div className="grid items-stretch gap-4 sm:grid-cols-2">
+          <div className="flex flex-col">
             <label className="text-sm font-medium">Before treatment</label>
             <div className="mt-2">
               <UploadZone
                 label="Upload before photo"
+                hint="Clear leaf photo taken in natural light · JPG or PNG, up to 8MB"
                 file={before}
                 onFile={setBefore}
                 disabled={mut.isPending}
               />
             </div>
           </div>
-          <div>
+          <div className="flex flex-col">
             <label className="text-sm font-medium">After treatment</label>
             <div className="mt-2">
               <UploadZone
                 label="Upload after photo"
+                hint="Same framing as the before photo · JPG or PNG, up to 8MB"
                 file={after}
                 onFile={setAfter}
                 disabled={mut.isPending}
@@ -196,6 +210,30 @@ function TrackerPage() {
                     </span>
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">{a.summary}</div>
+                  {typeof h.improvement_percent === "number" && (
+                    <div className="mt-2 max-w-xs" aria-label={`Recovery score ${h.improvement_percent}%`}>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Recovery score</span>
+                        <span className="font-medium tabular-nums">
+                          {Math.max(0, Math.min(100, h.improvement_percent))}%
+                        </span>
+                      </div>
+                      <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-muted">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            h.status === "Worse"
+                              ? "bg-destructive"
+                              : h.status === "Improved"
+                                ? "bg-primary"
+                                : "bg-muted-foreground/40"
+                          }`}
+                          style={{
+                            width: `${Math.max(0, Math.min(100, h.improvement_percent))}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="text-xs text-muted-foreground mt-1">
                     {new Date(h.created_at).toLocaleString()}
                   </div>
