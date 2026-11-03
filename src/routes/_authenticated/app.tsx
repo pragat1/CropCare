@@ -622,6 +622,7 @@ function ScanRow({ row }: { row: RecentRow }) {
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-2">
+        {row.is_sample && <Badge variant="secondary">Sample</Badge>}
         {row.severity && !row.is_healthy && (
           <Badge variant="outline" className="capitalize">
             {row.severity}
@@ -690,7 +691,22 @@ function ResultCard({ id, onNewScan }: { id: string; onNewScan: () => void }) {
         <div className="mt-5">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Confidence</span>
-            <span className="font-semibold tabular-nums">{d.confidence}%</span>
+            <span className="flex items-center gap-2">
+              {d.confidence >= 80 ? (
+                <Badge variant="outline" className="border-success/40 text-success">
+                  High confidence
+                </Badge>
+              ) : d.confidence >= 60 ? (
+                <Badge variant="outline" className="border-warning/40 text-warning">
+                  Moderate confidence
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border-warning/40 text-warning">
+                  Low confidence
+                </Badge>
+              )}
+              <span className="font-semibold tabular-nums">{d.confidence}%</span>
+            </span>
           </div>
           <Progress value={d.confidence} className="mt-2 h-2" />
         </div>
