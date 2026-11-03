@@ -138,6 +138,7 @@ export type Database = {
           image_path: string
           immediate_actions: Json | null
           is_healthy: boolean
+          is_sample: boolean
           plant_part: string | null
           prevention: Json | null
           raw: Json | null
@@ -166,6 +167,7 @@ export type Database = {
           image_path: string
           immediate_actions?: Json | null
           is_healthy?: boolean
+          is_sample?: boolean
           plant_part?: string | null
           prevention?: Json | null
           raw?: Json | null
@@ -194,6 +196,7 @@ export type Database = {
           image_path?: string
           immediate_actions?: Json | null
           is_healthy?: boolean
+          is_sample?: boolean
           plant_part?: string | null
           prevention?: Json | null
           raw?: Json | null
