@@ -327,6 +327,55 @@ function ScanThumb({ path, alt }: { path: string | null; alt: string }) {
 
 /** Shown only while the account has zero scans. Contains no data claims. */
 function WelcomeCard() {
+  const qc = useQueryClient();
+  const loadSample = useMutation({
+    mutationFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) throw new Error("You need to be signed in.");
+      for (const s of SAMPLE_SCANS) {
+        const blob = await (await fetch(s.image)).blob();
+        const path = `${uid}/${s.imageName}`;
+        const { error: upErr } = await supabase.storage.from("leaf-images").upload(path, blob, {
+          contentType: "image/jpeg",
+          upsert: false,
+        });
+        if (upErr) throw upErr;
+        const { error } = await supabase.from("detections").insert({
+          user_id: uid,
+          crop: s.crop,
+          image_path: path,
+          is_healthy: false,
+          disease: s.disease,
+          confidence: s.confidence,
+          severity: s.severity,
+          plant_part: s.plantPart,
+          summary: s.summary,
+          symptoms: s.symptoms,
+          causes: s.causes,
+          treatment_organic: s.treatmentOrganic,
+          treatment_chemical: s.treatmentChemical,
+          treatment_organic_detailed: s.organicPlans,
+          treatment_chemical_detailed: s.chemicalPlans,
+          immediate_actions: s.immediateActions,
+          prevention: s.prevention,
+          is_sample: true,
+          created_at: new Date(Date.now() - s.daysAgo * DAY).toISOString(),
+        });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["recent-detections"] });
+      qc.invalidateQueries({ queryKey: ["history"] });
+      toast.success(
+        'Sample farm data added — the scans are labelled "Sample" and can be deleted from History.',
+      );
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Couldn't add sample data"),
+  });
+
   return (
     <Card className="mt-6 overflow-hidden p-6 md:p-8">
       <div className="grid gap-6 md:grid-cols-[auto_minmax(0,1fr)] md:items-center">
@@ -350,7 +399,24 @@ function WelcomeCard() {
                 <MapPin className="h-4 w-4" aria-hidden /> Add farm location
               </Button>
             </Link>
+            <Button
+              variant="secondary"
+              className="gap-2 rounded-full"
+              disabled={loadSample.isPending}
+              onClick={() => loadSample.mutate()}
+            >
+              {loadSample.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <Sprout className="h-4 w-4" aria-hidden />
+              )}
+              Load sample farm data
+            </Button>
           </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            "Load sample farm data" adds two example scans labelled "Sample" so you can explore the
+            dashboard — delete them anytime from History.
+          </p>
         </div>
       </div>
     </Card>
@@ -805,7 +871,14 @@ function DashboardPage() {
                         >
                           <ScanThumb path={d.image_path} alt={`${d.crop} leaf scan`} />
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-sm font-medium">{d.crop}</span>
+                            <span className="flex items-center gap-2">
+                              <span className="min-w-0 truncate text-sm font-medium">{d.crop}</span>
+                              {d.is_sample && (
+                                <Badge variant="secondary" className="shrink-0 text-[10px]">
+                                  Sample
+                                </Badge>
+                              )}
+                            </span>
                             <span className="block truncate text-xs text-muted-foreground">
                               {d.is_healthy ? "Healthy" : (d.disease ?? "Disease detected")}
                               {d.severity ? ` · ${d.severity} severity` : ""}
