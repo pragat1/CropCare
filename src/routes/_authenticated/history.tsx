@@ -33,7 +33,7 @@ function HistoryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("detections")
-        .select("id, crop, disease, is_healthy, confidence, severity, summary, created_at")
+        .select("id, crop, disease, is_healthy, confidence, severity, summary, is_sample, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -129,6 +129,7 @@ function HistoryPage() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-1">
+                  {d.is_sample && <Badge variant="secondary">Sample</Badge>}
                   <Badge variant="secondary">{d.confidence ?? 0}%</Badge>
                   {d.severity && !d.is_healthy && (
                     <Badge variant="outline" className="text-xs capitalize">
