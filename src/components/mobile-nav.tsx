@@ -22,7 +22,7 @@ export function MobileNav() {
     >
       <div className="mx-auto grid max-w-md grid-cols-5 items-end px-2 pb-[max(env(safe-area-inset-bottom),0.4rem)] pt-1">
         <Link to="/dashboard" className={linkClass(isActive("/dashboard"))}>
-          <IconHome className="h-5 w-5" aria-hidden />
+          <LayoutDashboard className="h-5 w-5" aria-hidden />
           <span>Home</span>
         </Link>
         <Link to="/assistant" className={linkClass(isActive("/assistant"))}>
