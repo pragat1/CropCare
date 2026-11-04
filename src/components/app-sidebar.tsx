@@ -9,7 +9,6 @@ import {
   LineChart,
   LogOut,
   ScanLine,
-  Settings,
   ShieldCheck,
   Sprout,
   MessageCircle,
