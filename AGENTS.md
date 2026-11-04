@@ -12,3 +12,4 @@
 <!-- LOVABLE:END -->
 
 - Disease reference pages read published `content_items` directly, never bundled demo fallbacks, because the reference library must show only verified database records.
+- Sample/demo scans live in `public.detections` with `is_sample = true` and must always surface a "Sample" badge in the UI; every query that renders scans to users includes the flag so sample data is never mistaken for real farm history.
