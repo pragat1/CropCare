@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar, initialsOf } from "@/components/app-sidebar";
+import { MobileNav } from "@/components/mobile-nav";
 import { SyncStatus } from "@/components/sync-status";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -83,9 +84,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               </Link>
             </div>
           </header>
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-6 md:py-10">
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-8 md:px-6 md:pb-10 md:pt-10">
             {children}
           </main>
+          <MobileNav />
         </SidebarInset>
       </div>
     </SidebarProvider>
