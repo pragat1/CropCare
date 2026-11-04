@@ -15,8 +15,6 @@ export function MobileNav() {
       active ? "text-primary" : "text-muted-foreground hover:text-foreground"
     }`;
 
-  const IconHome = LayoutDashboard;
-
   return (
     <nav
       aria-label="Primary mobile"
