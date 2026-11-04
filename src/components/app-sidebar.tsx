@@ -1,17 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  BarChart3,
   Bell,
   BookOpen,
-  Brain,
-  CalendarDays,
   CloudSun,
   History,
-  Info,
   LayoutDashboard,
   Leaf,
   LineChart,
-  Lightbulb,
   LogOut,
   ScanLine,
   Settings,
@@ -32,40 +27,30 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { useProfile } from "@/lib/profile";
 
-type NavItem = { to: string; label: string; icon: typeof Info };
+type NavItem = { to: string; label: string; icon: typeof History };
 
-const MONITOR: NavItem[] = [
+// Farmer-first menu: the daily field tools up top, guidance below.
+// Secondary pages (history, settings) live in the footer; admin only for admins.
+const FARM: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/app", label: "Detect Disease", icon: ScanLine },
-  { to: "/assistant", label: "AI Assistant", icon: MessageCircle },
-  { to: "/soil", label: "Soil Analysis", icon: Sprout },
-  { to: "/weather", label: "Weather", icon: CloudSun },
   { to: "/tracker", label: "Treatment Tracker", icon: LineChart },
   { to: "/reminders", label: "Reminders", icon: Bell },
+  { to: "/soil", label: "Soil Analysis", icon: Sprout },
+  { to: "/weather", label: "Weather", icon: CloudSun },
 ];
 
-const LEARN: NavItem[] = [
-  { to: "/diseases", label: "Diseases", icon: BookOpen },
-  { to: "/crops", label: "Crop profiles", icon: Leaf },
-  { to: "/tips", label: "Tips", icon: Lightbulb },
-  { to: "/seasons", label: "Seasons", icon: CalendarDays },
-  { to: "/quiz", label: "Quiz", icon: Brain },
-];
-
-const ACCOUNT: NavItem[] = [
-  { to: "/history", label: "History", icon: History },
-  { to: "/analytics", label: "Analytics", icon: BarChart3 },
-  { to: "/settings", label: "Settings", icon: Settings },
-  { to: "/about", label: "About", icon: Info },
+const GUIDE: NavItem[] = [
+  { to: "/assistant", label: "AI Assistant", icon: MessageCircle },
+  { to: "/diseases", label: "Disease Guide", icon: BookOpen },
 ];
 
 export function initialsOf(name: string | null | undefined) {
   const source = (name ?? "").trim();
-  if (!source) return "LS";
+  if (!source) return "CC";
   return source
     .split(/\s+/)
     .slice(0, 2)
@@ -84,12 +69,13 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
   const close = () => isMobile && setOpenMobile(false);
 
   const groups: Array<{ label: string; items: NavItem[] }> = [
-    { label: "Monitor", items: MONITOR },
-    { label: "Learn", items: LEARN },
-    {
-      label: "Account",
-      items: isAdmin ? [...ACCOUNT, { to: "/admin", label: "Admin", icon: ShieldCheck }] : ACCOUNT,
-    },
+    { label: "Farm", items: FARM },
+    { label: "Guide", items: GUIDE },
+  ];
+
+  const footerItems: NavItem[] = [
+    { to: "/history", label: "History", icon: History },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin", icon: ShieldCheck }] : []),
   ];
 
   return (
@@ -140,18 +126,17 @@ export function AppSidebar({ onSignOut }: { onSignOut: () => void }) {
       </SidebarContent>
 
       <SidebarFooter>
-        {!collapsed && (
-          <div className="mb-1 rounded-xl border border-border/60 bg-primary/5 p-3">
-            <p className="text-sm font-medium">Go Premium</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Advanced analytics and priority support are coming soon.
-            </p>
-            <Button size="sm" variant="secondary" className="mt-3 w-full rounded-full" disabled>
-              Upgrade Now
-            </Button>
-          </div>
-        )}
         <SidebarMenu>
+          {footerItems.map(({ to, label, icon: Icon }) => (
+            <SidebarMenuItem key={to}>
+              <SidebarMenuButton asChild isActive={isActive(to)} tooltip={label}>
+                <Link to={to} onClick={close}>
+                  <Icon aria-hidden />
+                  <span>{label}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Settings">
               <Link to="/settings" onClick={close}>
