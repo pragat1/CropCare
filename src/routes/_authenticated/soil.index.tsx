@@ -142,8 +142,8 @@ function SoilPage() {
         description="Understand your soil before you plant. Upload a photo to analyze its visible characteristics and get insights from CropCare."
       />
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-2">
-        <Card className="p-6">
+      <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-2">
+        <Card className="flex h-full flex-col p-6">
           <h2 className="font-serif text-lg font-semibold">Analyze your soil</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Upload a clear photo of your soil for analysis.
@@ -179,9 +179,9 @@ function SoilPage() {
         </Card>
 
         {mutation.isPending || resultId ? (
-          <Card className="p-6">
+          <Card className="flex h-full flex-col p-6">
             {result.isLoading || mutation.isPending ? (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex flex-1 items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" /> Preparing your soil report…
               </div>
             ) : s ? (
@@ -232,7 +232,7 @@ function SoilPage() {
                   </div>
                 )}
 
-                <Button asChild className="mt-5 gap-2" variant="outline">
+                <Button asChild className="mt-auto self-start pt-5 gap-2" variant="outline">
                   <Link to="/soil/$id" params={{ id: s.id }}>
                     View full report <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -243,8 +243,8 @@ function SoilPage() {
             )}
           </Card>
         ) : (
-          <FadeIn delay={0.1}>
-            <Card className="p-6">
+          <FadeIn delay={0.1} className="h-full">
+            <Card className="h-full p-6">
               <h2 className="font-serif text-lg font-semibold">What can soil analysis tell you?</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Our AI reviews your soil photo to provide insights on:

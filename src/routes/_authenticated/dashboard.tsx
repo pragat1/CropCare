@@ -758,8 +758,8 @@ function DashboardPage() {
               </FadeIn>
 
               <FadeIn delay={0.06}>
-                <div className="grid gap-6 lg:grid-cols-2">
-                  <Card className="min-w-0 p-6">
+                <div className="grid items-stretch gap-6 lg:grid-cols-2">
+                  <Card className="h-full min-w-0 p-6">
                     <h2 className="font-serif text-lg font-semibold">Disease distribution</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Breakdown of detected diseases.
@@ -794,7 +794,7 @@ function DashboardPage() {
                     )}
                   </Card>
 
-                  <Card className="min-w-0 p-6">
+                  <Card className="h-full min-w-0 p-6">
                     <h2 className="font-serif text-lg font-semibold">Crops you scan most</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       Healthy scan rate per crop.{" "}
