@@ -98,10 +98,12 @@ function SoilPage() {
     queryKey: ["soil", resultId],
     enabled: !!resultId,
     queryFn: async () => {
+      const id = resultId;
+      if (!id) throw new Error("Soil report is unavailable");
       const { data, error } = await supabase
         .from("soil_analyses")
         .select("*")
-        .eq("id", resultId!)
+        .eq("id", id)
         .single();
       if (error) throw error;
       return data;
@@ -232,7 +234,7 @@ function SoilPage() {
                   </div>
                 )}
 
-                <Button asChild className="mt-auto self-start pt-5 gap-2" variant="outline">
+                <Button asChild className="mt-auto self-start gap-2" variant="outline">
                   <Link to="/soil/$id" params={{ id: s.id }}>
                     View full report <ArrowRight className="h-4 w-4" />
                   </Link>
