@@ -12,8 +12,8 @@
 - [x] Day 1 C2 (partial): improved no-photo placeholder copy
 - [x] Day 2 C6: sidebar pruned to farmer-first menu (Farm + Guide groups, Quiz/Tips/Seasons/Crop profiles/Analytics/About removed from nav, routes kept; fake "Go Premium/Upgrade Now" banner removed; History/Admin moved to footer)
 - [x] Day 2 C9: mobile thumb nav bar (Home, Assistant, raised Detect button, Guide, Menu; safe-area padding; 0 horizontal overflow)
-- [ ] Day 2 C7: header & nav polish (location pill states, collapsed-sidebar labels)
-- [ ] Day 2 C8: unified visual tokens / equal card heights across dashboard pages
-- [ ] Day 2 C10: soil analysis polish
+- [x] Day 2 C7: header & nav polish (responsive location pill, visible unset-location state, keyboard focus)
+- [x] Day 2 C8: unified card sizing across dashboard and soil analysis/detail grids
+- [x] Day 2 C10: soil analysis polish (equal-height analysis panels, semantically marked soil lists)
 - [ ] Disease photos: cotton leaf curl, cotton Alternaria, sugarcane red rot — BLOCKED: no freely licensed photo exists (Wikimedia/Commons have none; Bugwood & government images aren't hotlinkable/redistributable). Needs a user-supplied or explicitly licensed photo.
 - [ ] Per-growth-stage crop photos — blocked: no reliable licensed stage-by-stage photo set; needs user-supplied or approved photos

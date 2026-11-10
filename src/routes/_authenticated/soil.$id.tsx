@@ -115,23 +115,23 @@ function SoilDetail() {
             <Badge variant="secondary">pH: {s.ph_range ?? "—"}</Badge>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <Card className="p-4">
+          <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2">
+            <Card className="h-full p-4">
               <h3 className="font-semibold mb-2">Recommended crops</h3>
-              <ul className="text-sm space-y-1">
+              <ul className="list-disc space-y-1 pl-5 text-sm">
                 {arr(s.recommended_crops).map((c, i) => (
-                  <li key={i}>• {c}</li>
+                  <li key={i}>{c}</li>
                 ))}
                 {arr(s.recommended_crops).length === 0 && (
                   <li className="text-muted-foreground">No suggestions.</li>
                 )}
               </ul>
             </Card>
-            <Card className="p-4">
+            <Card className="h-full p-4">
               <h3 className="font-semibold mb-2">Care tips</h3>
-              <ul className="text-sm space-y-1">
+              <ul className="list-disc space-y-1 pl-5 text-sm">
                 {arr(s.tips).map((t, i) => (
-                  <li key={i}>• {t}</li>
+                  <li key={i}>{t}</li>
                 ))}
                 {arr(s.tips).length === 0 && <li className="text-muted-foreground">No tips.</li>}
               </ul>

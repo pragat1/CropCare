@@ -49,16 +49,20 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-dvh w-full bg-background bg-mesh">
         <AppSidebar onSignOut={signOut} />
         <SidebarInset className="min-w-0 bg-transparent">
-          <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border/50 bg-background/70 px-3 backdrop-blur-xl md:px-6">
+          <header className="sticky top-0 z-30 grid h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b border-border/50 bg-background/70 px-3 backdrop-blur-xl md:px-6">
             <SidebarTrigger className="min-h-10 min-w-10" />
             <Link
               to="/settings"
-              className="flex min-w-0 items-center gap-1.5 rounded-full border border-border/50 bg-card/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              aria-label={`Farm location: ${locationLabel}. Open settings to update.`}
+              title={locationLabel}
+              className="flex min-w-0 max-w-full items-center gap-1.5 justify-self-start rounded-full border border-border/50 bg-card/50 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden />
-              <span className="truncate">{locationLabel}</span>
+              <span className={`truncate ${locationLabel === "Add farm location" ? "text-primary" : ""}`}>
+                {locationLabel}
+              </span>
             </Link>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <SyncStatus className="hidden sm:flex" />
               <Link to="/reminders" className="relative">
                 <Button

@@ -66,19 +66,19 @@ function SoilTypePage() {
         <Badge variant="secondary">Water retention: {g.retention}</Badge>
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <Card className="p-5">
+      <div className="mt-6 grid items-stretch gap-4 md:grid-cols-2">
+        <Card className="h-full p-5">
           <h2 className="flex items-center gap-2 font-semibold">
             <Leaf className="h-4 w-4 text-primary" /> Best-suited crops
           </h2>
-          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
             {g.crops.map((c) => (
-              <li key={c}>• {c}</li>
+              <li key={c}>{c}</li>
             ))}
           </ul>
         </Card>
 
-        <Card className="p-5">
+        <Card className="h-full p-5">
           <h2 className="flex items-center gap-2 font-semibold">
             <Droplets className="h-4 w-4 text-primary" /> Water &amp; drainage
           </h2>
@@ -93,9 +93,9 @@ function SoilTypePage() {
             <Wrench className="h-4 w-4 text-primary" /> Maintenance
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">{g.maintenance}</p>
-          <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
             {g.tips.map((t) => (
-              <li key={t}>• {t}</li>
+              <li key={t}>{t}</li>
             ))}
           </ul>
         </Card>
